@@ -20,7 +20,9 @@ destination::destination( wxWindow* parent, wxWindowID id, const wxString& title
 	wxBoxSizer* bSizer24;
 	bSizer24 = new wxBoxSizer( wxHORIZONTAL );
 	
-	m_destinationList = new wxListBox( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, NULL, 0 ); 
+	m_destinationList = new wxListCtrl( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_REPORT|wxLC_SINGLE_SEL );
+	m_destinationList->SetMinSize( wxSize( 5,5 ) );
+	
 	bSizer24->Add( m_destinationList, 1, wxALL|wxEXPAND, 5 );
 	
 	wxBoxSizer* bSizer30;
@@ -70,8 +72,8 @@ destination::destination( wxWindow* parent, wxWindowID id, const wxString& title
 	wxBoxSizer* bSizer32;
 	bSizer32 = new wxBoxSizer( wxHORIZONTAL );
 	
-	m_host = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer32->Add( m_host, 1, wxALL, 5 );
+	m_destinationHost = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer32->Add( m_destinationHost, 1, wxALL, 5 );
 	
 	
 	fgSizer2->Add( bSizer32, 1, wxEXPAND, 5 );
@@ -83,8 +85,10 @@ destination::destination( wxWindow* parent, wxWindowID id, const wxString& title
 	wxBoxSizer* bSizer29;
 	bSizer29 = new wxBoxSizer( wxHORIZONTAL );
 	
-	m_port = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer29->Add( m_port, 1, wxALL, 5 );
+	m_destinationPort = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_destinationPort->SetValidator( wxTextValidator( wxFILTER_NUMERIC, &m_port ) );
+	
+	bSizer29->Add( m_destinationPort, 1, wxALL, 5 );
 	
 	
 	fgSizer2->Add( bSizer29, 1, wxEXPAND, 5 );
@@ -96,8 +100,8 @@ destination::destination( wxWindow* parent, wxWindowID id, const wxString& title
 	wxBoxSizer* bSizer33;
 	bSizer33 = new wxBoxSizer( wxHORIZONTAL );
 	
-	m_destinationAE = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer33->Add( m_destinationAE, 1, wxALL, 5 );
+	m_destinationAETitle = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer33->Add( m_destinationAETitle, 1, wxALL, 5 );
 	
 	
 	fgSizer2->Add( bSizer33, 1, wxEXPAND, 5 );
@@ -109,8 +113,8 @@ destination::destination( wxWindow* parent, wxWindowID id, const wxString& title
 	wxBoxSizer* bSizer25;
 	bSizer25 = new wxBoxSizer( wxHORIZONTAL );
 	
-	m_sourceAE = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer25->Add( m_sourceAE, 1, wxALL, 5 );
+	m_ourAETitle = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer25->Add( m_ourAETitle, 1, wxALL, 5 );
 	
 	
 	fgSizer2->Add( bSizer25, 1, wxEXPAND, 5 );
@@ -121,42 +125,42 @@ destination::destination( wxWindow* parent, wxWindowID id, const wxString& title
 	
 	bSizer23->Add( 0, 5, 0, wxEXPAND, 5 );
 	
-	wxBoxSizer* bSizer27;
-	bSizer27 = new wxBoxSizer( wxHORIZONTAL );
+	m_sdbSizer2 = new wxStdDialogButtonSizer();
+	m_sdbSizer2OK = new wxButton( this, wxID_OK );
+	m_sdbSizer2->AddButton( m_sdbSizer2OK );
+	m_sdbSizer2Cancel = new wxButton( this, wxID_CANCEL );
+	m_sdbSizer2->AddButton( m_sdbSizer2Cancel );
+	m_sdbSizer2->Realize();
 	
-	wxBoxSizer* bSizer34;
-	bSizer34 = new wxBoxSizer( wxVERTICAL );
-	
-	m_panel4 = new wxPanel( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
-	bSizer34->Add( m_panel4, 1, wxEXPAND | wxALL, 5 );
-	
-	
-	bSizer27->Add( bSizer34, 1, wxEXPAND, 5 );
-	
-	wxBoxSizer* bSizer26;
-	bSizer26 = new wxBoxSizer( wxHORIZONTAL );
-	
-	m_ok = new wxButton( this, wxID_ANY, _("OK"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer26->Add( m_ok, 0, wxALL, 5 );
-	
-	m_cancel = new wxButton( this, wxID_ANY, _("Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer26->Add( m_cancel, 0, wxALL, 5 );
-	
-	
-	bSizer27->Add( bSizer26, 0, wxEXPAND, 5 );
-	
-	
-	bSizer23->Add( bSizer27, 0, wxEXPAND, 5 );
+	bSizer23->Add( m_sdbSizer2, 0, wxALIGN_LEFT|wxALIGN_TOP|wxBOTTOM|wxEXPAND, 5 );
 	
 	
 	this->SetSizer( bSizer23 );
 	this->Layout();
 	
 	this->Centre( wxBOTH );
+	
+	// Connect Events
+	this->Connect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( destination::OnInitDialog ) );
+	m_destinationList->Connect( wxEVT_COMMAND_LIST_ITEM_DESELECTED, wxListEventHandler( destination::OnDeselected ), NULL, this );
+	m_destinationList->Connect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( destination::OnSelect ), NULL, this );
+	m_add->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( destination::OnAdd ), NULL, this );
+	m_delete->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( destination::OnDelete ), NULL, this );
+	m_name->Connect( wxEVT_KEY_UP, wxKeyEventHandler( destination::OnNameUpdate ), NULL, this );
+	m_sdbSizer2OK->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( destination::OnOK ), NULL, this );
 }
 
 destination::~destination()
 {
+	// Disconnect Events
+	this->Disconnect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( destination::OnInitDialog ) );
+	m_destinationList->Disconnect( wxEVT_COMMAND_LIST_ITEM_DESELECTED, wxListEventHandler( destination::OnDeselected ), NULL, this );
+	m_destinationList->Disconnect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( destination::OnSelect ), NULL, this );
+	m_add->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( destination::OnAdd ), NULL, this );
+	m_delete->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( destination::OnDelete ), NULL, this );
+	m_name->Disconnect( wxEVT_KEY_UP, wxKeyEventHandler( destination::OnNameUpdate ), NULL, this );
+	m_sdbSizer2OK->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( destination::OnOK ), NULL, this );
+	
 }
 
 mainFrame::mainFrame( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
@@ -296,6 +300,10 @@ mainFrame::mainFrame( wxWindow* parent, wxWindowID id, const wxString& title, co
 	// Connect Events
 	m_button5->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnBrowse ), NULL, this );
 	m_button6->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnDestinationEdit ), NULL, this );
+	m_update->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnUpdate ), NULL, this );
+	m_send->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnSend ), NULL, this );
+	m_about->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnAbout ), NULL, this );
+	m_exit->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnExit ), NULL, this );
 }
 
 mainFrame::~mainFrame()
@@ -303,6 +311,10 @@ mainFrame::~mainFrame()
 	// Disconnect Events
 	m_button5->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnBrowse ), NULL, this );
 	m_button6->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnDestinationEdit ), NULL, this );
+	m_update->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnUpdate ), NULL, this );
+	m_send->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnSend ), NULL, this );
+	m_about->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnAbout ), NULL, this );
+	m_exit->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnExit ), NULL, this );
 	
 }
 
@@ -431,5 +443,26 @@ changePatientInfo::changePatientInfo( wxWindow* parent, wxWindowID id, const wxS
 }
 
 changePatientInfo::~changePatientInfo()
+{
+}
+
+MyDialog4::MyDialog4( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	wxBoxSizer* bSizer30;
+	bSizer30 = new wxBoxSizer( wxVERTICAL );
+	
+	m_treeCtrl1 = new wxTreeCtrl( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTR_DEFAULT_STYLE );
+	bSizer30->Add( m_treeCtrl1, 0, wxALL, 5 );
+	
+	
+	this->SetSizer( bSizer30 );
+	this->Layout();
+	
+	this->Centre( wxBOTH );
+}
+
+MyDialog4::~MyDialog4()
 {
 }

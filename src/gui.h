@@ -11,25 +11,26 @@
 #include <wx/artprov.h>
 #include <wx/xrc/xmlres.h>
 #include <wx/intl.h>
-#include <wx/string.h>
-#include <wx/listbox.h>
+#include <wx/listctrl.h>
 #include <wx/gdicmn.h>
 #include <wx/font.h>
 #include <wx/colour.h>
 #include <wx/settings.h>
+#include <wx/string.h>
 #include <wx/button.h>
 #include <wx/sizer.h>
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
-#include <wx/panel.h>
+#include <wx/valtext.h>
 #include <wx/dialog.h>
 #include <wx/combobox.h>
-#include <wx/listctrl.h>
 #include <wx/bitmap.h>
 #include <wx/image.h>
 #include <wx/icon.h>
 #include <wx/statbmp.h>
+#include <wx/panel.h>
 #include <wx/frame.h>
+#include <wx/treectrl.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -42,25 +43,36 @@ class destination : public wxDialog
 	private:
 	
 	protected:
-		wxListBox* m_destinationList;
+		wxListCtrl* m_destinationList;
 		wxButton* m_add;
 		wxButton* m_delete;
 		wxButton* m_button12;
 		wxStaticText* m_staticText3;
 		wxTextCtrl* m_name;
 		wxStaticText* m_staticText4;
-		wxTextCtrl* m_host;
+		wxTextCtrl* m_destinationHost;
 		wxStaticText* m_staticText5;
-		wxTextCtrl* m_port;
+		wxTextCtrl* m_destinationPort;
 		wxStaticText* m_staticText6;
-		wxTextCtrl* m_destinationAE;
+		wxTextCtrl* m_destinationAETitle;
 		wxStaticText* m_staticText7;
-		wxTextCtrl* m_sourceAE;
-		wxPanel* m_panel4;
-		wxButton* m_ok;
-		wxButton* m_cancel;
+		wxTextCtrl* m_ourAETitle;
+		wxStdDialogButtonSizer* m_sdbSizer2;
+		wxButton* m_sdbSizer2OK;
+		wxButton* m_sdbSizer2Cancel;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnInitDialog( wxInitDialogEvent& event ) { event.Skip(); }
+		virtual void OnDeselected( wxListEvent& event ) { event.Skip(); }
+		virtual void OnSelect( wxListEvent& event ) { event.Skip(); }
+		virtual void OnAdd( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnDelete( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnNameUpdate( wxKeyEvent& event ) { event.Skip(); }
+		virtual void OnOK( wxCommandEvent& event ) { event.Skip(); }
+		
 	
 	public:
+		wxString m_port; 
 		
 		destination( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Destinations"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 469,555 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
 		~destination();
@@ -95,6 +107,10 @@ class mainFrame : public wxFrame
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnBrowse( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnDestinationEdit( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnUpdate( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnSend( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnAbout( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnExit( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:
@@ -147,6 +163,23 @@ class changePatientInfo : public wxDialog
 		
 		changePatientInfo( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Change Patient Info"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 353,208 ), long style = wxDEFAULT_DIALOG_STYLE ); 
 		~changePatientInfo();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class MyDialog4
+///////////////////////////////////////////////////////////////////////////////
+class MyDialog4 : public wxDialog 
+{
+	private:
+	
+	protected:
+		wxTreeCtrl* m_treeCtrl1;
+	
+	public:
+		
+		MyDialog4( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 528,347 ), long style = wxDEFAULT_DIALOG_STYLE ); 
+		~MyDialog4();
 	
 };
 

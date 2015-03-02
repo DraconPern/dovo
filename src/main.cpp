@@ -16,7 +16,6 @@ public:
 wxIMPLEMENT_APP(MyApp);
 bool MyApp::OnInit()
 {
-
 	dovo_mainFrame *frame = new dovo_mainFrame(NULL);
 	frame->Show( true );
 	return true;

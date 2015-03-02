@@ -10,12 +10,12 @@ SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
 set(Boost_USE_STATIC_LIBS        ON)
 set(Boost_USE_MULTITHREADED      ON)
 #set(Boost_USE_STATIC_RUNTIME     OFF)
-#find_package(Boost REQUIRED thread filesystem)
+find_package(Boost REQUIRED thread filesystem)
 
 find_package(wxWidgets COMPONENTS core base REQUIRED)
 include(${wxWidgets_USE_FILE})
 
-#INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR} ${DCMTK_ROOT}/include ${ZLIB_INCDIR} ${Boost_INCLUDE_DIRS} ${DCMJPEG2000}/include ${IMAGEMAGICK} ${IMAGEMAGICK}/Magick++/lib ${WTL}/include ${ULTIMATETOOLBOX}/include )
+INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR} ${Boost_INCLUDE_DIRS} ${DCMJPEG2000}/include )
 #LINK_DIRECTORIES(${DCMTK_ROOT}/lib ${ZLIB_LIBDIR} ${Boost_LIBRARY_DIRS} ${DCMJPEG2000}/lib ${IMAGEMAGICK}/VisualMagick/lib ${ULTIMATETOOLBOX}/lib/Libs)
 
 set(dovo_HEADERS	
@@ -24,6 +24,7 @@ set(dovo_HEADERS
 	src/dovo_changePatientInfo.h
 	src/dovo_destination.h
 	src/dovo_mainFrame.h
+	src/destinationentry.h
 )
 
 set(dovo_SRCS

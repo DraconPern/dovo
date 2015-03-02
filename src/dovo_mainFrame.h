@@ -21,6 +21,10 @@ class dovo_mainFrame : public mainFrame
 		// Handlers for mainFrame events.
 		void OnBrowse( wxCommandEvent& event );
 		void OnDestinationEdit( wxCommandEvent& event );
+		void OnUpdate( wxCommandEvent& event );
+		void OnSend( wxCommandEvent& event );
+		void OnAbout( wxCommandEvent& event );
+		void OnExit( wxCommandEvent& event );
 	public:
 		/** Constructor */
 		dovo_mainFrame( wxWindow* parent );
@@ -29,6 +33,7 @@ class dovo_mainFrame : public mainFrame
 		~dovo_mainFrame();
 		void SetDestinations();
 		std::vector<DestinationEntry> destinations, policyDestinations;
+
 };
 
 #endif // __dovo_mainFrame__
