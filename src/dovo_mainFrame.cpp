@@ -3,43 +3,13 @@
 dovo_mainFrame::dovo_mainFrame( wxWindow* parent )
 	:
 	mainFrame( parent )
-{
-	wxConfig config("fmdeye", "FrontMotion");
+{	
+	wxConfig::Get()->SetPath("/Settings");
+	m_directory->SetValue(wxConfig::Get()->Read("LastDir"));
 
-	config.SetPath("/Settings");
-	m_directory->SetValue(config.Read("LastDir"));
+	LoadDestinationList();
 
-	config.SetPath("/Destinations");
-	wxString str;
-	long dummy;
-	// first enum all entries
-	bool bCont = config.GetFirstEntry(str, dummy);
-	while ( bCont ) 
-	{
-		using namespace boost::spirit::classic;
-
-		wxString data;
-		std::vector<std::string> items;
-		data = config.Read(str);
-		parse((const char*)data.mb_str(wxConvUTF8),
-			((*(anychar_p - L','))[append(items)]) >>
-			(L',') >>
-			((*(anychar_p - L','))[append(items)]) >>
-			(L',') >>
-			((*(anychar_p - L','))[append(items)]) >>
-			(L',') >>
-			((*(anychar_p - L','))[append(items)]) >>
-			(L',') >>
-			(*anychar_p)[append(items)]
-		, space_p);
-
-		if(items.size() == 5)
-			destinations.push_back(DestinationEntry(items[0].c_str(), items[1].c_str(), atoi(items[2].c_str()), items[3].c_str(), items[4].c_str()));
-
-		bCont = config.GetNextEntry(str, dummy);
-	}
-
-	SetDestinations();
+	FillDestinationList();
 }
 
 void dovo_mainFrame::OnBrowse( wxCommandEvent& event )
@@ -60,7 +30,7 @@ void dovo_mainFrame::OnDestinationEdit( wxCommandEvent& event )
 	if(dlg.ShowModal() == wxID_OK)
 	{
 		destinations = dlg.m_destinations;
-		SetDestinations();
+		FillDestinationList();
 	}
 }
 
@@ -86,21 +56,95 @@ void dovo_mainFrame::OnExit( wxCommandEvent& event )
 
 
 dovo_mainFrame::~dovo_mainFrame()
-{
-	wxConfig config("fmdeye", "FrontMotion");
+{	
+	wxConfig::Get()->SetPath("/Settings");	
+	wxConfig::Get()->Write("LastDir", m_directory->GetValue());
 
-	config.SetPath("/Settings");	
-	config.Write("LastDir", m_directory->GetValue());
+	SaveDestinationList();
 }
 
-void dovo_mainFrame::SetDestinations()
+void dovo_mainFrame::FillDestinationList()
 {
 	// add to combo box
 	m_destination->Clear();
 	std::vector<DestinationEntry>::iterator itr;	
-	for(itr = policyDestinations.begin(); itr != policyDestinations.end(); itr++)
+	for(itr = globalDestinations.begin(); itr != globalDestinations.end(); itr++)
 		m_destination->Append((*itr).name + L" (*)");
 
 	for(itr = destinations.begin(); itr != destinations.end(); itr++)
 		m_destination->Append((*itr).name);
+}
+
+void dovo_mainFrame::SaveDestinationList()
+{
+
+}
+
+void dovo_mainFrame::LoadDestinationList()
+{		
+	wxConfig::Get()->SetPath("/Destinations");
+	wxString str;
+	long dummy;
+	// first enum all entries
+	bool bCont = wxConfig::Get()->GetFirstEntry(str, dummy);
+	while ( bCont ) 
+	{
+		using namespace boost::spirit::classic;
+
+		wxString data;
+		std::vector<std::string> items;
+		data = wxConfig::Get()->Read(str);
+		parse((const char*)data.mb_str(wxConvUTF8),
+			((*(anychar_p - L','))[append(items)]) >>
+			(L',') >>
+			((*(anychar_p - L','))[append(items)]) >>
+			(L',') >>
+			((*(anychar_p - L','))[append(items)]) >>
+			(L',') >>
+			((*(anychar_p - L','))[append(items)]) >>
+			(L',') >>
+			(*anychar_p)[append(items)]
+		, space_p);
+
+		if(items.size() == 5)
+			destinations.push_back(DestinationEntry(items[0].c_str(), items[1].c_str(), atoi(items[2].c_str()), items[3].c_str(), items[4].c_str()));
+
+		bCont = wxConfig::Get()->GetNextEntry(str, dummy);
+	}
+
+}
+
+
+void dovo_mainFrame::LoadGlobalDestinationList()
+{		
+	wxConfig::Get()->SetPath("/Destinations");
+	wxString str;
+	long dummy;
+	// first enum all entries
+	bool bCont = wxConfig::Get()->GetFirstEntry(str, dummy);
+	while ( bCont ) 
+	{
+		using namespace boost::spirit::classic;
+
+		wxString data;
+		std::vector<std::string> items;
+		data = wxConfig::Get()->Read(str);
+		parse((const char*)data.mb_str(wxConvUTF8),
+			((*(anychar_p - L','))[append(items)]) >>
+			(L',') >>
+			((*(anychar_p - L','))[append(items)]) >>
+			(L',') >>
+			((*(anychar_p - L','))[append(items)]) >>
+			(L',') >>
+			((*(anychar_p - L','))[append(items)]) >>
+			(L',') >>
+			(*anychar_p)[append(items)]
+		, space_p);
+
+		if(items.size() == 5)
+			destinations.push_back(DestinationEntry(items[0].c_str(), items[1].c_str(), atoi(items[2].c_str()), items[3].c_str(), items[4].c_str()));
+
+		bCont = wxConfig::Get()->GetNextEntry(str, dummy);
+	}
+
 }

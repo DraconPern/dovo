@@ -16,6 +16,9 @@ public:
 wxIMPLEMENT_APP(MyApp);
 bool MyApp::OnInit()
 {
+	wxConfig::Get()->SetAppName("fmdeye");
+	wxConfig::Get()->SetVendorName("FrontMotion");
+
 	dovo_mainFrame *frame = new dovo_mainFrame(NULL);
 	frame->Show( true );
 	return true;

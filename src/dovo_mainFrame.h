@@ -31,8 +31,11 @@ class dovo_mainFrame : public mainFrame
 	//// end generated class members
 
 		~dovo_mainFrame();
-		void SetDestinations();
-		std::vector<DestinationEntry> destinations, policyDestinations;
+		void FillDestinationList();
+		void LoadDestinationList();
+		void LoadGlobalDestinationList();
+		void SaveDestinationList();
+		std::vector<DestinationEntry> destinations, globalDestinations;
 
 };
 
