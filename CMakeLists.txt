@@ -12,7 +12,7 @@ set(Boost_USE_MULTITHREADED      ON)
 #set(Boost_USE_STATIC_RUNTIME     OFF)
 find_package(Boost REQUIRED thread filesystem)
 
-find_package(wxWidgets COMPONENTS core base REQUIRED)
+find_package(wxWidgets COMPONENTS core base adv REQUIRED)
 include(${wxWidgets_USE_FILE})
 
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR} ${Boost_INCLUDE_DIRS} ${DCMJPEG2000}/include )

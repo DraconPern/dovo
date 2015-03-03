@@ -17,7 +17,9 @@ class dovo_about : public about
 		/** Constructor */
 		dovo_about( wxWindow* parent );
 	//// end generated class members
-	
+
+
+
 };
 
 #endif // __dovo_about__

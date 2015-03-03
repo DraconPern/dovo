@@ -30,6 +30,7 @@
 #include <wx/statbmp.h>
 #include <wx/panel.h>
 #include <wx/frame.h>
+#include <wx/hyperlink.h>
 #include <wx/treectrl.h>
 
 ///////////////////////////////////////////////////////////////////////////
@@ -129,10 +130,12 @@ class about : public wxDialog
 	private:
 	
 	protected:
-		wxStaticText* m_staticText11;
+		wxStaticText* m_version;
+		wxStaticText* m_copyright;
+		wxStaticText* m_staticText13;
+		wxHyperlinkCtrl* m_hyperlink1;
 		wxStdDialogButtonSizer* m_sdbSizer1;
 		wxButton* m_sdbSizer1OK;
-		wxButton* m_sdbSizer1Cancel;
 	
 	public:
 		

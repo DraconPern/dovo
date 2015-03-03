@@ -325,18 +325,33 @@ about::about( wxWindow* parent, wxWindowID id, const wxString& title, const wxPo
 	wxBoxSizer* bSizer28;
 	bSizer28 = new wxBoxSizer( wxVERTICAL );
 	
-	m_staticText11 = new wxStaticText( this, wxID_ANY, _("MyLabel"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText11->Wrap( -1 );
-	bSizer28->Add( m_staticText11, 1, wxALL, 5 );
+	m_version = new wxStaticText( this, wxID_ANY, _("Version"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_version->Wrap( -1 );
+	bSizer28->Add( m_version, 0, wxALL, 5 );
+	
+	m_copyright = new wxStaticText( this, wxID_ANY, _("Copyright (C) 2007-2015 FrontMotion"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_copyright->Wrap( -1 );
+	bSizer28->Add( m_copyright, 0, wxALL, 5 );
+	
+	wxBoxSizer* bSizer27;
+	bSizer27 = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_staticText13 = new wxStaticText( this, wxID_ANY, _("Homepage:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText13->Wrap( -1 );
+	bSizer27->Add( m_staticText13, 0, wxALL, 5 );
+	
+	m_hyperlink1 = new wxHyperlinkCtrl( this, wxID_ANY, wxEmptyString, wxT("http://www.frontmotion.com"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+	bSizer27->Add( m_hyperlink1, 0, wxALL, 5 );
+	
+	
+	bSizer28->Add( bSizer27, 1, wxEXPAND, 5 );
 	
 	m_sdbSizer1 = new wxStdDialogButtonSizer();
 	m_sdbSizer1OK = new wxButton( this, wxID_OK );
 	m_sdbSizer1->AddButton( m_sdbSizer1OK );
-	m_sdbSizer1Cancel = new wxButton( this, wxID_CANCEL );
-	m_sdbSizer1->AddButton( m_sdbSizer1Cancel );
 	m_sdbSizer1->Realize();
 	
-	bSizer28->Add( m_sdbSizer1, 0, wxALL|wxEXPAND, 5 );
+	bSizer28->Add( m_sdbSizer1, 1, wxALIGN_BOTTOM|wxALL|wxEXPAND, 5 );
 	
 	
 	this->SetSizer( bSizer28 );

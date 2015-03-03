@@ -49,7 +49,8 @@ void dovo_mainFrame::OnSend( wxCommandEvent& event )
 
 void dovo_mainFrame::OnAbout( wxCommandEvent& event )
 {
-	// TODO: Implement OnAbout
+	dovo_about dlg(this);	
+	dlg.ShowModal();
 }
 
 void dovo_mainFrame::OnExit( wxCommandEvent& event )
