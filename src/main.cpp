@@ -16,10 +16,13 @@ public:
 wxIMPLEMENT_APP(MyApp);
 bool MyApp::OnInit()
 {
+	wxTheApp->SetAppName("fmdeye");
+	wxTheApp->SetVendorName("FrontMotion");
+
 	wxConfig::Get()->SetAppName("fmdeye");
 	wxConfig::Get()->SetVendorName("FrontMotion");
 
 	dovo_mainFrame *frame = new dovo_mainFrame(NULL);
-	frame->Show( true );
+	frame->Show( true );	
 	return true;
 }
