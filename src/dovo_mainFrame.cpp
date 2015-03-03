@@ -30,10 +30,13 @@ void dovo_mainFrame::OnDestinationEdit( wxCommandEvent& event )
 
 	if(dlg.ShowModal() == wxID_OK)
 	{
-		destinations = dlg.m_destinations;
-		FillDestinationList();
+		std::string oldsel = m_destination->GetStringSelection();
+		destinations = dlg.m_destinations;	
 		SaveDestinationList();
 		wxConfig::Get()->Flush();
+
+		FillDestinationList();
+		m_destination->SetStringSelection(oldsel);
 	}
 }
 
