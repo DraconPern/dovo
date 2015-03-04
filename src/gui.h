@@ -197,10 +197,14 @@ class searchStatus : public wxDialog
 	protected:
 		wxGauge* m_gauge1;
 		wxButton* m_stop;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnStop( wxCommandEvent& event ) { event.Skip(); }
+		
 	
 	public:
 		
-		searchStatus( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Searching..."), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 800,100 ), long style = wxDEFAULT_DIALOG_STYLE ); 
+		searchStatus( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Searching..."), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE ); 
 		~searchStatus();
 	
 };

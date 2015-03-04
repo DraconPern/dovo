@@ -56,14 +56,13 @@ void dovo_mainFrame::OnDestinationEdit( wxCommandEvent& event )
 }
 
 
-int fillname(void *param,int columns,char** values, char**names)
+int dovo_mainFrame::fillname(void *param,int columns,char** values, char**names)
 {
-	dovo_mainFrame *win = (dovo_mainFrame *) param;
-	/*
-	win->m_patients->InsertItem(0, CA2W(values[0], CP_UTF8));
-	dlg->patientsCtrl.SetItemText(0, 1, CA2W(values[1], CP_UTF8));
-	dlg->patientsCtrl.SetItemText(0, 2, CA2W(values[2], CP_UTF8));
-	*/
+	dovo_mainFrame *win = (dovo_mainFrame *) param;	
+	win->m_patients->InsertItem(0, values[0]);
+	win->m_patients->SetItem(0, 1, values[1]);
+	win->m_patients->SetItem(0, 2, values[2]);
+
 	return 0; 
 }
 
@@ -71,19 +70,15 @@ void dovo_mainFrame::OnUpdate( wxCommandEvent& event )
 {		
 	m_patients->DeleteAllItems();
 
+
 	std::string a =  m_directory->GetValue();
 	m_engine.StartScan(a);
-
-
-	/*
-	);
-	*/
-	dovo_searchStatus dlg(this);
-	//dlg.scanner = &scanner;
 	
+	dovo_searchStatus dlg(this);
+	dlg.m_scanner = &m_engine.scanner;	
 	dlg.ShowModal();	
 	
-
+	m_engine.GetPatients(fillname, this);
 }
 
 void dovo_mainFrame::OnSend( wxCommandEvent& event )

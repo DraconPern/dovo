@@ -35,7 +35,7 @@ class dovo_mainFrame : public mainFrame
 
 		~dovo_mainFrame();
 		void FillDestinationList();
-		
+		static int fillname(void *param,int columns,char** values, char**names);
 
 		engine m_engine;
 };

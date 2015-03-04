@@ -484,7 +484,7 @@ MyDialog4::~MyDialog4()
 
 searchStatus::searchStatus( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
 {
-	this->SetSizeHints( wxSize( 800,100 ), wxDefaultSize );
+	this->SetSizeHints( wxSize( 600,150 ), wxDefaultSize );
 	
 	wxBoxSizer* bSizer28;
 	bSizer28 = new wxBoxSizer( wxHORIZONTAL );
@@ -499,10 +499,17 @@ searchStatus::searchStatus( wxWindow* parent, wxWindowID id, const wxString& tit
 	
 	this->SetSizer( bSizer28 );
 	this->Layout();
+	bSizer28->Fit( this );
 	
 	this->Centre( wxBOTH );
+	
+	// Connect Events
+	m_stop->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( searchStatus::OnStop ), NULL, this );
 }
 
 searchStatus::~searchStatus()
 {
+	// Disconnect Events
+	m_stop->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( searchStatus::OnStop ), NULL, this );
+	
 }

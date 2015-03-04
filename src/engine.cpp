@@ -139,6 +139,8 @@ void engine::LoadGlobalDestinationList()
 
 void engine::StartScan(wxString path)
 {
+	sqlite3_exec(db, "DELETE FROM images", NULL, NULL, NULL);
+
 	scanner.Clear();
 	scanner.db = db;
 	scanner.ScanPath = path;
@@ -146,16 +148,18 @@ void engine::StartScan(wxString path)
 	boost::thread t(DICOMFileScanner::DoScanThread, &scanner);
 	t.detach();
 	
-
 }
-/*
-void ReturnPatient()
+
+void engine::StopScan()
 {
-	sqlite3_exec(db, "DELETE FROM images", NULL, NULL, NULL);
+	scanner.Cancel();
+}
+
+void engine::GetPatients(sqlite3_callback fillname, void *obj)
+{	
 	std::string selectsql = "SELECT name, patid, birthday FROM images GROUP BY name, patid ORDER BY name";
 	sqlite3_stmt *select;
 	sqlite3_prepare_v2(db, selectsql.c_str(), selectsql.length(), &select, NULL);		
-	// sqlite3_exec_stmt(select, &fillname, this, NULL);
+	sqlite3_exec_stmt(select, fillname, obj, NULL);
 	sqlite3_finalize(select);	
 }
-*/
