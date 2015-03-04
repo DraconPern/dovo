@@ -1,8 +1,7 @@
 #include <vector>
 #include "sqlite3.h"
-#include "sqlite3_exec_stmt.h"
-
 #include "destinationentry.h"
+#include "dicomscanner.h"
 
 class engine
 {
@@ -14,10 +13,11 @@ public:
 	void LoadDestinationList();
 	void LoadGlobalDestinationList();
 	void SaveDestinationList();
-	void update();
+	void StartScan(wxString path);
 protected:
-	sqlite3 *db;
 
+	sqlite3 *db;
+	DICOMFileScanner scanner;
 
 
 };

@@ -13,12 +13,14 @@
 #include <boost/spirit/include/classic_core.hpp>
 #include <boost/spirit/include/classic_confix.hpp>
 #include <boost/spirit/include/classic_escape_char.hpp>
+#include "sqlite3_exec_stmt.h"
+#include <boost/thread.hpp>
 
 engine::engine()	
 {
 	db = NULL;
 
-	if(sqlite3_open(":memory:", &db))
+	if(sqlite3_open16(":memory:", &db))
 	{
 		std::ostringstream msg;
 		msg << "Can't create database: " << sqlite3_errmsg(db);
@@ -45,7 +47,7 @@ void engine::SaveDestinationList()
 	for(unsigned int i = 0; i < destinations.size(); i++)
 	{
 		
-		std::ostringstream stream;
+		std::wstringstream stream;
 		stream << destinations[i].name << "," 
 			<< destinations[i].destinationHost << "," 
 			<< destinations[i].destinationPort << "," 
@@ -53,7 +55,7 @@ void engine::SaveDestinationList()
 			<< destinations[i].ourAETitle;
 		
 		wxConfig::Get()->SetPath("/Destinations");
-		wxConfig::Get()->Write(boost::lexical_cast<std::string>(i + 1), stream.str().c_str());
+		wxConfig::Get()->Write(boost::lexical_cast<std::wstring>(i + 1), stream.str().c_str());
 	}
 
 	wxConfig::Get()->Flush();
@@ -71,9 +73,9 @@ void engine::LoadDestinationList()
 		using namespace boost::spirit::classic;
 
 		wxString data;
-		std::vector<std::string> items;
+		std::vector<std::wstring> items;
 		data = wxConfig::Get()->Read(str);
-		parse((const char*)data.mb_str(wxConvUTF8),
+		parse(data.ToStdWstring().c_str(),
 			((*(anychar_p - L','))[append(items)]) >>
 			(L',') >>
 			((*(anychar_p - L','))[append(items)]) >>
@@ -113,9 +115,9 @@ void engine::LoadGlobalDestinationList()
 		using namespace boost::spirit::classic;
 
 		wxString data;
-		std::vector<std::string> items;
+		std::vector<std::wstring> items;
 		registry.QueryValue(str, data);
-		parse((const char*)data.mb_str(wxConvUTF8),
+		parse(data.ToStdWstring().c_str(),
 			((*(anychar_p - L','))[append(items)]) >>
 			(L',') >>
 			((*(anychar_p - L','))[append(items)]) >>
@@ -128,16 +130,27 @@ void engine::LoadGlobalDestinationList()
 		, space_p);
 
 		if(items.size() == 5)
-			globalDestinations.push_back(DestinationEntry(items[0].c_str(), items[1].c_str(), atoi(items[2].c_str()), items[3].c_str(), items[4].c_str()));
+			globalDestinations.push_back(DestinationEntry(items[0].c_str(), items[1].c_str(), boost::lexical_cast<int>(items[2]), items[3].c_str(), items[4].c_str()));
 
 		bCont = registry.GetNextValue(str, dummy);
 	}
 #endif
 }
 
-void engine::update()
+void engine::StartScan(wxString path)
 {
+	scanner.Clear();
+	scanner.db = db;
+	scanner.ScanPath = path;
+	
+	boost::thread t(DICOMFileScanner::DoScanThread, &scanner);
+	t.detach();
+	
 
+}
+/*
+void ReturnPatient()
+{
 	sqlite3_exec(db, "DELETE FROM images", NULL, NULL, NULL);
 	std::string selectsql = "SELECT name, patid, birthday FROM images GROUP BY name, patid ORDER BY name";
 	sqlite3_stmt *select;
@@ -145,3 +158,4 @@ void engine::update()
 	// sqlite3_exec_stmt(select, &fillname, this, NULL);
 	sqlite3_finalize(select);	
 }
+*/

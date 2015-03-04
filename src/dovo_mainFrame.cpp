@@ -71,15 +71,12 @@ void dovo_mainFrame::OnUpdate( wxCommandEvent& event )
 {		
 	m_patients->DeleteAllItems();
 
-	
+	std::string a =  m_directory->GetValue();
+	m_engine.StartScan(a);
 
 
 	/*
-	scanner.Clear();
-	scanner.db = db;
-	scanner.ScanPath = directory.GetString();
-	
-	CreateThread(NULL, 0, DICOMFileScanner::DoScanThread, &scanner, 0, NULL);
+	);
 	*/
 	dovo_searchStatus dlg(this);
 	//dlg.scanner = &scanner;

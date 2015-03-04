@@ -1,12 +1,10 @@
 #ifndef _DESTINATIONENTRY_
 #define _DESTINATIONENTRY_
 
-#include <string>
-
 class DestinationEntry
 {
 public:
-	DestinationEntry(std::string name, std::string destinationhost, int destinationport, std::string destinationaetitle, std::string ouraetitle)
+	DestinationEntry(wxString name, wxString destinationhost, int destinationport, wxString destinationaetitle, wxString ouraetitle)
 	{
 		this->name = name;		
 		this->destinationHost = destinationhost;
@@ -15,11 +13,11 @@ public:
 		this->ourAETitle = ouraetitle;
 	}
 
-	std::string name;	
-	std::string destinationHost;
+	wxString name;	
+	wxString destinationHost;
 	int destinationPort;
-	std::string destinationAETitle;
-	std::string ourAETitle;
+	wxString destinationAETitle;
+	wxString ourAETitle;
 };
 
 #endif

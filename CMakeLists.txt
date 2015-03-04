@@ -7,16 +7,22 @@ set(VERSION "1.0.0")
 SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DDEBUG")
 SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
 
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
+
 set(Boost_USE_STATIC_LIBS        ON)
 set(Boost_USE_MULTITHREADED      ON)
-#set(Boost_USE_STATIC_RUNTIME     OFF)
+set(Boost_USE_STATIC_RUNTIME     ON)
 find_package(Boost REQUIRED thread filesystem)
 
+set(wxWidgets_USE_STATIC   ON)
 find_package(wxWidgets COMPONENTS core base adv REQUIRED)
 include(${wxWidgets_USE_FILE})
 
-INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/sqlite3 ${Boost_INCLUDE_DIRS} ${DCMJPEG2000}/include )
-#LINK_DIRECTORIES(${DCMTK_ROOT}/lib ${ZLIB_LIBDIR} ${Boost_LIBRARY_DIRS} ${DCMJPEG2000}/lib ${IMAGEMAGICK}/VisualMagick/lib ${ULTIMATETOOLBOX}/lib/Libs)
+find_package(dcmtk REQUIRED CONFIG HINTS ${DCMTK_DIR})
+
+INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/sqlite3 ${Boost_INCLUDE_DIRS} ${DCMTK_INCLUDE_DIRS} ${DCMJPEG2000}/include )
+LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})
 
 set(dovo_HEADERS	
 	src/gui.h
@@ -24,7 +30,11 @@ set(dovo_HEADERS
 	src/dovo_changePatientInfo.h
 	src/dovo_destination.h
 	src/dovo_mainFrame.h
+
+	src/engine.h
 	src/destinationentry.h
+
+	src/dicomscanner.h
 )
 
 set(dovo_SRCS
@@ -37,6 +47,7 @@ set(dovo_SRCS
 	src/dovo_mainFrame.cpp
 	src/dovo_searchStatus.cpp
 	src/engine.cpp
+	src/dicomscanner.cpp
 	sqlite3/sqlite3.c
 	sqlite3/sqlite3_exec_stmt.c
 )
@@ -44,6 +55,8 @@ set(dovo_SRCS
 #VC++ stuff
 add_definitions(-D_UNICODE)
 add_definitions(-D_BIND_TO_CURRENT_VCLIBS_VERSION=1)
+
+add_definitions(-DHAVE_SSIZE_T)
 
 ADD_EXECUTABLE(dovo WIN32 ${dovo_SRCS})
 
@@ -55,7 +68,9 @@ ENDIF(WIN32)
 
 TARGET_LINK_LIBRARIES(dovo
 	
+	${DCMTK_LIBRARIES}
 	${wxWidgets_LIBRARIES}
+	${Boost_LIBRARIES}
 	${OS_SPECIFIC_LIBS}
 	)
 
