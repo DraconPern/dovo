@@ -20,6 +20,7 @@ class dovo_about : public about
 
 
 
+
 };
 
 #endif // __dovo_about__

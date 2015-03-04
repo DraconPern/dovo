@@ -15,7 +15,7 @@ find_package(Boost REQUIRED thread filesystem)
 find_package(wxWidgets COMPONENTS core base adv REQUIRED)
 include(${wxWidgets_USE_FILE})
 
-INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR} ${Boost_INCLUDE_DIRS} ${DCMJPEG2000}/include )
+INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/sqlite3 ${Boost_INCLUDE_DIRS} ${DCMJPEG2000}/include )
 #LINK_DIRECTORIES(${DCMTK_ROOT}/lib ${ZLIB_LIBDIR} ${Boost_LIBRARY_DIRS} ${DCMJPEG2000}/lib ${IMAGEMAGICK}/VisualMagick/lib ${ULTIMATETOOLBOX}/lib/Libs)
 
 set(dovo_HEADERS	
@@ -35,6 +35,10 @@ set(dovo_SRCS
 	src/dovo_changePatientInfo.cpp
 	src/dovo_destination.cpp
 	src/dovo_mainFrame.cpp
+	src/dovo_searchStatus.cpp
+	src/engine.cpp
+	sqlite3/sqlite3.c
+	sqlite3/sqlite3_exec_stmt.c
 )
 
 #VC++ stuff

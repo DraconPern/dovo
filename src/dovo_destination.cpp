@@ -10,7 +10,7 @@ dovo_destination::dovo_destination( wxWindow* parent )
 void dovo_destination::OnInitDialog( wxInitDialogEvent& event )
 {
 	m_destinationList->InsertColumn(0, "Name", wxLIST_FORMAT_LEFT, wxLIST_AUTOSIZE_USEHEADER);
-	for(int i = 0; i < m_destinations.size(); i++)
+	for(unsigned int i = 0; i < m_destinations.size(); i++)
 		m_destinationList->InsertItem(i, m_destinations[i].name);
 
 	m_destinationList->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
@@ -34,7 +34,7 @@ void dovo_destination::OnAdd( wxCommandEvent& event )
 
 	m_destinations.push_back(DestinationEntry("[New Name 1]", "localhost", 104, "SCP", "FRONTMOTION"));
 
-	int i = m_destinations.size() - 1;
+	unsigned int i = m_destinations.size() - 1;
 	m_destinationList->InsertItem(i, m_destinations[i].name);
 	m_destinationList->SetItemState(i, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
 

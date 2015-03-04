@@ -481,3 +481,28 @@ MyDialog4::MyDialog4( wxWindow* parent, wxWindowID id, const wxString& title, co
 MyDialog4::~MyDialog4()
 {
 }
+
+searchStatus::searchStatus( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxSize( 800,100 ), wxDefaultSize );
+	
+	wxBoxSizer* bSizer28;
+	bSizer28 = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_gauge1 = new wxGauge( this, wxID_ANY, 100, wxDefaultPosition, wxDefaultSize, wxGA_HORIZONTAL|wxGA_SMOOTH );
+	m_gauge1->SetValue( 0 ); 
+	bSizer28->Add( m_gauge1, 1, wxALIGN_CENTER_VERTICAL|wxBOTTOM|wxEXPAND|wxLEFT|wxTOP, 15 );
+	
+	m_stop = new wxButton( this, wxID_ANY, _("Stop"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer28->Add( m_stop, 0, wxALL, 15 );
+	
+	
+	this->SetSizer( bSizer28 );
+	this->Layout();
+	
+	this->Centre( wxBOTH );
+}
+
+searchStatus::~searchStatus()
+{
+}

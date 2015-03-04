@@ -32,6 +32,7 @@
 #include <wx/frame.h>
 #include <wx/hyperlink.h>
 #include <wx/treectrl.h>
+#include <wx/gauge.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -183,6 +184,24 @@ class MyDialog4 : public wxDialog
 		
 		MyDialog4( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 528,347 ), long style = wxDEFAULT_DIALOG_STYLE ); 
 		~MyDialog4();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class searchStatus
+///////////////////////////////////////////////////////////////////////////////
+class searchStatus : public wxDialog 
+{
+	private:
+	
+	protected:
+		wxGauge* m_gauge1;
+		wxButton* m_stop;
+	
+	public:
+		
+		searchStatus( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Searching..."), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 800,100 ), long style = wxDEFAULT_DIALOG_STYLE ); 
+		~searchStatus();
 	
 };
 

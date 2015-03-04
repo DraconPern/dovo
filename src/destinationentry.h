@@ -1,7 +1,7 @@
+#ifndef _DESTINATIONENTRY_
+#define _DESTINATIONENTRY_
+
 #include <string>
-#include <boost/spirit/include/classic_core.hpp>
-#include <boost/spirit/include/classic_confix.hpp>
-#include <boost/spirit/include/classic_escape_char.hpp>
 
 class DestinationEntry
 {
@@ -21,3 +21,5 @@ public:
 	std::string destinationAETitle;
 	std::string ourAETitle;
 };
+
+#endif

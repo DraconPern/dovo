@@ -4,13 +4,29 @@ dovo_mainFrame::dovo_mainFrame( wxWindow* parent )
 	:
 	mainFrame( parent )
 {	
+	// Create the UI
+	m_patients->InsertColumn(0, "Name");
+	m_patients->InsertColumn(1, "ID");
+	m_patients->InsertColumn(2, "Birthday");
+
+	m_studies->InsertColumn(0, "Date");
+	m_studies->InsertColumn(1, "Study");
+	m_studies->InsertColumn(2, "StudyID");
+
+	m_series->InsertColumn(0, "Series");
+	m_series->InsertColumn(1, "SeriesID");
+
+	m_instances->InsertColumn(0, L"SOPUid");
+	m_instances->InsertColumn(1, L"path");
+
+	// Fill in settings
 	wxConfig::Get()->SetPath("/Settings");
 	m_directory->SetValue(wxConfig::Get()->Read("LastDir"));
 
-	LoadDestinationList();
-	LoadGlobalDestinationList();
+	m_engine.LoadDestinationList();
+	m_engine.LoadGlobalDestinationList();
 
-	FillDestinationList();
+	FillDestinationList();	
 }
 
 void dovo_mainFrame::OnBrowse( wxCommandEvent& event )
@@ -26,23 +42,51 @@ void dovo_mainFrame::OnBrowse( wxCommandEvent& event )
 void dovo_mainFrame::OnDestinationEdit( wxCommandEvent& event )
 {
 	dovo_destination dlg(this);
-	dlg.m_destinations = destinations;
+	dlg.m_destinations = m_engine.destinations;
 
 	if(dlg.ShowModal() == wxID_OK)
 	{
 		std::string oldsel = m_destination->GetStringSelection();
-		destinations = dlg.m_destinations;	
-		SaveDestinationList();
-		wxConfig::Get()->Flush();
-
+		m_engine.destinations = dlg.m_destinations;	
+		m_engine.SaveDestinationList();
+		
 		FillDestinationList();
 		m_destination->SetStringSelection(oldsel);
 	}
 }
 
-void dovo_mainFrame::OnUpdate( wxCommandEvent& event )
+
+int fillname(void *param,int columns,char** values, char**names)
 {
-	// TODO: Implement OnUpdate
+	dovo_mainFrame *win = (dovo_mainFrame *) param;
+	/*
+	win->m_patients->InsertItem(0, CA2W(values[0], CP_UTF8));
+	dlg->patientsCtrl.SetItemText(0, 1, CA2W(values[1], CP_UTF8));
+	dlg->patientsCtrl.SetItemText(0, 2, CA2W(values[2], CP_UTF8));
+	*/
+	return 0; 
+}
+
+void dovo_mainFrame::OnUpdate( wxCommandEvent& event )
+{		
+	m_patients->DeleteAllItems();
+
+	
+
+
+	/*
+	scanner.Clear();
+	scanner.db = db;
+	scanner.ScanPath = directory.GetString();
+	
+	CreateThread(NULL, 0, DICOMFileScanner::DoScanThread, &scanner, 0, NULL);
+	*/
+	dovo_searchStatus dlg(this);
+	//dlg.scanner = &scanner;
+	
+	dlg.ShowModal();	
+	
+
 }
 
 void dovo_mainFrame::OnSend( wxCommandEvent& event )
@@ -64,6 +108,8 @@ void dovo_mainFrame::OnExit( wxCommandEvent& event )
 
 dovo_mainFrame::~dovo_mainFrame()
 {	
+	
+
 	wxConfig::Get()->SetPath("/Settings");	
 	wxConfig::Get()->Write("LastDir", m_directory->GetValue());
 	wxConfig::Get()->Flush();
@@ -74,106 +120,9 @@ void dovo_mainFrame::FillDestinationList()
 	// add to combo box
 	m_destination->Clear();
 	std::vector<DestinationEntry>::iterator itr;	
-	for(itr = globalDestinations.begin(); itr != globalDestinations.end(); itr++)
+	for(itr = m_engine.globalDestinations.begin(); itr != m_engine.globalDestinations.end(); itr++)
 		m_destination->Append((*itr).name + L" (*)");
 
-	for(itr = destinations.begin(); itr != destinations.end(); itr++)
+	for(itr = m_engine.destinations.begin(); itr != m_engine.destinations.end(); itr++)
 		m_destination->Append((*itr).name);
-}
-
-void dovo_mainFrame::SaveDestinationList()
-{
-	wxConfig::Get()->SetPath("/");
-	wxConfig::Get()->DeleteGroup("Destinations");
-	for(int i = 0; i < destinations.size(); i++)
-	{
-		
-		std::ostringstream stream;
-		stream << destinations[i].name << "," 
-			<< destinations[i].destinationHost << "," 
-			<< destinations[i].destinationPort << "," 
-			<< destinations[i].destinationAETitle << "," 
-			<< destinations[i].ourAETitle;
-		
-		wxConfig::Get()->SetPath("/Destinations");
-		wxConfig::Get()->Write(boost::lexical_cast<std::string>(i + 1), stream.str().c_str());
-	}
-
-	wxConfig::Get()->Flush();
-}
-
-void dovo_mainFrame::LoadDestinationList()
-{		
-	wxConfig::Get()->SetPath("/Destinations");
-	wxString str;
-	long dummy;
-	// first enum all entries
-	bool bCont = wxConfig::Get()->GetFirstEntry(str, dummy);
-	while ( bCont ) 
-	{
-		using namespace boost::spirit::classic;
-
-		wxString data;
-		std::vector<std::string> items;
-		data = wxConfig::Get()->Read(str);
-		parse((const char*)data.mb_str(wxConvUTF8),
-			((*(anychar_p - L','))[append(items)]) >>
-			(L',') >>
-			((*(anychar_p - L','))[append(items)]) >>
-			(L',') >>
-			((*(anychar_p - L','))[append(items)]) >>
-			(L',') >>
-			((*(anychar_p - L','))[append(items)]) >>
-			(L',') >>
-			(*anychar_p)[append(items)]
-		, space_p);
-
-		if(items.size() == 5)
-			destinations.push_back(DestinationEntry(items[0], items[1], boost::lexical_cast<int>(items[2]), items[3], items[4]));
-
-		bCont = wxConfig::Get()->GetNextEntry(str, dummy);
-	}
-}
-
-
-void dovo_mainFrame::LoadGlobalDestinationList()
-{	
-	// turn off error message
-	wxLogNull nolog;
-
-	// only valid for windows
-#if defined(__WINDOWS__) && wxUSE_CONFIG_NATIVE
-	wxRegKey registry;
-	registry.SetName(wxRegKey::HKLM, "Software\\Policies\\FrontMotion\\fmdeye\\Destinations");
-	registry.Open(wxRegKey::Read);
-	
-	wxString str;
-	long dummy;
-	// first enum all entries
-	bool bCont = registry.GetFirstValue(str, dummy);
-	while ( bCont ) 
-	{
-		using namespace boost::spirit::classic;
-
-		wxString data;
-		std::vector<std::string> items;
-		registry.QueryValue(str, data);
-		parse((const char*)data.mb_str(wxConvUTF8),
-			((*(anychar_p - L','))[append(items)]) >>
-			(L',') >>
-			((*(anychar_p - L','))[append(items)]) >>
-			(L',') >>
-			((*(anychar_p - L','))[append(items)]) >>
-			(L',') >>
-			((*(anychar_p - L','))[append(items)]) >>
-			(L',') >>
-			(*anychar_p)[append(items)]
-		, space_p);
-
-		if(items.size() == 5)
-			globalDestinations.push_back(DestinationEntry(items[0].c_str(), items[1].c_str(), atoi(items[2].c_str()), items[3].c_str(), items[4].c_str()));
-
-		bCont = registry.GetNextValue(str, dummy);
-	}
-#endif
 }
