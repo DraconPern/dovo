@@ -21,7 +21,7 @@ void dovo_searchStatus::OnTimer( wxTimerEvent& event )
 	}
 	else
 	{
-		m_gauge1->Pulse();
+		m_progress->Pulse();
 	}
 }
 
