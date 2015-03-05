@@ -32,11 +32,12 @@ set(dovo_HEADERS
 	src/dovo_mainFrame.h
 	src/dovo_searchStatus.h
 	src/dovo_sendStatus.h
-
+	sqlite3/sqlite3.h
 	src/engine.h
 	src/destinationentry.h
-
 	src/dicomscanner.h
+	src/dicomsender.h
+	
 )
 
 set(dovo_SRCS
@@ -49,17 +50,23 @@ set(dovo_SRCS
 	src/dovo_mainFrame.cpp
 	src/dovo_searchStatus.cpp
 	src/dovo_sendStatus.cpp
-	src/engine.cpp
-	src/dicomscanner.cpp
 	sqlite3/sqlite3.c
 	sqlite3/sqlite3_exec_stmt.c
+	src/engine.cpp
+	src/dicomscanner.cpp
+	src/dicomsender.cpp
+	
 )
 
 #VC++ stuff
 add_definitions(-D_UNICODE)
 add_definitions(-D_BIND_TO_CURRENT_VCLIBS_VERSION=1)
 
+#define this so that wxWidgets doesn't define it. Conflicts w/ dcmtk's declaration
 add_definitions(-DHAVE_SSIZE_T)
+
+#enable dcmtk filename to have wide version, only afffects WIN32.  Everyone else uses utf-8 mode.
+add_definitions(-DDCMTK_WIDE_CHAR_FILE_IO_FUNCTIONS=1)
 
 ADD_EXECUTABLE(dovo WIN32 ${dovo_SRCS})
 

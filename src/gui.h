@@ -108,6 +108,7 @@ class mainFrame : public wxFrame
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnBrowse( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnDestinationEdit( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnSelected( wxListEvent& event ) { event.Skip(); }
 		virtual void OnUpdate( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSend( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAbout( wxCommandEvent& event ) { event.Skip(); }
@@ -178,11 +179,16 @@ class sendStatus : public wxDialog
 	
 	protected:
 		wxGauge* m_progress;
+		wxButton* m_stop;
 		wxTextCtrl* m_log;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnStop( wxCommandEvent& event ) { event.Skip(); }
+		
 	
 	public:
 		
-		sendStatus( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Sending..."), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE ); 
+		sendStatus( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Sending..."), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 606,459 ), long style = wxDEFAULT_DIALOG_STYLE ); 
 		~sendStatus();
 	
 };

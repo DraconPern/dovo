@@ -2,7 +2,7 @@
 #include "dicomscanner.h"
 #include "sqlite3_exec_stmt.h"
 
-// work around the fact that dcmtk doesn't work in unicode mode, so all string operation needs to be converted
+// work around the fact that dcmtk doesn't work in unicode mode, so all string operation needs to be converted from/to mbcs
 #ifdef _UNICODE
 #undef _UNICODE
 #undef UNICODE
@@ -20,12 +20,11 @@
 
 DICOMFileScanner::DICOMFileScanner(void)
 {
-	cancelEvent = doneEvent = false;
+	Clear();
 }
 
 DICOMFileScanner::~DICOMFileScanner(void)
-{
-	Clear();
+{	
 }
 
 void DICOMFileScanner::Clear(void)
@@ -33,10 +32,13 @@ void DICOMFileScanner::Clear(void)
 	cancelEvent = doneEvent = false;
 }
 
-
 void DICOMFileScanner::ScanFile(boost::filesystem::path path)
 {
-	std::string filename = path.string();
+#if defined(WIDE_CHAR_FILE_IO_FUNCTIONS) && defined(_WIN32)
+	std::wstring filename = path.wstring();
+#else
+	std::string filename = path.string();	// utf-8
+#endif
 
 	DcmFileFormat dfile;
 	OFCondition cond = dfile.loadFile(filename.c_str()/*, EXS_Unknown, EGL_noChange, 10*/);
@@ -76,7 +78,7 @@ void DICOMFileScanner::ScanFile(boost::filesystem::path path)
 
 		sqlite3_bind_text(insertImage, 10, sopuid.c_str(), sopuid.length(), SQLITE_STATIC);
 
-		sqlite3_bind_text(insertImage, 11, filename.c_str(), filename.length(), SQLITE_STATIC);
+		sqlite3_bind_text(insertImage, 11, path.string().c_str(), filename.length(), SQLITE_STATIC);
 
 		sqlite3_exec_stmt(insertImage, NULL, NULL, NULL);
 
@@ -90,21 +92,14 @@ void DICOMFileScanner::DoScanThread(void *obj)
 	if(me)
 	{
 		me->SetDone(false);
-		me->DoScan(me->ScanPath);
+		me->DoScan(me->m_scanPath);
 		me->SetDone(true);
 	}
 
 }
 
-void DICOMFileScanner::DoScan(std::wstring path)
+void DICOMFileScanner::DoScan(boost::filesystem::path path)
 {	
-	/*
-	if(path.size() > 0)
-	{
-	if(path[path.size() - 1] == L'\\')
-	path.erase(path.end()-1);
-	}*/
-
 	std::string imagesql = "INSERT INTO images VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)";
 	sqlite3_prepare_v2(db, imagesql.c_str(), imagesql.length(), &insertImage, NULL);
 

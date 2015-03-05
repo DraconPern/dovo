@@ -3,7 +3,7 @@
 dovo_mainFrame::dovo_mainFrame( wxWindow* parent )
 	:
 	mainFrame( parent )
-{	
+{
 	// Create the UI
 	m_patients->InsertColumn(0, "Name");
 	m_patients->InsertColumn(1, "ID");
@@ -26,12 +26,11 @@ dovo_mainFrame::dovo_mainFrame( wxWindow* parent )
 	m_engine.LoadDestinationList();
 	m_engine.LoadGlobalDestinationList();
 
-	FillDestinationList();	
+	FillDestinationList();
 }
 
 void dovo_mainFrame::OnBrowse( wxCommandEvent& event )
 {
-
 	wxDirDialog dlg(this, "", m_directory->GetValue(), wxRESIZE_BORDER | wxDD_DIR_MUST_EXIST);
 	if(dlg.ShowModal() == wxID_OK)
 	{
@@ -47,12 +46,48 @@ void dovo_mainFrame::OnDestinationEdit( wxCommandEvent& event )
 	if(dlg.ShowModal() == wxID_OK)
 	{
 		std::string oldsel = m_destination->GetStringSelection();
-		m_engine.destinations = dlg.m_destinations;	
+		m_engine.destinations = dlg.m_destinations;
 		m_engine.SaveDestinationList();
-		
+
 		FillDestinationList();
 		m_destination->SetStringSelection(oldsel);
 	}
+}
+
+void dovo_mainFrame::OnSelected( wxListEvent& event )
+{
+	// TODO: Implement OnSelected
+}
+
+void dovo_mainFrame::OnUpdate( wxCommandEvent& event )
+{
+	m_patients->DeleteAllItems();
+
+	m_engine.StartScan(m_directory->GetValue());
+
+	dovo_searchStatus dlg(this);
+	dlg.m_scanner = &m_engine.scanner;
+
+	// show and wait for thread to end.
+	dlg.ShowModal();
+
+	m_engine.GetPatients(fillname, this);
+}
+
+void dovo_mainFrame::OnSend( wxCommandEvent& event )
+{
+	// TODO: Implement OnSend
+}
+
+void dovo_mainFrame::OnAbout( wxCommandEvent& event )
+{
+	dovo_about dlg(this);
+	dlg.ShowModal();
+}
+
+void dovo_mainFrame::OnExit( wxCommandEvent& event )
+{
+	Close();
 }
 
 
@@ -65,42 +100,8 @@ int dovo_mainFrame::fillname(void *param,int columns,char** values, char**names)
 	return 0; 
 }
 
-void dovo_mainFrame::OnUpdate( wxCommandEvent& event )
-{		
-	m_patients->DeleteAllItems();
-
-
-	std::string a =  m_directory->GetValue();
-	m_engine.StartScan(a);
-	
-	dovo_searchStatus dlg(this);
-	dlg.m_scanner = &m_engine.scanner;	
-	dlg.ShowModal();	
-	
-	m_engine.GetPatients(fillname, this);
-}
-
-void dovo_mainFrame::OnSend( wxCommandEvent& event )
-{
-	// TODO: Implement OnSend
-}
-
-void dovo_mainFrame::OnAbout( wxCommandEvent& event )
-{
-	dovo_about dlg(this);	
-	dlg.ShowModal();
-}
-
-void dovo_mainFrame::OnExit( wxCommandEvent& event )
-{
-	Close();
-}
-
-
 dovo_mainFrame::~dovo_mainFrame()
-{	
-	
-
+{
 	wxConfig::Get()->SetPath("/Settings");	
 	wxConfig::Get()->Write("LastDir", m_directory->GetValue());
 	wxConfig::Get()->Flush();

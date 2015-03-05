@@ -1,5 +1,5 @@
 SET TYPE=Release
-REM SET TYPE=Debug
+SET TYPE=Debug
 
 REM a top level directory for all PACS related code
 SET DEVSPACE="%CD%"
@@ -16,14 +16,16 @@ IF "%TYPE%" == "Debug"   b2 toolset=msvc-11.0 runtime-link=static define=_BIND_T
 cd ..
 
 cd %DEVSPACE%\dcmtk
-cmake -G "Visual Studio 11" -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\dcmtk
+mkdir build-%TYPE%
+cd build-%TYPE%
+cmake .. -G "Visual Studio 11" -DDCMTK_WIDE_CHAR_FILE_IO_FUNCTIONS=1 -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\dcmtk\build-%TYPE%
 msbuild /P:Configuration=%TYPE% INSTALL.vcxproj 
 cd ..\..
 
 cd %DEVSPACE%
 mkdir build-%TYPE%
 cd build-%TYPE%
-cmake .. -G "Visual Studio 11" -DwxWidgets_ROOT_DIR=%WXWIN% -DBOOST_ROOT=%DEVSPACE%\boost -DDCMTK_DIR=%DEVSPACE%\dcmtk
+cmake .. -G "Visual Studio 11" -DwxWidgets_ROOT_DIR=%WXWIN% -DBOOST_ROOT=%DEVSPACE%\boost -DDCMTK_DIR=%DEVSPACE%\dcmtk\build-%TYPE%
 msbuild /P:Configuration=%TYPE% ALL_BUILD.vcxproj
 cd ..
 

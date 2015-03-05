@@ -24,6 +24,7 @@ class dovo_mainFrame : public mainFrame
 		// Handlers for mainFrame events.
 		void OnBrowse( wxCommandEvent& event );
 		void OnDestinationEdit( wxCommandEvent& event );
+		void OnSelected( wxListEvent& event );
 		void OnUpdate( wxCommandEvent& event );
 		void OnSend( wxCommandEvent& event );
 		void OnAbout( wxCommandEvent& event );
@@ -38,6 +39,7 @@ class dovo_mainFrame : public mainFrame
 		static int fillname(void *param,int columns,char** values, char**names);
 
 		engine m_engine;
+
 };
 
 #endif // __dovo_mainFrame__

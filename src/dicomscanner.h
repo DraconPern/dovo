@@ -1,4 +1,6 @@
-#pragma once
+#ifndef _DICOMSCANNER_
+#define _DICOMSCANNER_
+
 #include <string>
 #include <boost/thread/mutex.hpp>
 #include <boost/filesystem.hpp>
@@ -12,10 +14,10 @@ public:
 
 	void Clear(void);
 
-	void DoScan(std::wstring path);
+	void DoScan(boost::filesystem::path path);
 
 	static void DoScanThread(void *obj);
-	std::wstring ScanPath;
+	boost::filesystem::path m_scanPath;
 
 	void Cancel();
 	bool IsDone();
@@ -31,6 +33,7 @@ private:
 	boost::mutex mutex;
 	bool cancelEvent, doneEvent;
 
-	sqlite3_stmt *insertPatient, *insertStudy, *insertSeries, *insertImage;
+	sqlite3_stmt *insertImage;
 };
 
+#endif

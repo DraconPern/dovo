@@ -20,7 +20,11 @@ engine::engine()
 {
 	db = NULL;
 
-	if(sqlite3_open16(":memory:", &db))
+#if defined(_WIN32)
+	if(sqlite3_open16(":memory:", &db))	// wide version mainly for unicode path and may be name?
+#else
+	if(sqlite3_open(":memory:", &db))	// everything in utf-8
+#endif
 	{
 		std::ostringstream msg;
 		msg << "Can't create database: " << sqlite3_errmsg(db);
@@ -143,11 +147,10 @@ void engine::StartScan(wxString path)
 
 	scanner.Clear();
 	scanner.db = db;
-	scanner.ScanPath = path;
+	scanner.m_scanPath = path;
 	
 	boost::thread t(DICOMFileScanner::DoScanThread, &scanner);
 	t.detach();
-	
 }
 
 void engine::StopScan()

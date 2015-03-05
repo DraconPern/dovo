@@ -300,6 +300,10 @@ mainFrame::mainFrame( wxWindow* parent, wxWindowID id, const wxString& title, co
 	// Connect Events
 	m_button5->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnBrowse ), NULL, this );
 	m_button6->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnDestinationEdit ), NULL, this );
+	m_patients->Connect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( mainFrame::OnSelected ), NULL, this );
+	m_studies->Connect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( mainFrame::OnSelected ), NULL, this );
+	m_series->Connect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( mainFrame::OnSelected ), NULL, this );
+	m_instances->Connect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( mainFrame::OnSelected ), NULL, this );
 	m_update->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnUpdate ), NULL, this );
 	m_send->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnSend ), NULL, this );
 	m_about->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnAbout ), NULL, this );
@@ -311,6 +315,10 @@ mainFrame::~mainFrame()
 	// Disconnect Events
 	m_button5->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnBrowse ), NULL, this );
 	m_button6->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnDestinationEdit ), NULL, this );
+	m_patients->Disconnect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( mainFrame::OnSelected ), NULL, this );
+	m_studies->Disconnect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( mainFrame::OnSelected ), NULL, this );
+	m_series->Disconnect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( mainFrame::OnSelected ), NULL, this );
+	m_instances->Disconnect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( mainFrame::OnSelected ), NULL, this );
 	m_update->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnUpdate ), NULL, this );
 	m_send->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnSend ), NULL, this );
 	m_about->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnAbout ), NULL, this );
@@ -468,9 +476,18 @@ sendStatus::sendStatus( wxWindow* parent, wxWindowID id, const wxString& title, 
 	wxBoxSizer* bSizer30;
 	bSizer30 = new wxBoxSizer( wxVERTICAL );
 	
+	wxBoxSizer* bSizer29;
+	bSizer29 = new wxBoxSizer( wxHORIZONTAL );
+	
 	m_progress = new wxGauge( this, wxID_ANY, 100, wxDefaultPosition, wxDefaultSize, wxGA_HORIZONTAL );
 	m_progress->SetValue( 0 ); 
-	bSizer30->Add( m_progress, 0, wxALL, 5 );
+	bSizer29->Add( m_progress, 1, wxBOTTOM|wxEXPAND|wxLEFT|wxTOP, 15 );
+	
+	m_stop = new wxButton( this, wxID_ANY, _("Stop"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer29->Add( m_stop, 0, wxBOTTOM|wxLEFT|wxRIGHT|wxTOP, 15 );
+	
+	
+	bSizer30->Add( bSizer29, 0, wxEXPAND, 5 );
 	
 	m_log = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY );
 	bSizer30->Add( m_log, 1, wxALL|wxEXPAND, 5 );
@@ -478,13 +495,18 @@ sendStatus::sendStatus( wxWindow* parent, wxWindowID id, const wxString& title, 
 	
 	this->SetSizer( bSizer30 );
 	this->Layout();
-	bSizer30->Fit( this );
 	
 	this->Centre( wxBOTH );
+	
+	// Connect Events
+	m_stop->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( sendStatus::OnStop ), NULL, this );
 }
 
 sendStatus::~sendStatus()
 {
+	// Disconnect Events
+	m_stop->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( sendStatus::OnStop ), NULL, this );
+	
 }
 
 searchStatus::searchStatus( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
