@@ -62,7 +62,6 @@ int dovo_mainFrame::fillname(void *param,int columns,char** values, char**names)
 	win->m_patients->InsertItem(0, values[0]);
 	win->m_patients->SetItem(0, 1, values[1]);
 	win->m_patients->SetItem(0, 2, values[2]);
-
 	return 0; 
 }
 

@@ -329,7 +329,7 @@ about::about( wxWindow* parent, wxWindowID id, const wxString& title, const wxPo
 	m_version->Wrap( -1 );
 	bSizer28->Add( m_version, 0, wxALL, 5 );
 	
-	m_copyright = new wxStaticText( this, wxID_ANY, _("Copyright (C) 2007-2015 FrontMotion"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_copyright = new wxStaticText( this, wxID_ANY, _("Copyright (C) 2007-2015 Ing-Long Eric Kuo"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_copyright->Wrap( -1 );
 	bSizer28->Add( m_copyright, 0, wxALL, 5 );
 	
@@ -340,7 +340,7 @@ about::about( wxWindow* parent, wxWindowID id, const wxString& title, const wxPo
 	m_staticText13->Wrap( -1 );
 	bSizer27->Add( m_staticText13, 0, wxALL, 5 );
 	
-	m_hyperlink1 = new wxHyperlinkCtrl( this, wxID_ANY, wxEmptyString, wxT("http://www.frontmotion.com"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+	m_hyperlink1 = new wxHyperlinkCtrl( this, wxID_ANY, wxEmptyString, wxT("http://www.draconpern.com/software/dovo"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
 	bSizer27->Add( m_hyperlink1, 0, wxALL, 5 );
 	
 	
@@ -461,24 +461,29 @@ changePatientInfo::~changePatientInfo()
 {
 }
 
-MyDialog4::MyDialog4( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+sendStatus::sendStatus( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
 {
-	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	this->SetSizeHints( wxSize( 600,400 ), wxDefaultSize );
 	
 	wxBoxSizer* bSizer30;
 	bSizer30 = new wxBoxSizer( wxVERTICAL );
 	
-	m_treeCtrl1 = new wxTreeCtrl( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTR_DEFAULT_STYLE );
-	bSizer30->Add( m_treeCtrl1, 0, wxALL, 5 );
+	m_progress = new wxGauge( this, wxID_ANY, 100, wxDefaultPosition, wxDefaultSize, wxGA_HORIZONTAL );
+	m_progress->SetValue( 0 ); 
+	bSizer30->Add( m_progress, 0, wxALL, 5 );
+	
+	m_log = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY );
+	bSizer30->Add( m_log, 1, wxALL|wxEXPAND, 5 );
 	
 	
 	this->SetSizer( bSizer30 );
 	this->Layout();
+	bSizer30->Fit( this );
 	
 	this->Centre( wxBOTH );
 }
 
-MyDialog4::~MyDialog4()
+sendStatus::~sendStatus()
 {
 }
 
@@ -489,9 +494,9 @@ searchStatus::searchStatus( wxWindow* parent, wxWindowID id, const wxString& tit
 	wxBoxSizer* bSizer28;
 	bSizer28 = new wxBoxSizer( wxHORIZONTAL );
 	
-	m_gauge1 = new wxGauge( this, wxID_ANY, 100, wxDefaultPosition, wxDefaultSize, wxGA_HORIZONTAL|wxGA_SMOOTH );
-	m_gauge1->SetValue( 0 ); 
-	bSizer28->Add( m_gauge1, 1, wxALIGN_CENTER_VERTICAL|wxBOTTOM|wxEXPAND|wxLEFT|wxTOP, 15 );
+	m_progress = new wxGauge( this, wxID_ANY, 100, wxDefaultPosition, wxDefaultSize, wxGA_HORIZONTAL|wxGA_SMOOTH );
+	m_progress->SetValue( 0 ); 
+	bSizer28->Add( m_progress, 1, wxALIGN_CENTER_VERTICAL|wxBOTTOM|wxEXPAND|wxLEFT|wxTOP, 15 );
 	
 	m_stop = new wxButton( this, wxID_ANY, _("Stop"), wxDefaultPosition, wxDefaultSize, 0 );
 	bSizer28->Add( m_stop, 0, wxALL, 15 );

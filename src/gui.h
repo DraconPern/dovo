@@ -31,7 +31,6 @@
 #include <wx/panel.h>
 #include <wx/frame.h>
 #include <wx/hyperlink.h>
-#include <wx/treectrl.h>
 #include <wx/gauge.h>
 
 ///////////////////////////////////////////////////////////////////////////
@@ -117,7 +116,7 @@ class mainFrame : public wxFrame
 	
 	public:
 		
-		mainFrame( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("FileIn"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 800,800 ), long style = wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
+		mainFrame( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("FileIn"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 900,800 ), long style = wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
 		
 		~mainFrame();
 	
@@ -140,7 +139,7 @@ class about : public wxDialog
 	
 	public:
 		
-		about( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("About"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 351,215 ), long style = wxDEFAULT_DIALOG_STYLE ); 
+		about( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("About"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 480,234 ), long style = wxDEFAULT_DIALOG_STYLE ); 
 		~about();
 	
 };
@@ -171,19 +170,20 @@ class changePatientInfo : public wxDialog
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class MyDialog4
+/// Class sendStatus
 ///////////////////////////////////////////////////////////////////////////////
-class MyDialog4 : public wxDialog 
+class sendStatus : public wxDialog 
 {
 	private:
 	
 	protected:
-		wxTreeCtrl* m_treeCtrl1;
+		wxGauge* m_progress;
+		wxTextCtrl* m_log;
 	
 	public:
 		
-		MyDialog4( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 528,347 ), long style = wxDEFAULT_DIALOG_STYLE ); 
-		~MyDialog4();
+		sendStatus( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Sending..."), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE ); 
+		~sendStatus();
 	
 };
 
@@ -195,7 +195,7 @@ class searchStatus : public wxDialog
 	private:
 	
 	protected:
-		wxGauge* m_gauge1;
+		wxGauge* m_progress;
 		wxButton* m_stop;
 		
 		// Virtual event handlers, overide them in your derived class

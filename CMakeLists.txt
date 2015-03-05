@@ -30,6 +30,8 @@ set(dovo_HEADERS
 	src/dovo_changePatientInfo.h
 	src/dovo_destination.h
 	src/dovo_mainFrame.h
+	src/dovo_searchStatus.h
+	src/dovo_sendStatus.h
 
 	src/engine.h
 	src/destinationentry.h
@@ -46,6 +48,7 @@ set(dovo_SRCS
 	src/dovo_destination.cpp
 	src/dovo_mainFrame.cpp
 	src/dovo_searchStatus.cpp
+	src/dovo_sendStatus.cpp
 	src/engine.cpp
 	src/dicomscanner.cpp
 	sqlite3/sqlite3.c
