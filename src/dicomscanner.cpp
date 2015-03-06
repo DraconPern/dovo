@@ -18,21 +18,55 @@
 #define UNICODE 1
 #endif
 
-DICOMFileScanner::DICOMFileScanner(void)
+class DICOMFileScannerImpl
 {
-	Clear();
+public:
+	DICOMFileScannerImpl(void);
+	~DICOMFileScannerImpl(void);
+
+	void Initialize(sqlite3 *db, boost::filesystem::path scanPath);
+
+	void DoScan(boost::filesystem::path path);
+
+	static void DoScanThread(void *obj);
+	boost::filesystem::path m_scanPath;
+
+	void Cancel();
+	bool IsDone();
+
+	sqlite3 *db;
+protected:
+	void ScanFile(boost::filesystem::path path);
+	void ScanDir(boost::filesystem::path path);
+
+	bool IsCanceled();
+	void SetDone(bool state);
+
+	boost::mutex mutex;
+	bool cancelEvent, doneEvent;
+
+	sqlite3_stmt *insertImage;
+};
+
+DICOMFileScannerImpl::DICOMFileScannerImpl()
+{
+	cancelEvent = doneEvent = false;
+	db = NULL;
+	m_scanPath = "";
 }
 
-DICOMFileScanner::~DICOMFileScanner(void)
+DICOMFileScannerImpl::~DICOMFileScannerImpl()
 {	
 }
 
-void DICOMFileScanner::Clear(void)
+void DICOMFileScannerImpl::Initialize(sqlite3 *db, boost::filesystem::path scanPath)
 {
 	cancelEvent = doneEvent = false;
+	this->db = db;
+	this->m_scanPath = scanPath;
 }
 
-void DICOMFileScanner::ScanFile(boost::filesystem::path path)
+void DICOMFileScannerImpl::ScanFile(boost::filesystem::path path)
 {
 #if defined(WIDE_CHAR_FILE_IO_FUNCTIONS) && defined(_WIN32)
 	std::wstring filename = path.wstring();
@@ -86,9 +120,9 @@ void DICOMFileScanner::ScanFile(boost::filesystem::path path)
 
 }
 
-void DICOMFileScanner::DoScanThread(void *obj)
+void DICOMFileScannerImpl::DoScanThread(void *obj)
 {
-	DICOMFileScanner *me = (DICOMFileScanner *) obj;
+	DICOMFileScannerImpl *me = (DICOMFileScannerImpl *) obj;
 	if(me)
 	{
 		me->SetDone(false);
@@ -98,7 +132,7 @@ void DICOMFileScanner::DoScanThread(void *obj)
 
 }
 
-void DICOMFileScanner::DoScan(boost::filesystem::path path)
+void DICOMFileScannerImpl::DoScan(boost::filesystem::path path)
 {	
 	std::string imagesql = "INSERT INTO images VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)";
 	sqlite3_prepare_v2(db, imagesql.c_str(), imagesql.length(), &insertImage, NULL);
@@ -108,7 +142,7 @@ void DICOMFileScanner::DoScan(boost::filesystem::path path)
 	sqlite3_finalize(insertImage);
 }
 
-void DICOMFileScanner::ScanDir(boost::filesystem::path path)
+void DICOMFileScannerImpl::ScanDir(boost::filesystem::path path)
 {
 	boost::filesystem::path someDir(path);
 	boost::filesystem::directory_iterator end_iter;
@@ -138,26 +172,57 @@ void DICOMFileScanner::ScanDir(boost::filesystem::path path)
 }
 
 
-void DICOMFileScanner::Cancel()
+void DICOMFileScannerImpl::Cancel()
 {
 	boost::mutex::scoped_lock lk(mutex);
 	cancelEvent = true;
 }
 
-bool DICOMFileScanner::IsDone()
+bool DICOMFileScannerImpl::IsDone()
 {
 	boost::mutex::scoped_lock lk(mutex);
 	return doneEvent;
 }
 
-bool DICOMFileScanner::IsCanceled()
+bool DICOMFileScannerImpl::IsCanceled()
 {
 	boost::mutex::scoped_lock lk(mutex);
 	return cancelEvent;
 }
 
-void DICOMFileScanner::SetDone(bool state)
+void DICOMFileScannerImpl::SetDone(bool state)
 {
 	boost::mutex::scoped_lock lk(mutex);
 	doneEvent = state;
+}
+
+DICOMFileScanner::DICOMFileScanner(void)
+{
+	impl = new DICOMFileScannerImpl;
+}
+
+DICOMFileScanner::~DICOMFileScanner(void)
+{
+	delete impl;
+}
+
+void DICOMFileScanner::Initialize(sqlite3 *db, boost::filesystem::path scanPath)
+{
+	impl->Initialize(db, scanPath);
+}
+
+void DICOMFileScanner::DoScanThread(void *obj)
+{	
+	DICOMFileScannerImpl::DoScanThread(((DICOMFileScanner *) obj)->impl);
+}
+
+
+void DICOMFileScanner::Cancel()
+{
+	impl->Cancel();
+}
+
+bool DICOMFileScanner::IsDone()
+{
+	return impl->IsDone();
 }

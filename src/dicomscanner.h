@@ -6,34 +6,22 @@
 #include <boost/filesystem.hpp>
 #include "sqlite3.h"
 
+class DICOMFileScannerImpl;
 class DICOMFileScanner
 {
 public:
-	DICOMFileScanner(void);
-	~DICOMFileScanner(void);
+	DICOMFileScanner();
+	~DICOMFileScanner();
 
+	void Initialize(sqlite3 *db, boost::filesystem::path scanPath);
 	void Clear(void);
 
-	void DoScan(boost::filesystem::path path);
-
 	static void DoScanThread(void *obj);
-	boost::filesystem::path m_scanPath;
 
 	void Cancel();
 	bool IsDone();
-
-	sqlite3 *db;
 private:
-	void ScanFile(boost::filesystem::path path);
-	void ScanDir(boost::filesystem::path path);
-
-	bool IsCanceled();
-	void SetDone(bool state);
-
-	boost::mutex mutex;
-	bool cancelEvent, doneEvent;
-
-	sqlite3_stmt *insertImage;
+	DICOMFileScannerImpl *impl;
 };
 
 #endif
