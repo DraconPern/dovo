@@ -4,6 +4,7 @@
 #include "sqlite3.h"
 #include "destinationentry.h"
 #include "dicomscanner.h"
+#include "dicomsender.h"
 
 class engine
 {
@@ -17,8 +18,11 @@ public:
 	void SaveDestinationList();
 	void StartScan(wxString path);
 	void StopScan();
+	void StartSend(wxString PatientName, wxString NewPatientName, wxString NewPatientID, wxString NewBirthDay, int destination);
+	void StopSend();
 	void GetPatients(sqlite3_callback fillname, void *obj);
 	DICOMFileScanner scanner;
+	DICOMSender sender;
 protected:
 
 	sqlite3 *db;

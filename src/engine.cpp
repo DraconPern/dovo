@@ -145,10 +145,8 @@ void engine::StartScan(wxString path)
 {
 	sqlite3_exec(db, "DELETE FROM images", NULL, NULL, NULL);
 
-	scanner.Clear();
-	scanner.db = db;
-	scanner.m_scanPath = path;
-	
+	boost::filesystem::path x = path;
+	scanner.Initialize(db, x);
 	boost::thread t(DICOMFileScanner::DoScanThread, &scanner);
 	t.detach();
 }
@@ -156,6 +154,42 @@ void engine::StartScan(wxString path)
 void engine::StopScan()
 {
 	scanner.Cancel();
+}
+
+
+void engine::StartSend(wxString PatientName, wxString NewPatientName, wxString NewPatientID, wxString NewBirthDay, int destination)
+{
+	// find the destination
+	wxString destinationHost;
+	int destinationPort;
+	wxString destinationAETitle, ourAETitle;
+
+	if(destination < globalDestinations.size())
+	{
+		destinationHost = globalDestinations[destination].destinationHost;
+		destinationPort = globalDestinations[destination].destinationPort;
+		destinationAETitle = globalDestinations[destination].destinationAETitle;
+		ourAETitle = globalDestinations[destination].ourAETitle;
+	}
+	else
+	{
+		destination -= globalDestinations.size();
+		destinationHost = destinations[destination].destinationHost;
+		destinationPort = destinations[destination].destinationPort;
+		destinationAETitle = destinations[destination].destinationAETitle;
+		ourAETitle = destinations[destination].ourAETitle;
+	}
+
+	sender.Initialize(db, PatientName.ToUTF8().data(), NewPatientName.ToUTF8().data(), NewPatientID.ToUTF8().data(), NewBirthDay.ToUTF8().data(),
+		destinationHost.ToUTF8().data(), destinationPort, destinationAETitle.ToUTF8().data(), ourAETitle.ToUTF8().data());
+	
+	boost::thread t(DICOMSender::DoSendThread, &sender);
+	t.detach(); 
+}
+
+void engine::StopSend()
+{
+	sender.Cancel();
 }
 
 void engine::GetPatients(sqlite3_callback fillname, void *obj)

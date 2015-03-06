@@ -3,58 +3,161 @@
 #include "sqlite3_exec_stmt.h"
 #include <boost/lexical_cast.hpp>
 
+// work around the fact that dcmtk doesn't work in unicode mode, so all string operation needs to be converted from/to mbcs
+#ifdef _UNICODE
+#undef _UNICODE
+#undef UNICODE
+#define _UNDEFINEDUNICODE
+#endif
 
-DICOMSender::DICOMSender(void)
-{
-	Clear();
+#include "dcmtk/ofstd/ofstd.h"
+#include "dcmtk/oflog/oflog.h"
+#include "dcmtk/dcmdata/dctk.h"
+#include "dcmtk/dcmnet/dimse.h"
+#include "dcmtk/dcmnet/diutil.h"
 
-	opt_verbose = true;
-	opt_showPresentationContexts = false;		
-	opt_maxReceivePDULength = ASC_DEFAULTMAXPDU;
+#ifdef _UNDEFINEDUNICODE
+#define _UNICODE 1
+#define UNICODE 1
+#endif
+
+class DICOMSenderImpl
+{	
+
+public:
+	DICOMSenderImpl(void);
+	~DICOMSenderImpl(void);
+
+	void Initialize(sqlite3 *db, const std::string m_PatientName, std::string m_NewPatientName, std::string m_NewPatientID ,std::string m_NewBirthDay,
+		std::string m_destinationHost, unsigned int m_destinationPort, std::string m_destinationAETitle, std::string m_ourAETitle);	
+
+	static void DoSendThread(void *obj);
+
+	std::string ReadLog();
+
+	void Cancel();
+	bool IsDone();
+
+	sqlite3 *db;
+
+	std::string m_PatientName;
+	std::string m_NewPatientName;
+	std::string m_NewPatientID;
+	std::string m_NewBirthDay;
+
+	std::string m_destinationHost;
+	unsigned int m_destinationPort;
+	std::string m_destinationAETitle;
+	std::string m_ourAETitle;
+
+protected:
+	static int countcallback(void *param,int columns,char** values, char**names);
+
+	void DoSend();
+
+	int SendABatch();
+
+	bool IsCanceled();
+	void SetDone(bool state);
+
+	boost::mutex mutex;
+	bool cancelEvent, doneEvent;
+
+	class GUILog
+	{
+	public:
+		void Write(const char *msg);
+		void Write(const OFCondition &cond);
+		void Write(std::stringstream &stream);
+		std::string Read();
+	protected:
+		std::stringstream mycout;	
+		boost::mutex mycoutmutex;
+	};
+
+	GUILog log;
+
+	OFCondition storeSCU(T_ASC_Association * assoc, const char *fname);
+	OFCondition cstore(T_ASC_Association * assoc, const OFString& fname);
+	void replacePatientInfoInformation(DcmDataset* dataset);
+	// void replaceSOPInstanceInformation(DcmDataset* dataset);
+	OFCondition addStoragePresentationContexts(T_ASC_Parameters *params, OFList<OFString>& sopClasses);	
+	OFString makeUID(OFString basePrefix, int counter);
+	bool updateStringAttributeValue(DcmItem* dataset, const DcmTagKey& key, OFString value);
+
+	/*  glue functions to transfer our db to the list*/
+	void addfiles();
+	static int addimage(void *param,int columns,char** values, char**names);
+
+	OFList<OFString> fileNameList;
+	OFList<OFString> sopClassUIDList;    // the list of sop classes
+
+
+
+	OFCmdUnsignedInt opt_maxReceivePDULength;
+	OFCmdUnsignedInt opt_maxSendPDULength;
+	E_TransferSyntax opt_networkTransferSyntax;
+
+	
+	bool opt_combineProposedTransferSyntaxes;
+
+	bool opt_correctUIDPadding;
+	OFString patientNamePrefix;   // PatientName is PN (maximum 16 chars)
+	OFString patientIDPrefix; // PatientID is LO (maximum 64 chars)
+	OFString studyIDPrefix;   // StudyID is SH (maximum 16 chars)
+	OFString accessionNumberPrefix;  // AccessionNumber is SH (maximum 16 chars)
+	bool opt_secureConnection; /* default: no secure connection */		
+	T_DIMSE_BlockingMode opt_blockMode;
+	int opt_dimse_timeout;	
+	int opt_timeout;
+
+	OFCmdUnsignedInt opt_compressionLevel;		
+
+	static void progressCallback(void * callbackData, T_DIMSE_StoreProgress *progress, T_DIMSE_C_StoreRQ * req);
+};
+
+DICOMSenderImpl::DICOMSenderImpl()
+{			
 	opt_maxSendPDULength = 0;
 	opt_networkTransferSyntax = EXS_Unknown;
 	// opt_networkTransferSyntax = EXS_JPEG2000LosslessOnly;
 
-	unsuccessfulStoreEncountered = false;
-	lastStatusCode = STATUS_Success;
-
-	opt_proposeOnlyRequiredPresentationContexts = false;
+	
 	opt_combineProposedTransferSyntaxes = true;
 
-	opt_correctUIDPadding = false;
 	patientNamePrefix = "OFFIS^TEST_PN_";   // PatientName is PN (maximum 16 chars)
 	patientIDPrefix = "PID_"; // PatientID is LO (maximum 64 chars)
 	studyIDPrefix = "SID_";   // StudyID is SH (maximum 16 chars)
 	accessionNumberPrefix;  // AccessionNumber is SH (maximum 16 chars)
-	opt_secureConnection = false; /* default: no secure connection */    
-	opt_blockMode = DIMSE_NONBLOCKING;
-	opt_dimse_timeout = 10;
-	opt_acse_timeout = 20;
+
 	opt_timeout = 10;
 
 	opt_compressionLevel = 0;
 }
 
-DICOMSender::~DICOMSender(void)
+DICOMSenderImpl::~DICOMSenderImpl()
 {
 }
 
-void DICOMSender::Clear(void)
+void DICOMSenderImpl::Initialize(sqlite3 *db, const std::string PatientName, std::string NewPatientName, std::string NewPatientID, std::string NewBirthDay,
+								 std::string destinationHost, unsigned int destinationPort, std::string destinationAETitle, std::string ourAETitle)
 {
 	cancelEvent = doneEvent = false;
+	this->db = db;
+	this->m_PatientName = PatientName;
+	this->m_NewPatientName = NewPatientName;
+	this->m_NewPatientID = NewPatientID;
+	this->m_NewBirthDay = NewBirthDay;
+
+	this->m_destinationHost = destinationHost;
+	this->m_destinationPort = destinationPort;
+	this->m_destinationAETitle = destinationAETitle;
+	this->m_ourAETitle = ourAETitle;
 }
 
-int countcallback(void *param,int columns,char** values, char**names)
+void DICOMSenderImpl::DoSendThread(void *obj)
 {
-	int *count = (int *) param;
-
-	*count = boost::lexical_cast<int>(values[0]);
-	return 0;
-}
-
-void DICOMSender::DoSendThread(void *obj)
-{
-	DICOMSender *me = (DICOMSender *) obj;
+	DICOMSenderImpl *me = (DICOMSenderImpl *) obj;
 	if (me)
 	{
 		me->SetDone(false);
@@ -64,21 +167,38 @@ void DICOMSender::DoSendThread(void *obj)
 
 }
 
-void DICOMSender::WriteLog(const char *msg)
+std::string DICOMSenderImpl::ReadLog()
+{
+	return log.Read();
+}
+
+void DICOMSenderImpl::GUILog::Write(const char *msg)
 {
 	boost::mutex::scoped_lock lk(mycoutmutex);
 	mycout << msg;
 }
 
-void DICOMSender::WriteLog(const OFCondition &cond)
+void DICOMSenderImpl::GUILog::Write(const OFCondition &cond)
 {
 	OFString dumpmsg; DimseCondition::dump(dumpmsg, cond); dumpmsg.append("\n");
-	WriteLog(dumpmsg.c_str());
+	Write(dumpmsg.c_str());
 }
 
-void DICOMSender::DoSend()
-{
+void DICOMSenderImpl::GUILog::Write(std::stringstream &stream)
+{	
+	Write(stream.str().c_str());
+	stream.str(std::string());
+}
 
+std::string DICOMSenderImpl::GUILog::Read()
+{
+	boost::mutex::scoped_lock lk(mycoutmutex);	
+	std::string str = mycout.str();
+	mycout.str("");
+	return str;
+}
+void DICOMSenderImpl::DoSend()
+{
 	int retry = 0;
 	int countbefore = 0;
 	int countafter = 0;
@@ -91,10 +211,9 @@ void DICOMSender::DoSend()
 		sqlite3_bind_text(select, 1, m_PatientName.c_str(), m_PatientName.length(), SQLITE_STATIC);
 		sqlite3_exec_stmt(select, &countcallback, &countbefore, NULL);
 
+		// batch send
 		if (countbefore > 0)
-		{
-			int ret = Send();
-		}
+			SendABatch();		
 
 		sqlite3_exec_stmt(select, &countcallback, &countafter, NULL);
 		sqlite3_finalize(select);
@@ -103,10 +222,10 @@ void DICOMSender::DoSend()
 		if (countafter > 0 && countbefore == countafter && retry < 10000)
 		{
 			retry++;
-			WriteLog("Waiting 5 mins before retry\n");
+			log.Write("Waiting 5 mins before retry\n");
 
 			// sleep loop with cancel check, 5 minutes
-			int sleeploop = 10 * 5;
+			int sleeploop = 5 * 60 * 5;
 			while (sleeploop > 0)
 			{
 				Sleep(200);
@@ -128,226 +247,141 @@ void DICOMSender::DoSend()
 	sqlite3_exec(db, updatesql.c_str(), NULL, NULL, NULL);    
 }
 
-int DICOMSender::Send()
+int DICOMSenderImpl::SendABatch()
 {
+	T_ASC_Network *net = NULL;
+	T_ASC_Parameters *params = NULL;
+	T_ASC_Association *assoc = NULL;
 
-	addfiles();
-	
-	OFCondition cond = ASC_initializeNetwork(NET_REQUESTOR, 0, opt_acse_timeout, &net);
-	if (cond.bad())
-	{		
-		WriteLog(cond);
-		return 1;
-	}
-
-	/* initialize asscociation parameters, i.e. create an instance of T_ASC_Parameters*. */
-	cond = ASC_createAssociationParameters(&params, opt_maxReceivePDULength);
-	if (cond.bad())
-	{		
-		WriteLog(cond);
-		return 1;
-	}
-	
-	ASC_setAPTitles(params, m_ourAETitle.c_str(), m_destinationAETitle.c_str(), NULL);
-	
-	cond = ASC_setTransportLayerType(params, false);
-	
-	/* Figure out the presentation addresses and copy the */
-	/* corresponding values into the association parameters.*/
-	gethostname(localHost, sizeof(localHost) - 1);
-	sprintf(peerHost, "%s:%d", m_destinationHost, m_destinationPort);
-	ASC_setPresentationAddresses(params, localHost, peerHost);
-
-
-	/* Set the presentation contexts which will be negotiated */
-	/* when the network connection will be established */
-	boost::mutex::scoped_lock lk(mycoutmutex);
-
-	OFListConstIterator(OFString) s_cur = sopClassUIDList.begin();
-	OFListConstIterator(OFString) s_end = sopClassUIDList.end();
-	while (s_cur != s_end)
+	try
 	{
-		mycout << (*s_cur).c_str();	
-		++s_cur;
-	}
+		// init network
+		int acse_timeout = 20;
+		OFCondition cond = ASC_initializeNetwork(NET_REQUESTOR, 0, acse_timeout, &net);
+		if (cond.bad())
+		{		
+			log.Write(cond);
+			throw new std::exception("ASC_initializeNetwork");
+		}
 
+		cond = ASC_createAssociationParameters(&params, ASC_DEFAULTMAXPDU);
+		if (cond.bad())
+		{		
+			log.Write(cond);
+			throw new std::exception("ASC_createAssociationParameters");
+		}
 
-	cond = addStoragePresentationContexts(params, sopClassUIDList);
+		ASC_setAPTitles(params, m_ourAETitle.c_str(), m_destinationAETitle.c_str(), NULL);	
 
+		DIC_NODENAME localHost;
+		gethostname(localHost, sizeof(localHost) - 1);
+		std::stringstream peerHost;
+		peerHost << m_destinationHost << ":" << m_destinationPort;
+		ASC_setPresentationAddresses(params, localHost, peerHost.str().c_str());
 
-	if (cond.bad())
-	{
-		boost::mutex::scoped_lock lk(mycoutmutex);
-		OFString dumpmsg; DimseCondition::dump(dumpmsg, cond); mycout << dumpmsg << std::endl;
-		return 1;
-	}
+		addfiles();
+		cond = addStoragePresentationContexts(params, sopClassUIDList);
 
-	/* dump presentation contexts if required */
-	if (1)
-	{
-		boost::mutex::scoped_lock lk(mycoutmutex);
-		mycout << "Request Parameters:\n";
-		ASC_dumpParameters(params, mycout);
-	}
-
-	/* create association, i.e. try to establish a network connection to another */
-	/* DICOM application. This call creates an instance of T_ASC_Association*. */
-	if (opt_verbose)
-	{
-		boost::mutex::scoped_lock lk(mycoutmutex);
-		mycout << "Requesting Association\n";
-	}
-	cond = ASC_requestAssociation(net, params, &assoc);
-	if (cond.bad())
-	{
-		if (cond == DUL_ASSOCIATIONREJECTED)
+		if (cond.bad())
 		{
-			boost::mutex::scoped_lock lk(mycoutmutex);
-			T_ASC_RejectParameters rej;
+			log.Write(cond);
+			throw new std::exception("addStoragePresentationContexts");
+		}
 
-			ASC_getRejectParameters(params, &rej);
-			mycout << "Association Rejected:" << std::endl;
-			ASC_printRejectParameters(mycout, &rej);
-			return 1;
+		log.Write("Requesting Association\n");
+
+		cond = ASC_requestAssociation(net, params, &assoc);
+		if (cond.bad())
+		{
+			if (cond == DUL_ASSOCIATIONREJECTED)
+			{				
+				T_ASC_RejectParameters rej;
+				ASC_getRejectParameters(params, &rej);
+				std::stringstream msg;
+				msg << "Association Rejected:\n";
+				ASC_printRejectParameters(msg, &rej);
+				log.Write(msg);
+				throw new std::exception("ASC_requestAssociation");
+			}
+			else
+			{
+				log.Write("Association Request Failed:\n");			
+				log.Write(cond);
+				throw new std::exception("ASC_requestAssociation");
+			}
+		}
+
+		// display the presentation contexts which have been accepted/refused	
+		std::stringstream msg;
+		msg << "Association Parameters Negotiated:\n";
+		ASC_dumpParameters(params, msg);
+		log.Write(msg);
+
+		/* count the presentation contexts which have been accepted by the SCP */
+		/* If there are none, finish the execution */
+		if (ASC_countAcceptedPresentationContexts(params) == 0)
+		{
+			log.Write("No Acceptable Presentation Contexts\n");
+			throw new std::exception("ASC_countAcceptedPresentationContexts");
+		}
+
+		/* do the real work, i.e. for all files which were specified in the */
+		/* command line, transmit the encapsulated DICOM objects to the SCP. */
+		cond = EC_Normal;
+		OFListIterator(OFString) iter = fileNameList.begin();
+		OFListIterator(OFString) enditer = fileNameList.end();
+
+		while ((iter != enditer)/* && (cond == EC_Normal)*/) // compare with EC_Normal since DUL_PEERREQUESTEDRELEASE is also good()
+		{
+			if (IsCanceled())
+				break;
+			cond = cstore(assoc, *iter);
+			++iter;
+		}
+
+		fileNameList.clear();
+
+		/* tear down association, i.e. terminate network connection to SCP */
+		if (cond == EC_Normal)
+		{
+			log.Write("Releasing Association\n");
+
+			cond = ASC_releaseAssociation(assoc);
+			if (cond.bad())
+			{			
+				log.Write("Association Release Failed:\n");
+				log.Write(cond);			
+			}
+		}
+		else if (cond == DUL_PEERREQUESTEDRELEASE)
+		{
+			log.Write("Protocol Error: peer requested release (Aborting)\n");		
+			ASC_abortAssociation(assoc);		
+		}
+		else if (cond == DUL_PEERABORTEDASSOCIATION)
+		{
+			log.Write("Peer Aborted Association\n");		
 		}
 		else
 		{
-			boost::mutex::scoped_lock lk(mycoutmutex);
-			mycout << "Association Request Failed:" << std::endl;
-			OFString dumpmsg; DimseCondition::dump(dumpmsg, cond); mycout << dumpmsg << std::endl;
+			log.Write("SCU Failed:\n");
+			log.Write(cond);		
+			log.Write("Aborting Association\n");
 
-			return 1;
+			ASC_abortAssociation(assoc);		
 		}
 	}
-
-	/// display the presentation contexts which have been accepted/refused	
+	catch(...)
 	{
-		boost::mutex::scoped_lock lk(mycoutmutex);
-		mycout << "Association Parameters Negotiated:\n";
-		ASC_dumpParameters(params, mycout);
-	}
-
-	/* count the presentation contexts which have been accepted by the SCP */
-	/* If there are none, finish the execution */
-	if (ASC_countAcceptedPresentationContexts(params) == 0)
-	{
-		boost::mutex::scoped_lock lk(mycoutmutex);
-		mycout << "No Acceptable Presentation Contexts" << std::endl;
-		return 1;
-	}
-
-	/* dump general information concerning the establishment of the network connection if required */
-	if (opt_verbose)
-	{
-		boost::mutex::scoped_lock lk(mycoutmutex);
-		mycout << "Association Accepted (Max Send PDV: "
-			<< assoc->sendPDVLength	<< ")\n";
-	}
-
-	/* do the real work, i.e. for all files which were specified in the */
-	/* command line, transmit the encapsulated DICOM objects to the SCP. */
-	cond = EC_Normal;
-	OFListIterator(OFString) iter = fileNameList.begin();
-	OFListIterator(OFString) enditer = fileNameList.end();
-
-	while ((iter != enditer)/* && (cond == EC_Normal)*/) // compare with EC_Normal since DUL_PEERREQUESTEDRELEASE is also good()
-	{
-		if (IsCanceled())
-			break;
-		cond = cstore(assoc, *iter);
-		++iter;
-	}
-
-	fileNameList.clear();
-
-	/* tear down association, i.e. terminate network connection to SCP */
-	if (cond == EC_Normal)
-	{
-		/* release association */
-		if (opt_verbose)
-		{
-			boost::mutex::scoped_lock lk(mycoutmutex);
-			mycout << "Releasing Association\n";
-		}
-		cond = ASC_releaseAssociation(assoc);
-		if (cond.bad())
-		{
-			boost::mutex::scoped_lock lk(mycoutmutex);
-			mycout << "Association Release Failed:";
-			OFString dumpmsg; DimseCondition::dump(dumpmsg, cond); mycout << dumpmsg << std::endl;
-			return 1;
-		}
 
 	}
-	else if (cond == DUL_PEERREQUESTEDRELEASE)
-	{
-		if (1)
-		{
-			boost::mutex::scoped_lock lk(mycoutmutex);
-			mycout << "Protocol Error: peer requested release (Aborting)\n";
-		}
-		if (opt_verbose)
-		{
-			boost::mutex::scoped_lock lk(mycoutmutex);
-			mycout << "Aborting Association\n";
-		}
-		cond = ASC_abortAssociation(assoc);
-		if (cond.bad())
-		{
-			boost::mutex::scoped_lock lk(mycoutmutex);
-			mycout << "Association Abort Failed:";
-			OFString dumpmsg; DimseCondition::dump(dumpmsg, cond); mycout << dumpmsg << std::endl;
-			return 1;
-		}
-	}
-	else if (cond == DUL_PEERABORTEDASSOCIATION)
-	{
-		if (opt_verbose)
-		{
-			boost::mutex::scoped_lock lk(mycoutmutex);
-			mycout << "Peer Aborted Association\n";
-		}
-	}
-	else
-	{
-		{
-			boost::mutex::scoped_lock lk(mycoutmutex);
-			mycout << "SCU Failed:\n";
-			OFString dumpmsg; DimseCondition::dump(dumpmsg, cond); mycout << dumpmsg << std::endl;
-		}
-		if (opt_verbose)
-		{
-			boost::mutex::scoped_lock lk(mycoutmutex);
-			mycout << "Aborting Association\n";
-		}
-		cond = ASC_abortAssociation(assoc);
-		if (cond.bad())
-		{
-			boost::mutex::scoped_lock lk(mycoutmutex);
-			mycout << "Association Abort Failed:";
-			OFString dumpmsg; DimseCondition::dump(dumpmsg, cond); mycout << dumpmsg ;
-			return 1;
-		}
-	}
 
-	/* destroy the association, i.e. free memory of T_ASC_Association* structure. This */
-	/* call is the counterpart of ASC_requestAssociation(...) which was called above. */
-	cond = ASC_destroyAssociation(&assoc);
-	if (cond.bad())
-	{
-		boost::mutex::scoped_lock lk(mycoutmutex);
-		OFString dumpmsg; DimseCondition::dump(dumpmsg, cond); mycout << dumpmsg << std::endl;
-		return 1;
-	}
-	/* drop the network, i.e. free memory of T_ASC_Network* structure. This call */
-	/* is the counterpart of ASC_initializeNetwork(...) which was called above. */
-	cond = ASC_dropNetwork(&net);
-	if (cond.bad())
-	{
-		boost::mutex::scoped_lock lk(mycoutmutex);
-		OFString dumpmsg; DimseCondition::dump(dumpmsg, cond); mycout << dumpmsg << std::endl;
-		return 1;
-	}
+	if(assoc)
+		ASC_destroyAssociation(&assoc);	
+	
+	if(net)
+		ASC_dropNetwork(&net);
+
 
 	return 0;
 }
@@ -408,7 +442,7 @@ static OFCondition
 	return cond;
 }
 
-OFCondition DICOMSender::addStoragePresentationContexts(T_ASC_Parameters *params, OFList<OFString>& sopClasses)
+OFCondition DICOMSenderImpl::addStoragePresentationContexts(T_ASC_Parameters *params, OFList<OFString>& sopClasses)
 {
 	/*
 	* Each SOP Class will be proposed in two presentation contexts (unless
@@ -474,18 +508,9 @@ OFCondition DICOMSender::addStoragePresentationContexts(T_ASC_Parameters *params
 	combinedSyntaxes.push_back(preferredTransferSyntax);
 	while (s_cur != s_end)
 	{
-		if (!isaListMember(combinedSyntaxes, *s_cur)) combinedSyntaxes.push_back(*s_cur);
+		if (!isaListMember(combinedSyntaxes, *s_cur)) 
+			combinedSyntaxes.push_back(*s_cur);
 		++s_cur;
-	}
-
-	if (!opt_proposeOnlyRequiredPresentationContexts)
-	{
-		// add the (short list of) known storage sop classes to the list
-		// the array of Storage SOP Class UIDs comes from dcuid.h
-		for (int i=0; i<numberOfDcmShortSCUStorageSOPClassUIDs; i++)
-		{
-			sopClasses.push_back(dcmShortSCUStorageSOPClassUIDs[i]);
-		}
 	}
 
 	// thin out the sop classes to remove any duplicates.
@@ -511,8 +536,7 @@ OFCondition DICOMSender::addStoragePresentationContexts(T_ASC_Parameters *params
 
 		if (pid > 255)
 		{
-			boost::mutex::scoped_lock lk(mycoutmutex);
-			mycout << "Too many presentation contexts\n";
+			log.Write("Too many presentation contexts\n");
 			return ASC_BADPRESENTATIONCONTEXTID;
 		}
 
@@ -532,8 +556,7 @@ OFCondition DICOMSender::addStoragePresentationContexts(T_ASC_Parameters *params
 			{
 				if (pid > 255)
 				{
-					boost::mutex::scoped_lock lk(mycoutmutex);
-					mycout << "Too many presentation contexts";
+					log.Write("Too many presentation contexts\n");
 					return ASC_BADPRESENTATIONCONTEXTID;
 				}
 
@@ -548,7 +571,7 @@ OFCondition DICOMSender::addStoragePresentationContexts(T_ASC_Parameters *params
 	return cond;
 }
 
-bool DICOMSender::updateStringAttributeValue(DcmItem* dataset, const DcmTagKey& key, OFString value)
+bool DICOMSenderImpl::updateStringAttributeValue(DcmItem* dataset, const DcmTagKey& key, OFString value)
 {
 	DcmStack stack;
 	DcmTag tag(key);
@@ -557,7 +580,9 @@ bool DICOMSender::updateStringAttributeValue(DcmItem* dataset, const DcmTagKey& 
 	cond = dataset->search(key, stack, ESM_fromHere, false);
 	if (cond != EC_Normal)
 	{
-		mycout << "error: updateStringAttributeValue: cannot find: " << tag.getTagName() << " " << key << ": " << cond.text() << std::endl;
+		std::stringstream msg;
+		msg << "Error: updateStringAttributeValue: cannot find: " << tag.getTagName() << " " << key << ": " << cond.text() << std::endl;
+		log.Write(msg);
 		return false;
 	}
 
@@ -566,36 +591,35 @@ bool DICOMSender::updateStringAttributeValue(DcmItem* dataset, const DcmTagKey& 
 	DcmVR vr(elem->ident());
 	if (elem->getLength() > vr.getMaxValueLength())
 	{
-		mycout << "error: updateStringAttributeValue: " << tag.getTagName()
+		std::stringstream msg;
+		msg << "error: updateStringAttributeValue: " << tag.getTagName()
 			<< " " << key << ": value too large (max "
 			<< vr.getMaxValueLength() << ") for " << vr.getVRName() << " value: " << value << std::endl;
+		log.Write(msg);
 		return false;
 	}
 
 	cond = elem->putOFStringArray(value);
 	if (cond != EC_Normal)
 	{
-		mycout << "error: updateStringAttributeValue: cannot put string in attribute: " << tag.getTagName()
-			<< " " << key << ": "
-			<< cond.text() << std::endl;
+		std::stringstream msg;
+		msg << "error: updateStringAttributeValue: cannot put string in attribute: " << tag.getTagName()
+			<< " " << key << ": " << cond.text() << std::endl;
+		log.Write(msg);
 		return false;
 	}
 
 	return true;
 }
 
-void DICOMSender::replacePatientInfoInformation(DcmDataset* dataset)
+void DICOMSenderImpl::replacePatientInfoInformation(DcmDataset* dataset)
 {
-	if (opt_verbose)
-	{
-		boost::mutex::scoped_lock lk(mycoutmutex);
-		//mycout << "  PatientName=" << m_PatientName << std::endl;
-		mycout << "Changing PatientID=" << m_NewPatientID << std::endl;
-		mycout << "Changing PatientName=" << m_NewPatientName << std::endl;
-		mycout << "Changing Birthday=" << m_NewBirthDay << std::endl;
-	}
+	std::stringstream msg;		
+	msg << "Changing PatientID = " << m_NewPatientID << std::endl;
+	msg << "Changing PatientName = " << m_NewPatientName << std::endl;
+	msg << "Changing Birthday = " << m_NewBirthDay << std::endl;
+	log.Write(msg);
 
-	//
 	if (m_NewPatientID.length() != 0)
 		updateStringAttributeValue(dataset, DCM_PatientID, m_NewPatientID.c_str());
 
@@ -607,43 +631,25 @@ void DICOMSender::replacePatientInfoInformation(DcmDataset* dataset)
 }
 
 
-void DICOMSender::progressCallback(void * callbackData, T_DIMSE_StoreProgress *progress, T_DIMSE_C_StoreRQ * req)
+void DICOMSenderImpl::progressCallback(void * callbackData, T_DIMSE_StoreProgress *progress, T_DIMSE_C_StoreRQ * req)
 {
-	DICOMSender *sender = (DICOMSender *)callbackData;
-	if (sender->opt_verbose)
-	{
-		boost::mutex::scoped_lock lk(sender->mycoutmutex);
-		switch (progress->state)
-		{
-		case DIMSE_StoreBegin:
-			sender->mycout << "XMIT:";
-			break;
-		case DIMSE_StoreEnd:
-			sender->mycout << "|\n";
-			break;
-		default:
-			sender->mycout << '.';
-			break;
-		}
-	}
+	DICOMSenderImpl *sender = (DICOMSenderImpl *)callbackData;
 
-	if (sender->IsCanceled())
+	switch (progress->state)
 	{
-		DIMSE_sendCancelRequest(sender->assoc, sender->presId, req->MessageID);
+	case DIMSE_StoreBegin:
+		sender->log.Write("XMIT:");
+		break;
+	case DIMSE_StoreEnd:
+		sender->log.Write("|\n");
+		break;
+	default:
+		sender->log.Write(".");
+		break;
 	}
 }
 
-OFCondition DICOMSender::storeSCU(T_ASC_Association * assoc, const char *fname)
-	/*
-	* This function will read all the information from the given file,
-	* figure out a corresponding presentation context which will be used
-	* to transmit the information over the network to the SCP, and it
-	* will finally initiate the transmission of all data to the SCP.
-	*
-	* Parameters:
-	*   assoc - [in] The association (network connection to another DICOM application).
-	*   fname - [in] Name of the file which shall be processed.
-	*/
+OFCondition DICOMSenderImpl::storeSCU(T_ASC_Association * assoc, const char *fname)
 {
 	DIC_US msgId = assoc->nextMsgID++;
 	T_DIMSE_C_StoreRQ req;
@@ -652,86 +658,72 @@ OFCondition DICOMSender::storeSCU(T_ASC_Association * assoc, const char *fname)
 	DIC_UI sopInstance;
 	DcmDataset *statusDetail = NULL;
 
-	unsuccessfulStoreEncountered = true; // assumption
+	std::stringstream msg;
+	msg << "Sending file: " << fname << "\n";
+	log.Write(msg);
 
-	if (opt_verbose)
-	{
-		boost::mutex::scoped_lock lk(mycoutmutex);
-		mycout << "--------------------------\n";
-		mycout << "Sending file: " << fname << "\n";
-	}
-
-	/* read information from file. After the call to DcmFileFormat::loadFile(...) the information */
-	/* which is encapsulated in the file will be available through the DcmFileFormat object. */
-	/* In detail, it will be available through calls to DcmFileFormat::getMetaInfo() (for */
-	/* meta header information) and DcmFileFormat::getDataset() (for data set information). */
 	DcmFileFormat dcmff;
 	OFCondition cond = dcmff.loadFile(fname);
 
-	/* figure out if an error occured while the file was read*/
 	if (cond.bad())
-	{
-		boost::mutex::scoped_lock lk(mycoutmutex);
-		mycout << "Bad DICOM file: " << fname << ":" << cond.text() << std::endl;
+	{		
+		log.Write(cond);
 		return cond;
 	}
 
 	replacePatientInfoInformation(dcmff.getDataset());
 
 	/* figure out which SOP class and SOP instance is encapsulated in the file */
-	if (!DU_findSOPClassAndInstanceInDataSet(dcmff.getDataset(),
-		sopClass, sopInstance, opt_correctUIDPadding))
-	{
-		boost::mutex::scoped_lock lk(mycoutmutex);
-		mycout << "No SOP Class & Instance UIDs in file: " << fname << std::endl;
+	if (!DU_findSOPClassAndInstanceInDataSet(dcmff.getDataset(), sopClass, sopInstance, false))
+	{		
+		log.Write("No SOP Class & Instance UIDs\n");
 		return DIMSE_BADDATA;
 	}
 
-	/* figure out which of the accepted presentation contexts should be used */
 	DcmXfer filexfer(dcmff.getDataset()->getOriginalXfer());
 
 	/* special case: if the file uses an unencapsulated transfer syntax (uncompressed
 	* or deflated explicit VR) and we prefer deflated explicit VR, then try
 	* to find a presentation context for deflated explicit VR first.
 	*/
-	if (filexfer.isNotEncapsulated() &&
-		opt_networkTransferSyntax == EXS_DeflatedLittleEndianExplicit)
+	if (filexfer.isNotEncapsulated() && opt_networkTransferSyntax == EXS_DeflatedLittleEndianExplicit)
 	{
 		filexfer = EXS_DeflatedLittleEndianExplicit;
 	}
 
-	if (filexfer.getXfer() != EXS_Unknown) presId = ASC_findAcceptedPresentationContextID(assoc, sopClass, filexfer.getXferID());
-	else presId = ASC_findAcceptedPresentationContextID(assoc, sopClass);
+	T_ASC_PresentationContextID presId;
+	if (filexfer.getXfer() != EXS_Unknown)
+		presId = ASC_findAcceptedPresentationContextID(assoc, sopClass, filexfer.getXferID());
+	else 
+		presId = ASC_findAcceptedPresentationContextID(assoc, sopClass);
+
 	if (presId == 0)
 	{
 		const char *modalityName = dcmSOPClassUIDToModality(sopClass);
-		if (!modalityName) modalityName = dcmFindNameOfUID(sopClass);
-		if (!modalityName) modalityName = "unknown SOP class";
-		boost::mutex::scoped_lock lk(mycoutmutex);
-		mycout << "No presentation context for: " << modalityName << ", " << sopClass << std::endl;
+		if (!modalityName)
+			modalityName = dcmFindNameOfUID(sopClass);
+		if (!modalityName)
+			modalityName = "unknown SOP class";
+
+		std::stringstream msg;
+		msg << "No presentation context for: " << sopClass << " = " << modalityName << std::endl;
+		log.Write(msg);
 		return DIMSE_NOVALIDPRESENTATIONCONTEXTID;
 	}
-
 
 	DcmXfer fileTransfer(dcmff.getDataset()->getOriginalXfer());
 	T_ASC_PresentationContext pc;
 	ASC_findAcceptedPresentationContext(assoc->params, presId, &pc);
 	DcmXfer netTransfer(pc.acceptedTransferSyntax);
 
-	/* if required, dump general information concerning transfer syntaxes */
-	if (opt_verbose)
-	{
-		boost::mutex::scoped_lock lk(mycoutmutex);
-		mycout << "Transfer: "
-			<< dcmFindNameOfUID(fileTransfer.getXferID()) << " -> "
-			<< dcmFindNameOfUID(netTransfer.getXferID()) << "\n";
-	}
+	msg << "Transfer: " << dcmFindNameOfUID(fileTransfer.getXferID()) << " -> " << dcmFindNameOfUID(netTransfer.getXferID()) << "\n";
+	log.Write(msg);
 
 	if(fileTransfer.getXferID() != netTransfer.getXferID())
 	{
 		if(dcmff.getDataset()->chooseRepresentation(netTransfer.getXfer(), NULL) != EC_Normal)
 		{
-
+			log.Write("Unable to choose Representation\n");
 		}
 	}
 
@@ -741,64 +733,33 @@ OFCondition DICOMSender::storeSCU(T_ASC_Association * assoc, const char *fname)
 	strcpy(req.AffectedSOPClassUID, sopClass);
 	strcpy(req.AffectedSOPInstanceUID, sopInstance);
 	req.DataSetType = DIMSE_DATASET_PRESENT;
-	req.Priority = DIMSE_PRIORITY_LOW;
+	req.Priority = DIMSE_PRIORITY_LOW;	
 
-	/* if required, dump some more general information */
-	if (opt_verbose)
-	{
-		mycout << "Store SCU RQ: MsgID " <<  msgId << ", " << dcmSOPClassUIDToModality(sopClass) << std::endl;
-	}
-
-	/* finally conduct transmission of data */
+	// send it!
 	cond = DIMSE_storeUser(assoc, presId, &req,
 		NULL, dcmff.getDataset(), progressCallback, this,
-		opt_blockMode, opt_dimse_timeout,
-		&rsp, &statusDetail, NULL, OFStandard::getFileSize(fname));
-
-	/*
-	* If store command completed normally, with a status
-	* of success or some warning then the image was accepted.
-	*/
-	if (cond == EC_Normal && (rsp.DimseStatus == STATUS_Success || DICOM_WARNING_STATUS(rsp.DimseStatus)))
-	{
-		unsuccessfulStoreEncountered = false;
+		DIMSE_NONBLOCKING, 10,
+		&rsp, &statusDetail, NULL, OFStandard::getFileSize(fname));	
+	
+	if (cond.bad())	
+	{		
+		log.Write("Store Failed\n");
+		log.Write(cond);		
 	}
 
-	/* remember the response's status for later transmissions of data */
-	lastStatusCode = rsp.DimseStatus;
-
-	/* dump some more general information */
-	if (cond == EC_Normal)
-	{
-		if (opt_verbose)
-		{
-			boost::mutex::scoped_lock lk(mycoutmutex);
-			OFString dumpmsg;
-			DIMSE_dumpMessage(dumpmsg, rsp, DIMSE_INCOMING);
-			mycout << dumpmsg << std::endl;
-		}
-	}
-	else
-	{
-		boost::mutex::scoped_lock lk(mycoutmutex);
-		mycout << "Store Failed, file: " << fname << std::endl;
-		OFString dumpmsg; DimseCondition::dump(dumpmsg, cond); mycout << dumpmsg << std::endl;
-	}
-
-	/* dump status detail information if there is some */
 	if (statusDetail != NULL)
 	{
-		boost::mutex::scoped_lock lk(mycoutmutex);
-		mycout << "  Status Detail:\n";
-		statusDetail->print(mycout);
+		msg << "Status Detail:\n";
+		statusDetail->print(msg);
 		delete statusDetail;
+		log.Write(msg);
 	}
-	/* return */
+
 	return cond;
 }
 
 
-OFCondition DICOMSender::cstore(T_ASC_Association * assoc, const OFString& fname)
+OFCondition DICOMSenderImpl::cstore(T_ASC_Association * assoc, const OFString& fname)
 	/*
 	* This function will process the given file as often as is specified by opt_repeatCount.
 	* "Process" in this case means "read file, send C-STORE-RQ, receive C-STORE-RSP".
@@ -810,7 +771,7 @@ OFCondition DICOMSender::cstore(T_ASC_Association * assoc, const OFString& fname
 {
 	OFCondition cond = EC_Normal;
 
-	/* process file (read file, send C-STORE-RQ, receive C-STORE-RSP) */
+	// process file (read file, send C-STORE-RQ, receive C-STORE-RSP) 
 	cond = storeSCU(assoc, fname.c_str());    
 
 	// update the sent status
@@ -827,59 +788,45 @@ OFCondition DICOMSender::cstore(T_ASC_Association * assoc, const OFString& fname
 	return cond;
 }
 
-int DICOMSender::addimage(void *param,int columns,char** values, char**names)
+int DICOMSenderImpl::addimage(void *param,int columns,char** values, char**names)
 {
-	DICOMSender *sender = (DICOMSender *) param;
+	DICOMSenderImpl *sender = (DICOMSenderImpl *) param;
 
 	char *currentFilename = values[0];
 
-	bool ignoreName = false;
-	OFString errormsg;
+	if (access(currentFilename, R_OK) < 0)
+	{
+		std::stringstream msg;
+		msg << "cannot access file, ignoring: " << currentFilename << std::endl;
+		sender->log.Write(msg);
+		return 0;
+	}
+
 	char sopClassUID[128];
 	char sopInstanceUID[128];
 
-	if (access(currentFilename, R_OK) < 0)
-	{
-		errormsg = "cannot access file: ";
-		errormsg += currentFilename;
-		boost::mutex::scoped_lock lk(sender->mycoutmutex);
-		sender->mycout << "warning: " << errormsg << ", ignoring file" << std::endl;
+	if (!DU_findSOPClassAndInstanceInFile(currentFilename, sopClassUID, sopInstanceUID))
+	{	
+		std::stringstream msg;
+		msg << "missing SOP class (or instance) in file, ignoring: " << currentFilename << std::endl;
+		sender->log.Write(msg);
+		return 0;
 	}
-	else
-	{
-		if (sender->opt_proposeOnlyRequiredPresentationContexts)
-		{
-			if (!DU_findSOPClassAndInstanceInFile(currentFilename, sopClassUID, sopInstanceUID))
-			{
-				ignoreName = true;
-				errormsg = "missing SOP class (or instance) in file: ";
-				errormsg += currentFilename;
-				boost::mutex::scoped_lock lk(sender->mycoutmutex);
-				sender->mycout << "warning: " << errormsg << ", ignoring file" << std::endl;
-			}
-			else if (!dcmIsaStorageSOPClassUID(sopClassUID))
-			{
-				ignoreName = true;
-				errormsg = "unknown storage sop class in file: ";
-				errormsg += currentFilename;
-				errormsg += ": ";
-				errormsg += sopClassUID;
-				boost::mutex::scoped_lock lk(sender->mycoutmutex);
-				sender->mycout << "warning: " << errormsg << ", ignoring file" << std::endl;
-			}
-			else
-			{
-				sender->sopClassUIDList.push_back(sopClassUID);
-			}
-		}
 
-		if (!ignoreName)
-			sender->fileNameList.push_back(currentFilename);
+	if (!dcmIsaStorageSOPClassUID(sopClassUID))
+	{		
+		std::stringstream msg;
+		msg << "unknown storage sop class in file, ignoring: " << currentFilename << " : " << sopClassUID << std::endl;
+		sender->log.Write(msg);
+		return 0;
 	}
+
+	sender->sopClassUIDList.push_back(sopClassUID);
+
 	return 0;
 }
 
-void DICOMSender::addfiles()
+void DICOMSenderImpl::addfiles()
 {	
 	std::string selectsql = "SELECT filename FROM images WHERE name = ? AND sent = 0";
 	sqlite3_stmt *select;
@@ -889,26 +836,71 @@ void DICOMSender::addfiles()
 	sqlite3_finalize(select);
 }
 
-void DICOMSender::Cancel()
+int DICOMSenderImpl::countcallback(void *param,int columns,char** values, char**names)
+{
+	int *count = (int *) param;
+
+	*count = boost::lexical_cast<int>(values[0]);
+	return 0;
+}
+
+void DICOMSenderImpl::Cancel()
 {
 	boost::mutex::scoped_lock lk(mutex);
 	cancelEvent = true;
 }
 
-bool DICOMSender::IsDone()
+bool DICOMSenderImpl::IsDone()
 {
 	boost::mutex::scoped_lock lk(mutex);
 	return doneEvent;
 }
 
-bool DICOMSender::IsCanceled()
+bool DICOMSenderImpl::IsCanceled()
 {
 	boost::mutex::scoped_lock lk(mutex);
 	return cancelEvent;
 }
 
-void DICOMSender::SetDone(bool state)
+void DICOMSenderImpl::SetDone(bool state)
 {
 	boost::mutex::scoped_lock lk(mutex);
 	doneEvent = state;
+}
+
+DICOMSender::DICOMSender(void)
+{
+	impl = new DICOMSenderImpl;
+}
+
+DICOMSender::~DICOMSender(void)
+{
+	delete impl;
+}
+
+void DICOMSender::Initialize(sqlite3 *db, const std::string PatientName, std::string NewPatientName, std::string NewPatientID, std::string NewBirthDay,
+							 std::string destinationHost, unsigned int destinationPort, std::string destinationAETitle, std::string ourAETitle)
+{
+	impl->Initialize(db, PatientName, NewPatientName, NewPatientID, NewBirthDay,
+		destinationHost, destinationPort, destinationAETitle, ourAETitle);
+}
+
+void DICOMSender::DoSendThread(void *obj)
+{
+	DICOMSenderImpl::DoSendThread(((DICOMSender *) obj)->impl);
+}
+
+std::string DICOMSender::ReadLog()
+{
+	return impl->ReadLog();
+}
+
+void DICOMSender::Cancel()
+{
+	impl->Cancel();
+}
+
+bool DICOMSender::IsDone()
+{
+	return impl->IsDone();
 }
