@@ -54,9 +54,24 @@ void dovo_mainFrame::OnDestinationEdit( wxCommandEvent& event )
 	}
 }
 
-void dovo_mainFrame::OnSelected( wxListEvent& event )
+void dovo_mainFrame::OnPatientsSelected( wxListEvent& event )
 {
-	// TODO: Implement OnSelected
+	// TODO: Implement OnPatientsSelected
+}
+
+void dovo_mainFrame::OnStudiesSelected( wxListEvent& event )
+{
+	// TODO: Implement OnStudiesSelected
+}
+
+void dovo_mainFrame::OnSeriesSelected( wxListEvent& event )
+{
+	// TODO: Implement OnSeriesSelected
+}
+
+void dovo_mainFrame::OnInstancesSelected( wxListEvent& event )
+{
+	// TODO: Implement OnInstancesSelected
 }
 
 void dovo_mainFrame::OnUpdate( wxCommandEvent& event )
@@ -75,8 +90,28 @@ void dovo_mainFrame::OnUpdate( wxCommandEvent& event )
 }
 
 void dovo_mainFrame::OnSend( wxCommandEvent& event )
-{
-	// TODO: Implement OnSend
+{	
+	long item = m_patients->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+	if (item == -1)
+	{
+		wxMessageBox("Please select a Patient.", "Error", wxOK, this);
+		return;
+	}
+	
+	if(m_destination->GetSelection() == wxNOT_FOUND)
+	{
+		wxMessageBox("Please select a destination.", "Error", wxOK, this);
+		return;
+	}
+
+	wxString patientname = m_patients->GetItemText(item);
+	m_engine.StartSend(patientname, "", "", "", m_destination->GetSelection());
+
+	dovo_sendStatus dlg(this);
+	dlg.m_sender = &m_engine.sender;
+
+	// show and wait for thread to end.
+	dlg.ShowModal();
 }
 
 void dovo_mainFrame::OnAbout( wxCommandEvent& event )

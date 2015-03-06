@@ -2190,7 +2190,7 @@
                                         <event name="OnListItemFocused"></event>
                                         <event name="OnListItemMiddleClick"></event>
                                         <event name="OnListItemRightClick"></event>
-                                        <event name="OnListItemSelected">OnSelected</event>
+                                        <event name="OnListItemSelected">OnPatientsSelected</event>
                                         <event name="OnListKeyDown"></event>
                                         <event name="OnMiddleDClick"></event>
                                         <event name="OnMiddleDown"></event>
@@ -2304,7 +2304,7 @@
                                                 <event name="OnListItemFocused"></event>
                                                 <event name="OnListItemMiddleClick"></event>
                                                 <event name="OnListItemRightClick"></event>
-                                                <event name="OnListItemSelected">OnSelected</event>
+                                                <event name="OnListItemSelected">OnStudiesSelected</event>
                                                 <event name="OnListKeyDown"></event>
                                                 <event name="OnMiddleDClick"></event>
                                                 <event name="OnMiddleDown"></event>
@@ -2409,7 +2409,7 @@
                                                 <event name="OnListItemFocused"></event>
                                                 <event name="OnListItemMiddleClick"></event>
                                                 <event name="OnListItemRightClick"></event>
-                                                <event name="OnListItemSelected">OnSelected</event>
+                                                <event name="OnListItemSelected">OnSeriesSelected</event>
                                                 <event name="OnListKeyDown"></event>
                                                 <event name="OnMiddleDClick"></event>
                                                 <event name="OnMiddleDown"></event>
@@ -2608,7 +2608,7 @@
                                         <event name="OnListItemFocused"></event>
                                         <event name="OnListItemMiddleClick"></event>
                                         <event name="OnListItemRightClick"></event>
-                                        <event name="OnListItemSelected">OnSelected</event>
+                                        <event name="OnListItemSelected">OnInstancesSelected</event>
                                         <event name="OnListKeyDown"></event>
                                         <event name="OnMiddleDClick"></event>
                                         <event name="OnMiddleDown"></event>

@@ -300,10 +300,10 @@ mainFrame::mainFrame( wxWindow* parent, wxWindowID id, const wxString& title, co
 	// Connect Events
 	m_button5->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnBrowse ), NULL, this );
 	m_button6->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnDestinationEdit ), NULL, this );
-	m_patients->Connect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( mainFrame::OnSelected ), NULL, this );
-	m_studies->Connect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( mainFrame::OnSelected ), NULL, this );
-	m_series->Connect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( mainFrame::OnSelected ), NULL, this );
-	m_instances->Connect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( mainFrame::OnSelected ), NULL, this );
+	m_patients->Connect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( mainFrame::OnPatientsSelected ), NULL, this );
+	m_studies->Connect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( mainFrame::OnStudiesSelected ), NULL, this );
+	m_series->Connect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( mainFrame::OnSeriesSelected ), NULL, this );
+	m_instances->Connect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( mainFrame::OnInstancesSelected ), NULL, this );
 	m_update->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnUpdate ), NULL, this );
 	m_send->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnSend ), NULL, this );
 	m_about->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnAbout ), NULL, this );
@@ -315,10 +315,10 @@ mainFrame::~mainFrame()
 	// Disconnect Events
 	m_button5->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnBrowse ), NULL, this );
 	m_button6->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnDestinationEdit ), NULL, this );
-	m_patients->Disconnect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( mainFrame::OnSelected ), NULL, this );
-	m_studies->Disconnect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( mainFrame::OnSelected ), NULL, this );
-	m_series->Disconnect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( mainFrame::OnSelected ), NULL, this );
-	m_instances->Disconnect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( mainFrame::OnSelected ), NULL, this );
+	m_patients->Disconnect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( mainFrame::OnPatientsSelected ), NULL, this );
+	m_studies->Disconnect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( mainFrame::OnStudiesSelected ), NULL, this );
+	m_series->Disconnect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( mainFrame::OnSeriesSelected ), NULL, this );
+	m_instances->Disconnect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( mainFrame::OnInstancesSelected ), NULL, this );
 	m_update->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnUpdate ), NULL, this );
 	m_send->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnSend ), NULL, this );
 	m_about->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnAbout ), NULL, this );

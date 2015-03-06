@@ -108,7 +108,10 @@ class mainFrame : public wxFrame
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnBrowse( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnDestinationEdit( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnSelected( wxListEvent& event ) { event.Skip(); }
+		virtual void OnPatientsSelected( wxListEvent& event ) { event.Skip(); }
+		virtual void OnStudiesSelected( wxListEvent& event ) { event.Skip(); }
+		virtual void OnSeriesSelected( wxListEvent& event ) { event.Skip(); }
+		virtual void OnInstancesSelected( wxListEvent& event ) { event.Skip(); }
 		virtual void OnUpdate( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSend( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAbout( wxCommandEvent& event ) { event.Skip(); }
