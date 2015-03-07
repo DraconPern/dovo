@@ -20,11 +20,7 @@ engine::engine()
 {
 	db = NULL;
 
-#if defined(_WIN32)
-	if(sqlite3_open16(":memory:", &db))	// wide version mainly for unicode path and may be name?
-#else
-	if(sqlite3_open(":memory:", &db))	// everything in utf-8
-#endif
+	if(sqlite3_open_v2(":memory:", &db, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_NOMUTEX, NULL))	// everything in utf-8
 	{
 		std::ostringstream msg;
 		msg << "Can't create database: " << sqlite3_errmsg(db);
