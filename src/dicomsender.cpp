@@ -279,6 +279,7 @@ int DICOMSenderImpl::SendABatch()
 		peerHost << m_destinationHost << ":" << m_destinationPort;
 		ASC_setPresentationAddresses(params, localHost, peerHost.str().c_str());
 
+		log.Write("Loading files...\n");
 		addfiles();
 		cond = addStoragePresentationContexts(params, sopClassUIDList);
 
@@ -822,6 +823,7 @@ int DICOMSenderImpl::addimage(void *param,int columns,char** values, char**names
 	}
 
 	sender->sopClassUIDList.push_back(sopClassUID);
+	sender->fileNameList.push_back(currentFilename);
 
 	return 0;
 }
