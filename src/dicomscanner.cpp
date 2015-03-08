@@ -2,6 +2,8 @@
 #include "dicomscanner.h"
 #include "sqlite3_exec_stmt.h"
 
+#include <boost/locale.hpp>
+
 // work around the fact that dcmtk doesn't work in unicode mode, so all string operation needs to be converted from/to mbcs
 #ifdef _UNICODE
 #undef _UNICODE
@@ -13,10 +15,17 @@
 #include "dcmtk/oflog/oflog.h"
 #include "dcmtk/dcmdata/dctk.h"
 
+// check DCMTK functionality
+#if !defined(WIDE_CHAR_FILE_IO_FUNCTIONS) && defined(_WIN32)
+#error "DCMTK and this program must be compiled with DCMTK_WIDE_CHAR_FILE_IO_FUNCTIONS"
+#endif
+
 #ifdef _UNDEFINEDUNICODE
 #define _UNICODE 1
 #define UNICODE 1
 #endif
+
+
 
 class DICOMFileScannerImpl
 {
@@ -68,10 +77,10 @@ void DICOMFileScannerImpl::Initialize(sqlite3 *db, boost::filesystem::path scanP
 
 void DICOMFileScannerImpl::ScanFile(boost::filesystem::path path)
 {
-#if defined(WIDE_CHAR_FILE_IO_FUNCTIONS) && defined(_WIN32)
+#if defined(_WIN32)
 	std::wstring filename = path.wstring();
 #else
-	std::string filename = path.string();	// utf-8
+	std::string filename = path.string();
 #endif
 
 	DcmFileFormat dfile;
@@ -112,7 +121,8 @@ void DICOMFileScannerImpl::ScanFile(boost::filesystem::path path)
 
 		sqlite3_bind_text(insertImage, 10, sopuid.c_str(), sopuid.length(), SQLITE_STATIC);
 
-		sqlite3_bind_text(insertImage, 11, path.string().c_str(), filename.length(), SQLITE_STATIC);
+		std::string p = path.native();
+		sqlite3_bind_text(insertImage, 11, p.c_str(), p.length(), SQLITE_STATIC);
 
 		sqlite3_exec_stmt(insertImage, NULL, NULL, NULL);
 
@@ -152,7 +162,7 @@ void DICOMFileScannerImpl::ScanDir(boost::filesystem::path path)
 	{
 		if ( boost::filesystem::exists(path) && boost::filesystem::is_directory(path))
 		{
-			for( boost::filesystem::directory_iterator dir_iter(someDir) ; dir_iter != end_iter ; ++dir_iter)
+			for( boost::filesystem::directory_iterator dir_iter(someDir) ; dir_iter != end_iter ; dir_iter++)
 			{
 				if(IsCanceled())
 				{			

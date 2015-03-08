@@ -20,7 +20,7 @@ engine::engine()
 {
 	db = NULL;
 
-	if(sqlite3_open_v2(":memory:", &db, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_NOMUTEX, NULL))	// everything in utf-8
+	if(sqlite3_open_v2(":memory:", &db, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_NOMUTEX, NULL))
 	{
 		std::ostringstream msg;
 		msg << "Can't create database: " << sqlite3_errmsg(db);
@@ -30,7 +30,7 @@ engine::engine()
 	sqlite3_exec(db, "CREATE TABLE images (name TEXT, patid TEXT, birthday TEXT, \
 					 studyuid TEXT, modality TEXT, studydesc TEXT, studydate TEXT, \
 					 seriesuid TEXT, seriesdesc TEXT, \
-					 sopuid TEXT UNIQUE, filename TEXT, sent INTEGER)", NULL, NULL, NULL);
+					 sopuid TEXT UNIQUE, filename BLOB, sent INTEGER)", NULL, NULL, NULL);
 
 }
 
@@ -46,16 +46,16 @@ void engine::SaveDestinationList()
 	wxConfig::Get()->DeleteGroup("Destinations");
 	for(unsigned int i = 0; i < destinations.size(); i++)
 	{
-		
-		std::wstringstream stream;
+
+		std::stringstream stream;
 		stream << destinations[i].name << "," 
 			<< destinations[i].destinationHost << "," 
 			<< destinations[i].destinationPort << "," 
 			<< destinations[i].destinationAETitle << "," 
 			<< destinations[i].ourAETitle;
-		
+
 		wxConfig::Get()->SetPath("/Destinations");
-		wxConfig::Get()->Write(boost::lexical_cast<std::wstring>(i + 1), stream.str().c_str());
+		wxConfig::Get()->Write(boost::lexical_cast<std::string>(i + 1), wxString::FromUTF8(stream.str().c_str()));
 	}
 
 	wxConfig::Get()->Flush();
@@ -73,9 +73,11 @@ void engine::LoadDestinationList()
 		using namespace boost::spirit::classic;
 
 		wxString data;
-		std::vector<std::wstring> items;
 		data = wxConfig::Get()->Read(str);
-		parse(data.ToStdWstring().c_str(),
+		
+		std::vector<std::string> items;		
+		//parse(data.ToStdWstring().c_str(),
+		parse(data.ToUTF8().data(),
 			((*(anychar_p - L','))[append(items)]) >>
 			(L',') >>
 			((*(anychar_p - L','))[append(items)]) >>
@@ -105,7 +107,7 @@ void engine::LoadGlobalDestinationList()
 	wxRegKey registry;
 	registry.SetName(wxRegKey::HKLM, "Software\\Policies\\FrontMotion\\fmdeye\\Destinations");
 	registry.Open(wxRegKey::Read);
-	
+
 	wxString str;
 	long dummy;
 	// first enum all entries
@@ -114,10 +116,11 @@ void engine::LoadGlobalDestinationList()
 	{
 		using namespace boost::spirit::classic;
 
-		wxString data;
-		std::vector<std::wstring> items;
+		wxString data;		
 		registry.QueryValue(str, data);
-		parse(data.ToStdWstring().c_str(),
+
+		std::vector<std::string> items;
+		parse(data.ToUTF8().data(),
 			((*(anychar_p - L','))[append(items)]) >>
 			(L',') >>
 			((*(anychar_p - L','))[append(items)]) >>
@@ -137,12 +140,10 @@ void engine::LoadGlobalDestinationList()
 #endif
 }
 
-void engine::StartScan(wxString path)
+void engine::StartScan(boost::filesystem::path path)
 {
 	sqlite3_exec(db, "DELETE FROM images", NULL, NULL, NULL);
-
-	boost::filesystem::path x = path;
-	scanner.Initialize(db, x);
+	scanner.Initialize(db, path);
 	boost::thread t(DICOMFileScanner::DoScanThread, &scanner);
 	t.detach();
 }
@@ -153,12 +154,12 @@ void engine::StopScan()
 }
 
 
-void engine::StartSend(wxString PatientName, wxString NewPatientName, wxString NewPatientID, wxString NewBirthDay, int destination)
+void engine::StartSend(std::string PatientName, std::string NewPatientName, std::string NewPatientID, std::string NewBirthDay, int destination)
 {
 	// find the destination
-	wxString destinationHost;
+	std::string destinationHost;
 	int destinationPort;
-	wxString destinationAETitle, ourAETitle;
+	std::string destinationAETitle, ourAETitle;
 
 	if(destination < globalDestinations.size())
 	{
@@ -176,9 +177,9 @@ void engine::StartSend(wxString PatientName, wxString NewPatientName, wxString N
 		ourAETitle = destinations[destination].ourAETitle;
 	}
 
-	sender.Initialize(db, PatientName.ToUTF8().data(), NewPatientName.ToUTF8().data(), NewPatientID.ToUTF8().data(), NewBirthDay.ToUTF8().data(),
-		destinationHost.ToUTF8().data(), destinationPort, destinationAETitle.ToUTF8().data(), ourAETitle.ToUTF8().data());
-	
+	sender.Initialize(db, PatientName, NewPatientName, NewPatientID, NewBirthDay,
+		destinationHost, destinationPort, destinationAETitle, ourAETitle);
+
 	boost::thread t(DICOMSender::DoSendThread, &sender);
 	t.detach(); 
 }
@@ -192,7 +193,44 @@ void engine::GetPatients(sqlite3_callback fillname, void *obj)
 {	
 	std::string selectsql = "SELECT name, patid, birthday FROM images GROUP BY name, patid ORDER BY name";
 	sqlite3_stmt *select;
-	sqlite3_prepare_v2(db, selectsql.c_str(), selectsql.length(), &select, NULL);		
+	sqlite3_prepare_v2(db, selectsql.c_str(), selectsql.length(), &select, NULL);
 	sqlite3_exec_stmt(select, fillname, obj, NULL);
-	sqlite3_finalize(select);	
+	sqlite3_finalize(select);
+}
+
+void engine::GetStudies(std::string patientname, sqlite3_callback fillstudy, void *obj)
+{
+	std::string selectsql = "SELECT DISTINCT studyuid, studydesc, studydate FROM images WHERE name = ? ORDER BY studyuid";
+	sqlite3_stmt *select;
+	sqlite3_prepare_v2(db, selectsql.c_str(), selectsql.length(), &select, NULL);
+	
+	sqlite3_bind_text(select, 1, patientname.c_str(), patientname.length(), SQLITE_STATIC);
+
+	sqlite3_exec_stmt(select, fillstudy, obj, NULL);		
+	sqlite3_finalize(select);
+}
+
+void engine::GetSeries(std::string studyuid, sqlite3_callback fillseries, void *obj)
+{
+	std::string selectsql = "SELECT DISTINCT seriesuid, seriesdesc FROM images WHERE (studyuid = ?)";
+	sqlite3_stmt *select;
+	sqlite3_prepare_v2(db, selectsql.c_str(), selectsql.length(), &select, NULL);
+	
+	sqlite3_bind_text(select, 1, studyuid.c_str(), studyuid.length(), SQLITE_STATIC);
+
+	sqlite3_exec_stmt(select, fillseries, obj, NULL);		
+	sqlite3_finalize(select);
+}
+
+
+void engine::GetInstances(std::string seriesuid, sqlite3_callback fillinstances, void *obj)
+{
+	std::string selectsql = "SELECT sopuid, filename FROM images WHERE (seriesuid = ?)";
+	sqlite3_stmt *select;
+	sqlite3_prepare_v2(db, selectsql.c_str(), selectsql.length(), &select, NULL);
+			
+	sqlite3_bind_text(select, 1, seriesuid.c_str(), seriesuid.length(), SQLITE_STATIC);
+
+	sqlite3_exec_stmt(select, fillinstances, obj, NULL);		
+	sqlite3_finalize(select);
 }

@@ -329,15 +329,12 @@ int DICOMSenderImpl::SendABatch()
 		/* do the real work, i.e. for all files which were specified in the */
 		/* command line, transmit the encapsulated DICOM objects to the SCP. */
 		cond = EC_Normal;
-		OFListIterator(OFString) iter = fileNameList.begin();
-		OFListIterator(OFString) enditer = fileNameList.end();
 
-		while ((iter != enditer)/* && (cond == EC_Normal)*/) // compare with EC_Normal since DUL_PEERREQUESTEDRELEASE is also good()
+		for(OFListIterator(OFString) iter = fileNameList.begin(); iter != fileNameList.end(); iter++)		
 		{
 			if (IsCanceled())
 				break;
-			cond = cstore(assoc, *iter);
-			++iter;
+			cond = cstore(assoc, *iter);			
 		}
 
 		fileNameList.clear();
@@ -390,18 +387,12 @@ int DICOMSenderImpl::SendABatch()
 
 static bool
 	isaListMember(OFList<OFString>& lst, OFString& s)
-{
-	OFListIterator(OFString) cur = lst.begin();
-	OFListIterator(OFString) end = lst.end();
-
+{	
 	bool found = false;
 
-	while (cur != end && !found)
+	for(OFListIterator(OFString) itr = lst.begin(); itr != lst.end() && !found; itr++)
 	{
-
-		found = (s == *cur);
-
-		++cur;
+		found = (s == *itr);	
 	}
 
 	return found;

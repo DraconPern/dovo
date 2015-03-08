@@ -65,7 +65,7 @@ add_definitions(-D_BIND_TO_CURRENT_VCLIBS_VERSION=1)
 #define this so that wxWidgets doesn't define it. Conflicts w/ dcmtk's declaration
 add_definitions(-DHAVE_SSIZE_T)
 
-#enable dcmtk filename to have wide version, only afffects WIN32.  Everyone else uses utf-8 mode.
+#enable dcmtk filename to have wide version, only affects WIN32.  http://utf8everywhere.org/
 add_definitions(-DDCMTK_WIDE_CHAR_FILE_IO_FUNCTIONS=1)
 
 ADD_EXECUTABLE(dovo WIN32 ${dovo_SRCS})

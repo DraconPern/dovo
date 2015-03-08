@@ -40,9 +40,13 @@ class dovo_mainFrame : public mainFrame
 
 		~dovo_mainFrame();
 		void FillDestinationList();
-		static int fillname(void *param,int columns,char** values, char**names);
+		static int fillpatients(void *param,int columns,char** values, char**names);
+		static int fillstudies(void *param,int columns,char** values, char**names);
+		static int fillseries(void *param,int columns,char** values, char**names);
+		static int fillinstances(void *param,int columns,char** values, char**names);
 
 		engine m_engine;
+
 
 
 };

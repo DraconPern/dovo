@@ -45,7 +45,7 @@ void dovo_mainFrame::OnDestinationEdit( wxCommandEvent& event )
 
 	if(dlg.ShowModal() == wxID_OK)
 	{
-		std::string oldsel = m_destination->GetStringSelection();
+		wxString oldsel = m_destination->GetStringSelection();
 		m_engine.destinations = dlg.m_destinations;
 		m_engine.SaveDestinationList();
 
@@ -56,29 +56,45 @@ void dovo_mainFrame::OnDestinationEdit( wxCommandEvent& event )
 
 void dovo_mainFrame::OnPatientsSelected( wxListEvent& event )
 {
-	// TODO: Implement OnPatientsSelected
+	long item = m_patients->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+	if (item == -1)
+		return;
+
+	m_studies->DeleteAllItems();
+	m_engine.GetStudies(m_patients->GetItemText(item).ToUTF8().data(), fillstudies, this);
 }
 
 void dovo_mainFrame::OnStudiesSelected( wxListEvent& event )
 {
-	// TODO: Implement OnStudiesSelected
+	long item = m_studies->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+	if (item == -1)
+		return;
+
+	m_series->DeleteAllItems();
+	m_engine.GetSeries(m_studies->GetItemText(item, 2).ToUTF8().data(), fillseries, this);
 }
 
 void dovo_mainFrame::OnSeriesSelected( wxListEvent& event )
 {
-	// TODO: Implement OnSeriesSelected
+	long item = m_series->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+	if (item == -1)
+		return;
+
+	m_instances->DeleteAllItems();
+	m_engine.GetInstances(m_series->GetItemText(item, 1).ToUTF8().data(), fillinstances, this);
 }
 
 void dovo_mainFrame::OnInstancesSelected( wxListEvent& event )
 {
-	// TODO: Implement OnInstancesSelected
+	// draw it
 }
 
 void dovo_mainFrame::OnUpdate( wxCommandEvent& event )
 {
 	m_patients->DeleteAllItems();
 
-	m_engine.StartScan(m_directory->GetValue());
+	boost::filesystem::path p = m_directory->GetValue();
+	m_engine.StartScan(p);
 
 	dovo_searchStatus dlg(this);
 	dlg.m_scanner = &m_engine.scanner;
@@ -86,18 +102,19 @@ void dovo_mainFrame::OnUpdate( wxCommandEvent& event )
 	// show and wait for thread to end.
 	dlg.ShowModal();
 
-	m_engine.GetPatients(fillname, this);
+	m_engine.GetPatients(fillpatients, this);
 }
 
 void dovo_mainFrame::OnSend( wxCommandEvent& event )
-{	
+{
+
 	long item = m_patients->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
 	if (item == -1)
 	{
 		wxMessageBox("Please select a Patient.", "Error", wxOK, this);
 		return;
 	}
-	
+
 	if(m_destination->GetSelection() == wxNOT_FOUND)
 	{
 		wxMessageBox("Please select a destination.", "Error", wxOK, this);
@@ -105,7 +122,7 @@ void dovo_mainFrame::OnSend( wxCommandEvent& event )
 	}
 
 	wxString patientname = m_patients->GetItemText(item);
-	m_engine.StartSend(patientname, "", "", "", m_destination->GetSelection());
+	m_engine.StartSend(patientname.ToUTF8().data(), "", "", "", m_destination->GetSelection());
 
 	dovo_sendStatus dlg(this);
 	dlg.m_sender = &m_engine.sender;
@@ -126,14 +143,18 @@ void dovo_mainFrame::OnExit( wxCommandEvent& event )
 }
 
 
-int dovo_mainFrame::fillname(void *param,int columns,char** values, char**names)
+void dovo_mainFrame::FillDestinationList()
 {
-	dovo_mainFrame *win = (dovo_mainFrame *) param;	
-	win->m_patients->InsertItem(0, values[0]);
-	win->m_patients->SetItem(0, 1, values[1]);
-	win->m_patients->SetItem(0, 2, values[2]);
-	return 0; 
+	// add to combo box
+	m_destination->Clear();
+	std::vector<DestinationEntry>::iterator itr;	
+	for(itr = m_engine.globalDestinations.begin(); itr != m_engine.globalDestinations.end(); itr++)	
+		m_destination->Append(wxString::FromUTF8((*itr).name.c_str()) + L" (*)");
+
+	for(itr = m_engine.destinations.begin(); itr != m_engine.destinations.end(); itr++)
+		m_destination->Append(wxString::FromUTF8((*itr).name.c_str()));
 }
+
 
 dovo_mainFrame::~dovo_mainFrame()
 {
@@ -142,14 +163,52 @@ dovo_mainFrame::~dovo_mainFrame()
 	wxConfig::Get()->Flush();
 }
 
-void dovo_mainFrame::FillDestinationList()
+int dovo_mainFrame::fillstudies(void *param,int columns,char** values, char**names)
 {
-	// add to combo box
-	m_destination->Clear();
-	std::vector<DestinationEntry>::iterator itr;	
-	for(itr = m_engine.globalDestinations.begin(); itr != m_engine.globalDestinations.end(); itr++)
-		m_destination->Append((*itr).name + L" (*)");
+	dovo_mainFrame *win = (dovo_mainFrame *) param;	
 
-	for(itr = m_engine.destinations.begin(); itr != m_engine.destinations.end(); itr++)
-		m_destination->Append((*itr).name);
+	std::string date;
+	date = values[2];
+
+	struct tm thedate;
+	memset(&thedate, 0, sizeof(struct tm));
+	thedate.tm_year = boost::lexical_cast<int>(date.substr(0, 4)) - 1900;
+	thedate.tm_mon = boost::lexical_cast<int>(date.substr(4, 2)) - 1;
+	thedate.tm_mday = boost::lexical_cast<int>(date.substr(6, 2));
+
+	char buf[1024];
+	memset(buf, 0, 1024);
+
+	strftime(buf, 1024, "%x", &thedate);
+
+	win->m_studies->InsertItem(0, buf);
+	win->m_studies->SetItem(0, 1, wxString::FromUTF8(values[1]));
+	win->m_studies->SetItem(0, 2, wxString::FromUTF8(values[0]));
+	return 0; 
+}
+
+int dovo_mainFrame::fillpatients(void *param,int columns,char** values, char**names)
+{
+	dovo_mainFrame *win = (dovo_mainFrame *) param;	
+	win->m_patients->InsertItem(0, values[0]);
+	win->m_patients->SetItem(0, 1, values[1]);
+	win->m_patients->SetItem(0, 2, values[2]);
+	return 0; 
+}
+
+int dovo_mainFrame::fillseries(void *param,int columns,char** values, char**names)
+{
+	dovo_mainFrame *win = (dovo_mainFrame *) param;	
+	win->m_series->InsertItem(0, wxString::FromUTF8(values[1]));
+	win->m_series->SetItem(0, 1, wxString::FromUTF8(values[0]));	
+	return 0; 
+}
+
+int dovo_mainFrame::fillinstances(void *param,int columns,char** values, char**names)
+{
+
+	dovo_mainFrame *win = (dovo_mainFrame *) param;	
+	win->m_instances->InsertItem(0, wxString::FromUTF8(values[0]));
+	win->m_instances->SetItem(0, 1, wxString::FromUTF8(values[1]));	
+	return 0; 
 }

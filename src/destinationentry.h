@@ -4,7 +4,7 @@
 class DestinationEntry
 {
 public:
-	DestinationEntry(wxString name, wxString destinationhost, int destinationport, wxString destinationaetitle, wxString ouraetitle)
+	DestinationEntry(std::string name, std::string destinationhost, int destinationport, std::string destinationaetitle, std::string ouraetitle)
 	{
 		this->name = name;		
 		this->destinationHost = destinationhost;
@@ -13,11 +13,11 @@ public:
 		this->ourAETitle = ouraetitle;
 	}
 
-	wxString name;	
-	wxString destinationHost;
+	std::string name;
+	std::string destinationHost;
 	int destinationPort;
-	wxString destinationAETitle;
-	wxString ourAETitle;
+	std::string destinationAETitle;
+	std::string ourAETitle;
 };
 
 #endif

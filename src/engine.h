@@ -16,11 +16,14 @@ public:
 	void LoadDestinationList();
 	void LoadGlobalDestinationList();
 	void SaveDestinationList();
-	void StartScan(wxString path);
+	void StartScan(boost::filesystem::path path);
 	void StopScan();
-	void StartSend(wxString PatientName, wxString NewPatientName, wxString NewPatientID, wxString NewBirthDay, int destination);
+	void StartSend(std::string PatientName, std::string NewPatientName, std::string NewPatientID, std::string NewBirthDay, int destination);
 	void StopSend();
 	void GetPatients(sqlite3_callback fillname, void *obj);
+	void GetStudies(std::string patientname, sqlite3_callback fillstudy, void *obj);
+	void GetSeries(std::string studyuid, sqlite3_callback fillseries, void *obj);
+	void GetInstances(std::string seriesuid, sqlite3_callback fillinstances, void *obj);
 	DICOMFileScanner scanner;
 	DICOMSender sender;
 protected:
