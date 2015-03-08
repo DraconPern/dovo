@@ -147,26 +147,33 @@ void DICOMFileScannerImpl::ScanDir(boost::filesystem::path path)
 	boost::filesystem::path someDir(path);
 	boost::filesystem::directory_iterator end_iter;
 
-	if ( boost::filesystem::exists(path) && boost::filesystem::is_directory(path))
+	// catch any access errors
+	try
 	{
-		for( boost::filesystem::directory_iterator dir_iter(someDir) ; dir_iter != end_iter ; ++dir_iter)
+		if ( boost::filesystem::exists(path) && boost::filesystem::is_directory(path))
 		{
-			if(IsCanceled())
-			{			
-				break;
+			for( boost::filesystem::directory_iterator dir_iter(someDir) ; dir_iter != end_iter ; ++dir_iter)
+			{
+				if(IsCanceled())
+				{			
+					break;
+				}
+
+				if (boost::filesystem::is_regular_file(dir_iter->status()) )
+				{
+					ScanFile(*dir_iter);
+				}
+				else if (boost::filesystem::is_directory(dir_iter->status()) )
+				{
+					// descent recursively
+					ScanDir(*dir_iter);
+				}
 			}
 
-			if (boost::filesystem::is_regular_file(dir_iter->status()) )
-			{
-				ScanFile(*dir_iter);
-			}
-			else if (boost::filesystem::is_directory(dir_iter->status()) )
-			{
-				// descent recursively
-				ScanDir(*dir_iter);
-
-			}
 		}
+	}
+	catch(...)
+	{
 
 	}
 }

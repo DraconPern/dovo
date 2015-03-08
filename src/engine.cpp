@@ -24,7 +24,7 @@ engine::engine()
 	{
 		std::ostringstream msg;
 		msg << "Can't create database: " << sqlite3_errmsg(db);
-		throw new std::exception(msg.str().c_str());				
+		throw std::exception(msg.str().c_str());				
 	}	
 
 	sqlite3_exec(db, "CREATE TABLE images (name TEXT, patid TEXT, birthday TEXT, \

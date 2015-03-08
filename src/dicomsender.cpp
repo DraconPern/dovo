@@ -261,14 +261,14 @@ int DICOMSenderImpl::SendABatch()
 		if (cond.bad())
 		{		
 			log.Write(cond);
-			throw new std::exception("ASC_initializeNetwork");
+			throw std::exception("ASC_initializeNetwork");
 		}
 
 		cond = ASC_createAssociationParameters(&params, ASC_DEFAULTMAXPDU);
 		if (cond.bad())
 		{		
 			log.Write(cond);
-			throw new std::exception("ASC_createAssociationParameters");
+			throw std::exception("ASC_createAssociationParameters");
 		}
 
 		ASC_setAPTitles(params, m_ourAETitle.c_str(), m_destinationAETitle.c_str(), NULL);	
@@ -286,7 +286,7 @@ int DICOMSenderImpl::SendABatch()
 		if (cond.bad())
 		{
 			log.Write(cond);
-			throw new std::exception("addStoragePresentationContexts");
+			throw std::exception("addStoragePresentationContexts");
 		}
 
 		log.Write("Requesting Association\n");
@@ -302,13 +302,13 @@ int DICOMSenderImpl::SendABatch()
 				msg << "Association Rejected:\n";
 				ASC_printRejectParameters(msg, &rej);
 				log.Write(msg);
-				throw new std::exception("ASC_requestAssociation");
+				throw std::exception("ASC_requestAssociation");
 			}
 			else
 			{
 				log.Write("Association Request Failed:\n");			
 				log.Write(cond);
-				throw new std::exception("ASC_requestAssociation");
+				throw std::exception("ASC_requestAssociation");
 			}
 		}
 
