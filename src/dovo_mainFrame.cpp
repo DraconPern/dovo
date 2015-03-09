@@ -92,8 +92,11 @@ void dovo_mainFrame::OnInstancesSelected( wxListEvent& event )
 void dovo_mainFrame::OnUpdate( wxCommandEvent& event )
 {
 	m_patients->DeleteAllItems();
-
+#ifdef _WIN32
     boost::filesystem::path p = m_directory->GetValue();
+#else
+	boost::filesystem::path p = m_directory->GetValue().ToUTF8().data();
+#endif
     m_engine.StartScan(p);
 
 	dovo_searchStatus dlg(this);
