@@ -6,6 +6,7 @@ dovo_searchStatus::dovo_searchStatus( wxWindow* parent )
 {	
 	timer.Connect(wxEVT_TIMER, wxTimerEventHandler( dovo_searchStatus::OnTimer ), NULL, this );
 	timer.Start(500);
+	m_progress->SetRange(200);
 }
 
 dovo_searchStatus::~dovo_searchStatus()
