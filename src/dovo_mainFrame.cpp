@@ -4,6 +4,9 @@ dovo_mainFrame::dovo_mainFrame( wxWindow* parent )
 	:
 	mainFrame( parent )
 {
+#ifdef __WXMAC__
+	m_about->Hide();
+#endif 
 	// Create the UI
 	m_patients->InsertColumn(0, "Name");
 	m_patients->InsertColumn(1, "ID");
