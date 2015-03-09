@@ -73,6 +73,9 @@ void dovo_mainFrame::OnPatientsSelected( wxListEvent& event )
 
 	m_studies->DeleteAllItems();
 	m_engine.GetStudies(m_patients->GetItemText(item).ToUTF8().data(), fillstudies, this);
+	m_studies->SetColumnWidth(0, wxLIST_AUTOSIZE);
+	m_studies->SetColumnWidth(1, wxLIST_AUTOSIZE);
+	m_studies->SetColumnWidth(2, wxLIST_AUTOSIZE);
 }
 
 void dovo_mainFrame::OnStudiesSelected( wxListEvent& event )
@@ -83,6 +86,8 @@ void dovo_mainFrame::OnStudiesSelected( wxListEvent& event )
 
 	m_series->DeleteAllItems();
 	m_engine.GetSeries(m_studies->GetItemText(item, 2).ToUTF8().data(), fillseries, this);
+	m_series->SetColumnWidth(0, wxLIST_AUTOSIZE);
+	m_series->SetColumnWidth(1, wxLIST_AUTOSIZE);	
 }
 
 void dovo_mainFrame::OnSeriesSelected( wxListEvent& event )
@@ -93,6 +98,8 @@ void dovo_mainFrame::OnSeriesSelected( wxListEvent& event )
 
 	m_instances->DeleteAllItems();
 	m_engine.GetInstances(m_series->GetItemText(item, 1).ToUTF8().data(), fillinstances, this);
+	m_instances->SetColumnWidth(0, wxLIST_AUTOSIZE);
+	m_instances->SetColumnWidth(1, wxLIST_AUTOSIZE);
 }
 
 void dovo_mainFrame::OnInstancesSelected( wxListEvent& event )
@@ -103,6 +110,9 @@ void dovo_mainFrame::OnInstancesSelected( wxListEvent& event )
 void dovo_mainFrame::OnUpdate( wxCommandEvent& event )
 {
 	m_patients->DeleteAllItems();
+	m_studies->DeleteAllItems();
+	m_series->DeleteAllItems();
+	m_instances->DeleteAllItems();
 #ifdef _WIN32
     boost::filesystem::path p = m_directory->GetValue();
 #else
@@ -117,6 +127,9 @@ void dovo_mainFrame::OnUpdate( wxCommandEvent& event )
 	dlg.ShowModal();
 
 	m_engine.GetPatients(fillpatients, this);
+	m_patients->SetColumnWidth(0, wxLIST_AUTOSIZE);
+	m_patients->SetColumnWidth(1, wxLIST_AUTOSIZE);
+	m_patients->SetColumnWidth(2, wxLIST_AUTOSIZE);
 }
 
 void dovo_mainFrame::OnSend( wxCommandEvent& event )
@@ -166,7 +179,7 @@ void dovo_mainFrame::FillDestinationList()
 		m_destination->Append(wxString::FromUTF8((*itr).name.c_str()) + L" (*)");
 
 	for(itr = m_engine.destinations.begin(); itr != m_engine.destinations.end(); itr++)
-		m_destination->Append(wxString::FromUTF8((*itr).name.c_str()));
+		m_destination->Append(wxString::FromUTF8((*itr).name.c_str()));	
 }
 
 
