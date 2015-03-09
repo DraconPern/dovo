@@ -44,3 +44,5 @@ make -j8
 cd ..
 
 echo "If you are getting a fchmodat error, please modify boost/libs/filessystem/src/operations.cpp.  Find the call to fchmodat and disable the #if using '#if 0 &&"
+echo "If you are getting macosx-version-min error, in boost/tools/build/src/tools/darwin.jam after feature macosx-version-min add a new line"
+echo "feature.extend macosx-version-min : 10.9 ;"

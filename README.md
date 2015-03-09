@@ -1,7 +1,11 @@
 # dovo
-Imports DICOM files and sends to PACS.
+Cross-platform software for Importing DICOM files and sending to PACS. Tested on Windows and OS X.
 
-Supports Group Policy for PACS destinations
+- Supports Group Policy for PACS destinations on Windows.
+- 32bit on Windows, 64bit on OS X.
+- Supports Unicode file and path.
+- Image preview (coming soon)
+- No dll's need to be distributed.
 
 ## Development notes
 The program is http://utf8everywhere.org/
