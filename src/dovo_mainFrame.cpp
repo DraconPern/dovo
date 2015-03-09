@@ -76,6 +76,9 @@ void dovo_mainFrame::OnPatientsSelected( wxListEvent& event )
 	m_studies->SetColumnWidth(0, wxLIST_AUTOSIZE);
 	m_studies->SetColumnWidth(1, wxLIST_AUTOSIZE);
 	m_studies->SetColumnWidth(2, wxLIST_AUTOSIZE);
+
+	if(m_studies->GetItemCount() > 0)
+		m_studies->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
 }
 
 void dovo_mainFrame::OnStudiesSelected( wxListEvent& event )
@@ -88,6 +91,9 @@ void dovo_mainFrame::OnStudiesSelected( wxListEvent& event )
 	m_engine.GetSeries(m_studies->GetItemText(item, 2).ToUTF8().data(), fillseries, this);
 	m_series->SetColumnWidth(0, wxLIST_AUTOSIZE);
 	m_series->SetColumnWidth(1, wxLIST_AUTOSIZE);	
+
+	if(m_series->GetItemCount() > 0)
+		m_series->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
 }
 
 void dovo_mainFrame::OnSeriesSelected( wxListEvent& event )
@@ -100,6 +106,9 @@ void dovo_mainFrame::OnSeriesSelected( wxListEvent& event )
 	m_engine.GetInstances(m_series->GetItemText(item, 1).ToUTF8().data(), fillinstances, this);
 	m_instances->SetColumnWidth(0, wxLIST_AUTOSIZE);
 	m_instances->SetColumnWidth(1, wxLIST_AUTOSIZE);
+
+	if(m_instances->GetItemCount() > 0)
+		m_instances->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
 }
 
 void dovo_mainFrame::OnInstancesSelected( wxListEvent& event )
@@ -130,6 +139,9 @@ void dovo_mainFrame::OnUpdate( wxCommandEvent& event )
 	m_patients->SetColumnWidth(0, wxLIST_AUTOSIZE);
 	m_patients->SetColumnWidth(1, wxLIST_AUTOSIZE);
 	m_patients->SetColumnWidth(2, wxLIST_AUTOSIZE);
+
+	if(m_patients->GetItemCount() > 0)
+		m_patients->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
 }
 
 void dovo_mainFrame::OnSend( wxCommandEvent& event )

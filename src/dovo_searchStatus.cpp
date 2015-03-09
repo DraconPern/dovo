@@ -6,11 +6,11 @@ searchStatus( parent )
 {
 
 #if defined(_WIN32)
-	SetMinSize(wxSize(600, 150));
-	SetSize(wxSize(600, 150));
+	SetMinSize(wxSize(600, 120));
+	SetSize(wxSize(600, 120));
 #elif defined(__WXMAC__)
-	SetMinSize(wxSize(400, 50));
-	SetSize(wxSize(400, 50));
+	SetMinSize(wxSize(400, 100));
+	SetSize(wxSize(400, 100));
 #endif
 	timer.Connect(wxEVT_TIMER, wxTimerEventHandler( dovo_searchStatus::OnTimer ), NULL, this );
 	timer.Start(500);
