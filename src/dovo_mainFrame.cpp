@@ -4,8 +4,14 @@ dovo_mainFrame::dovo_mainFrame( wxWindow* parent )
 	:
 	mainFrame( parent )
 {
-#ifdef __WXMAC__
+#if defined(_WIN32)
+	SetMinSize(wxSize(800, 700));
+	SetSize(wxSize(800, 700));
+#elif defined(__WXMAC__)
+	SetMinSize(wxSize(800, 700));
+	SetSize(wxSize(800, 700));
 	m_about->Hide();
+	m_exit->Hide();
 #endif 
 	// Create the UI
 	m_patients->InsertColumn(0, "Name");
@@ -30,6 +36,8 @@ dovo_mainFrame::dovo_mainFrame( wxWindow* parent )
 	m_engine.LoadGlobalDestinationList();
 
 	FillDestinationList();
+
+
 }
 
 void dovo_mainFrame::OnBrowse( wxCommandEvent& event )

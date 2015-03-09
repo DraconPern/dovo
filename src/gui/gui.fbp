@@ -1493,7 +1493,7 @@
             <property name="minimum_size">-1,-1</property>
             <property name="name">mainFrame</property>
             <property name="pos"></property>
-            <property name="size">900,800</property>
+            <property name="size">-1,-1</property>
             <property name="style">wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER</property>
             <property name="subclass"></property>
             <property name="title">FileIn</property>

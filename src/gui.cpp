@@ -294,6 +294,7 @@ mainFrame::mainFrame( wxWindow* parent, wxWindowID id, const wxString& title, co
 	
 	this->SetSizer( bSizer14 );
 	this->Layout();
+	bSizer14->Fit( this );
 	
 	this->Centre( wxBOTH );
 	
