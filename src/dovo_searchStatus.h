@@ -28,6 +28,8 @@ class dovo_searchStatus : public searchStatus
 		void OnTimer( wxTimerEvent& event );
 		DICOMFileScanner *m_scanner;
 
+
+
 };
 
 #endif // __dovo_searchStatus__
