@@ -8,8 +8,8 @@ dovo_searchStatus::dovo_searchStatus( wxWindow* parent )
 	SetMinSize(wxSize(600, 150));
 	SetSize(wxSize(600, 150));
 #elif defined(__WXMAC__)
-	SetMinSize(wxSize(600, 150));
-	SetSize(wxSize(600, 150));	
+	SetMinSize(wxSize(400, 50));
+	SetSize(wxSize(400, 50));	
 #endif 
 
 	timer.Connect(wxEVT_TIMER, wxTimerEventHandler( dovo_searchStatus::OnTimer ), NULL, this );

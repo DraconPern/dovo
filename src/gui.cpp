@@ -522,7 +522,7 @@ searchStatus::searchStatus( wxWindow* parent, wxWindowID id, const wxString& tit
 	bSizer28->Add( m_progress, 1, wxALIGN_CENTER_VERTICAL|wxBOTTOM|wxEXPAND|wxLEFT|wxTOP, 15 );
 	
 	m_stop = new wxButton( this, wxID_ANY, _("Stop"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer28->Add( m_stop, 0, wxALL, 15 );
+	bSizer28->Add( m_stop, 0, wxALIGN_CENTER_VERTICAL|wxALL, 15 );
 	
 	
 	this->SetSizer( bSizer28 );
