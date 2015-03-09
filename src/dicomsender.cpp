@@ -657,16 +657,20 @@ OFCondition DICOMSenderImpl::storeSCU(T_ASC_Association * assoc, const boost::fi
 	DcmDataset *statusDetail = NULL;	
 
 	std::stringstream msg;
+#ifdef _WIN32
 	msg << "Sending file: " << fname.string(std::codecvt_utf8<boost::filesystem::path::value_type>()) << "\n";
+#else
+	msg << "Sending file: " << fname.string() << "\n";
+#endif
 	log.Write(msg);
 
 	DcmFileFormat dcmff;
 #if defined(_WIN32)
 	std::wstring filename = fname.wstring();
 #else
-	std::string filename = fname.string(std::codecvt_utf8<boost::filesystem::path::value_type>());
+	std::string filename = fname.string();
 #endif
-	OFCondition cond = dcmff.loadFile(filename.c_str());
+	OFCondition cond = dcmff.loadFile(fname.c_str());
 
 	if (cond.bad())
 	{		
@@ -783,7 +787,7 @@ int DICOMSenderImpl::addimage(void *param,int columns,char** values, char**names
 #endif
 
 	DcmFileFormat dfile;
-	OFCondition cond = dfile.loadFile(filename.c_str()/*, EXS_Unknown, EGL_noChange, 10*/);
+	OFCondition cond = dfile.loadFile(currentFilename.c_str());
 	if (cond.bad())
 	{
 		std::stringstream msg;

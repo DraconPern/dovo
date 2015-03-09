@@ -82,11 +82,11 @@ void DICOMFileScannerImpl::ScanFile(boost::filesystem::path path)
 #if defined(_WIN32)
 	std::wstring filename = path.wstring();
 #else
-	std::string filename = path.string(std::codecvt_utf8<boost::filesystem::path::value_type>());
+	std::string filename = path.string();
 #endif
 
 	DcmFileFormat dfile;
-	OFCondition cond = dfile.loadFile(filename.c_str()/*, EXS_Unknown, EGL_noChange, 10*/);
+	OFCondition cond = dfile.loadFile(path.c_str());
 	if (cond.good())
 	{		
 		OFString patientname, patientid, birthday;
@@ -123,9 +123,12 @@ void DICOMFileScannerImpl::ScanFile(boost::filesystem::path path)
 
 		sqlite3_bind_text(insertImage, 10, sopuid.c_str(), sopuid.length(), SQLITE_STATIC);
 
+#ifdef _WIN32
 		std::string p = path.string(std::codecvt_utf8<boost::filesystem::path::value_type>());
 		sqlite3_bind_text(insertImage, 11, p.c_str(), p.length(), SQLITE_STATIC);
-
+#else
+		sqlite3_bind_text(insertImage, 11, path.string().c_str(), path.string().length(), SQLITE_STATIC);
+#endif
 		sqlite3_exec_stmt(insertImage, NULL, NULL, NULL);
 
 	}
