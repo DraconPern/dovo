@@ -13,7 +13,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
 set(Boost_USE_STATIC_LIBS        ON)
 set(Boost_USE_MULTITHREADED      ON)
 set(Boost_USE_STATIC_RUNTIME     ON)
-find_package(Boost REQUIRED thread filesystem)
+find_package(Boost REQUIRED thread filesystem system)
 
 set(wxWidgets_USE_STATIC   ON)
 find_package(wxWidgets COMPONENTS core base adv REQUIRED)

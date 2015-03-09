@@ -233,8 +233,12 @@ void DICOMSenderImpl::DoSend()
 			int sleeploop = 5 * 60 * 5;
 			while (sleeploop > 0)
 			{
+#ifdef _WIN32
 				Sleep(200);
-				sleeploop--;
+#else
+                usleep(200);
+#endif
+                sleeploop--;
 				if (IsCanceled())
 					break;
 			}
@@ -778,12 +782,11 @@ OFCondition DICOMSenderImpl::storeSCU(T_ASC_Association * assoc, const boost::fi
 int DICOMSenderImpl::addimage(void *param,int columns,char** values, char**names)
 {
 	DICOMSenderImpl *sender = (DICOMSenderImpl *) param;
-	
+
+#ifdef _WIN32
 	boost::filesystem::path currentFilename(values[0], std::codecvt_utf8<boost::filesystem::path::value_type>());
-#if defined(_WIN32)
-	std::wstring filename = currentFilename.wstring();
 #else
-	std::string filename = currentFilename.string(std::codecvt_utf8<boost::filesystem::path::value_type>());
+    boost::filesystem::path currentFilename(values[0]);
 #endif
 
 	DcmFileFormat dfile;
