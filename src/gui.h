@@ -191,7 +191,7 @@ class sendStatus : public wxDialog
 	
 	public:
 		
-		sendStatus( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Sending..."), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 606,459 ), long style = wxDEFAULT_DIALOG_STYLE ); 
+		sendStatus( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Sending..."), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 781,535 ), long style = wxDEFAULT_DIALOG_STYLE ); 
 		~sendStatus();
 	
 };

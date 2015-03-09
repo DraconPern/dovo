@@ -4508,7 +4508,7 @@
             <property name="minimum_size">600,400</property>
             <property name="name">sendStatus</property>
             <property name="pos"></property>
-            <property name="size">606,459</property>
+            <property name="size">781,535</property>
             <property name="style">wxDEFAULT_DIALOG_STYLE</property>
             <property name="subclass"></property>
             <property name="title">Sending...</property>

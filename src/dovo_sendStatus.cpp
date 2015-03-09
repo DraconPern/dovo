@@ -29,7 +29,7 @@ void dovo_sendStatus::OnTimer( wxTimerEvent& event )
 
 	if(str.length() != 0)
 	{
-		m_log->AppendText(str);			
+		m_log->AppendText(wxString::FromUTF8(str.c_str()));
 	}
 
 	if(m_sender->IsDone())

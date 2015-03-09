@@ -1,8 +1,10 @@
 
 #include "dicomscanner.h"
 #include "sqlite3_exec_stmt.h"
+#include <codecvt>
 
-#include <boost/locale.hpp>
+// #include <locale>
+
 
 // work around the fact that dcmtk doesn't work in unicode mode, so all string operation needs to be converted from/to mbcs
 #ifdef _UNICODE
@@ -80,7 +82,7 @@ void DICOMFileScannerImpl::ScanFile(boost::filesystem::path path)
 #if defined(_WIN32)
 	std::wstring filename = path.wstring();
 #else
-	std::string filename = path.string();
+	std::string filename = path.string(std::codecvt_utf8<boost::filesystem::path::value_type>());
 #endif
 
 	DcmFileFormat dfile;
@@ -121,7 +123,7 @@ void DICOMFileScannerImpl::ScanFile(boost::filesystem::path path)
 
 		sqlite3_bind_text(insertImage, 10, sopuid.c_str(), sopuid.length(), SQLITE_STATIC);
 
-		std::string p = path.native();
+		std::string p = path.string(std::codecvt_utf8<boost::filesystem::path::value_type>());
 		sqlite3_bind_text(insertImage, 11, p.c_str(), p.length(), SQLITE_STATIC);
 
 		sqlite3_exec_stmt(insertImage, NULL, NULL, NULL);

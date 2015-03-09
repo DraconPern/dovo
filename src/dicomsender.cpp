@@ -2,6 +2,7 @@
 #include "dicomsender.h"
 #include "sqlite3_exec_stmt.h"
 #include <boost/lexical_cast.hpp>
+#include <codecvt>
 
 // work around the fact that dcmtk doesn't work in unicode mode, so all string operation needs to be converted from/to mbcs
 #ifdef _UNICODE
@@ -15,6 +16,11 @@
 #include "dcmtk/dcmdata/dctk.h"
 #include "dcmtk/dcmnet/dimse.h"
 #include "dcmtk/dcmnet/diutil.h"
+
+// check DCMTK functionality
+#if !defined(WIDE_CHAR_FILE_IO_FUNCTIONS) && defined(_WIN32)
+#error "DCMTK and this program must be compiled with DCMTK_WIDE_CHAR_FILE_IO_FUNCTIONS"
+#endif
 
 #ifdef _UNDEFINEDUNICODE
 #define _UNICODE 1
@@ -77,8 +83,7 @@ protected:
 
 	GUILog log;
 
-	OFCondition storeSCU(T_ASC_Association * assoc, const char *fname);
-	OFCondition cstore(T_ASC_Association * assoc, const OFString& fname);
+	OFCondition storeSCU(T_ASC_Association * assoc, const boost::filesystem::path &fname);	
 	void replacePatientInfoInformation(DcmDataset* dataset);
 	// void replaceSOPInstanceInformation(DcmDataset* dataset);
 	OFCondition addStoragePresentationContexts(T_ASC_Parameters *params, OFList<OFString>& sopClasses);	
@@ -89,7 +94,7 @@ protected:
 	void addfiles();
 	static int addimage(void *param,int columns,char** values, char**names);
 
-	OFList<OFString> fileNameList;
+	std::vector<boost::filesystem::path> fileNameList;
 	OFList<OFString> sopClassUIDList;    // the list of sop classes
 
 
@@ -261,14 +266,14 @@ int DICOMSenderImpl::SendABatch()
 		if (cond.bad())
 		{		
 			log.Write(cond);
-			throw std::exception("ASC_initializeNetwork");
+			throw std::runtime_error("ASC_initializeNetwork");
 		}
 
 		cond = ASC_createAssociationParameters(&params, ASC_DEFAULTMAXPDU);
 		if (cond.bad())
 		{		
 			log.Write(cond);
-			throw std::exception("ASC_createAssociationParameters");
+			throw std::runtime_error("ASC_createAssociationParameters");
 		}
 
 		ASC_setAPTitles(params, m_ourAETitle.c_str(), m_destinationAETitle.c_str(), NULL);	
@@ -286,7 +291,7 @@ int DICOMSenderImpl::SendABatch()
 		if (cond.bad())
 		{
 			log.Write(cond);
-			throw std::exception("addStoragePresentationContexts");
+			throw std::runtime_error("addStoragePresentationContexts");
 		}
 
 		log.Write("Requesting Association\n");
@@ -302,13 +307,13 @@ int DICOMSenderImpl::SendABatch()
 				msg << "Association Rejected:\n";
 				ASC_printRejectParameters(msg, &rej);
 				log.Write(msg);
-				throw std::exception("ASC_requestAssociation");
+				throw std::runtime_error("ASC_requestAssociation");
 			}
 			else
 			{
 				log.Write("Association Request Failed:\n");			
 				log.Write(cond);
-				throw std::exception("ASC_requestAssociation");
+				throw std::runtime_error("ASC_requestAssociation");
 			}
 		}
 
@@ -323,18 +328,18 @@ int DICOMSenderImpl::SendABatch()
 		if (ASC_countAcceptedPresentationContexts(params) == 0)
 		{
 			log.Write("No Acceptable Presentation Contexts\n");
-			throw new std::exception("ASC_countAcceptedPresentationContexts");
+			throw new std::runtime_error("ASC_countAcceptedPresentationContexts");
 		}
 
 		/* do the real work, i.e. for all files which were specified in the */
 		/* command line, transmit the encapsulated DICOM objects to the SCP. */
 		cond = EC_Normal;
 
-		for(OFListIterator(OFString) iter = fileNameList.begin(); iter != fileNameList.end(); iter++)		
+		for(std::vector<boost::filesystem::path>::iterator iter = fileNameList.begin(); iter != fileNameList.end(); iter++)		
 		{
 			if (IsCanceled())
 				break;
-			cond = cstore(assoc, *iter);			
+			cond = storeSCU(assoc, *iter);			
 		}
 
 		fileNameList.clear();
@@ -607,11 +612,12 @@ bool DICOMSenderImpl::updateStringAttributeValue(DcmItem* dataset, const DcmTagK
 void DICOMSenderImpl::replacePatientInfoInformation(DcmDataset* dataset)
 {
 	std::stringstream msg;		
+	/*
 	msg << "Changing PatientID = " << m_NewPatientID << std::endl;
 	msg << "Changing PatientName = " << m_NewPatientName << std::endl;
 	msg << "Changing Birthday = " << m_NewBirthDay << std::endl;
 	log.Write(msg);
-
+	*/
 	if (m_NewPatientID.length() != 0)
 		updateStringAttributeValue(dataset, DCM_PatientID, m_NewPatientID.c_str());
 
@@ -641,21 +647,26 @@ void DICOMSenderImpl::progressCallback(void * callbackData, T_DIMSE_StoreProgres
 	}
 }
 
-OFCondition DICOMSenderImpl::storeSCU(T_ASC_Association * assoc, const char *fname)
+OFCondition DICOMSenderImpl::storeSCU(T_ASC_Association * assoc, const boost::filesystem::path &fname)
 {
 	DIC_US msgId = assoc->nextMsgID++;
 	T_DIMSE_C_StoreRQ req;
 	T_DIMSE_C_StoreRSP rsp;
 	DIC_UI sopClass;
 	DIC_UI sopInstance;
-	DcmDataset *statusDetail = NULL;
+	DcmDataset *statusDetail = NULL;	
 
 	std::stringstream msg;
-	msg << "Sending file: " << fname << "\n";
+	msg << "Sending file: " << fname.string(std::codecvt_utf8<boost::filesystem::path::value_type>()) << "\n";
 	log.Write(msg);
 
 	DcmFileFormat dcmff;
-	OFCondition cond = dcmff.loadFile(fname);
+#if defined(_WIN32)
+	std::wstring filename = fname.wstring();
+#else
+	std::string filename = fname.string(std::codecvt_utf8<boost::filesystem::path::value_type>());
+#endif
+	OFCondition cond = dcmff.loadFile(filename.c_str());
 
 	if (cond.bad())
 	{		
@@ -731,7 +742,7 @@ OFCondition DICOMSenderImpl::storeSCU(T_ASC_Association * assoc, const char *fna
 	cond = DIMSE_storeUser(assoc, presId, &req,
 		NULL, dcmff.getDataset(), progressCallback, this,
 		DIMSE_NONBLOCKING, 10,
-		&rsp, &statusDetail, NULL, OFStandard::getFileSize(fname));	
+		&rsp, &statusDetail, NULL, boost::filesystem::file_size(fname));	
 	
 	if (cond.bad())	
 	{		
@@ -747,46 +758,33 @@ OFCondition DICOMSenderImpl::storeSCU(T_ASC_Association * assoc, const char *fna
 		log.Write(msg);
 	}
 
-	return cond;
-}
-
-
-OFCondition DICOMSenderImpl::cstore(T_ASC_Association * assoc, const OFString& fname)
-	/*
-	* This function will process the given file as often as is specified by opt_repeatCount.
-	* "Process" in this case means "read file, send C-STORE-RQ, receive C-STORE-RSP".
-	*
-	* Parameters:
-	*   assoc - [in] The association (network connection to another DICOM application).
-	*   fname - [in] Name of the file which shall be processed.
-	*/
-{
-	OFCondition cond = EC_Normal;
-
-	// process file (read file, send C-STORE-RQ, receive C-STORE-RSP) 
-	cond = storeSCU(assoc, fname.c_str());    
-
 	// update the sent status
 	if (cond.good())
 	{
-		std::string updatesql = "UPDATE images SET sent = 1 WHERE filename = ?";
+		std::string updatesql = "UPDATE images SET sent = 1 WHERE sopuid = ?";
 		sqlite3_stmt *update;
 		sqlite3_prepare_v2(db, updatesql.c_str(), updatesql.length(), &update, NULL);
-		sqlite3_bind_text(update, 1, fname.c_str(), fname.length(), SQLITE_STATIC);
+		sqlite3_bind_text(update, 1, sopInstance, strlen(sopInstance), SQLITE_STATIC);
 		sqlite3_exec_stmt(update, NULL, NULL, NULL);
 		sqlite3_finalize(update);
 	}
-
 	return cond;
 }
 
 int DICOMSenderImpl::addimage(void *param,int columns,char** values, char**names)
 {
 	DICOMSenderImpl *sender = (DICOMSenderImpl *) param;
+	
+	boost::filesystem::path currentFilename(values[0], std::codecvt_utf8<boost::filesystem::path::value_type>());
+#if defined(_WIN32)
+	std::wstring filename = currentFilename.wstring();
+#else
+	std::string filename = currentFilename.string(std::codecvt_utf8<boost::filesystem::path::value_type>());
+#endif
 
-	char *currentFilename = values[0];
-
-	if (access(currentFilename, R_OK) < 0)
+	DcmFileFormat dfile;
+	OFCondition cond = dfile.loadFile(filename.c_str()/*, EXS_Unknown, EGL_noChange, 10*/);
+	if (cond.bad())
 	{
 		std::stringstream msg;
 		msg << "cannot access file, ignoring: " << currentFilename << std::endl;
@@ -797,7 +795,7 @@ int DICOMSenderImpl::addimage(void *param,int columns,char** values, char**names
 	char sopClassUID[128];
 	char sopInstanceUID[128];
 
-	if (!DU_findSOPClassAndInstanceInFile(currentFilename, sopClassUID, sopInstanceUID))
+	if (!DU_findSOPClassAndInstanceInDataSet(dfile.getDataset(), sopClassUID, sopInstanceUID))
 	{	
 		std::stringstream msg;
 		msg << "missing SOP class (or instance) in file, ignoring: " << currentFilename << std::endl;

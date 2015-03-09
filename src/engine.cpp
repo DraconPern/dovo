@@ -24,13 +24,13 @@ engine::engine()
 	{
 		std::ostringstream msg;
 		msg << "Can't create database: " << sqlite3_errmsg(db);
-		throw std::exception(msg.str().c_str());				
+		throw std::runtime_error(msg.str().c_str());				
 	}	
 
 	sqlite3_exec(db, "CREATE TABLE images (name TEXT, patid TEXT, birthday TEXT, \
 					 studyuid TEXT, modality TEXT, studydesc TEXT, studydate TEXT, \
 					 seriesuid TEXT, seriesdesc TEXT, \
-					 sopuid TEXT UNIQUE, filename BLOB, sent INTEGER)", NULL, NULL, NULL);
+					 sopuid TEXT UNIQUE, filename TEXT, sent INTEGER)", NULL, NULL, NULL);
 
 }
 
