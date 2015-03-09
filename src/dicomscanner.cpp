@@ -79,12 +79,6 @@ void DICOMFileScannerImpl::Initialize(sqlite3 *db, boost::filesystem::path scanP
 
 void DICOMFileScannerImpl::ScanFile(boost::filesystem::path path)
 {
-#if defined(_WIN32)
-	std::wstring filename = path.wstring();
-#else
-	std::string filename = path.string();
-#endif
-
 	DcmFileFormat dfile;
 	OFCondition cond = dfile.loadFile(path.c_str());
 	if (cond.good())

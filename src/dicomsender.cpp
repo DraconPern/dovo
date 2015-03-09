@@ -669,11 +669,6 @@ OFCondition DICOMSenderImpl::storeSCU(T_ASC_Association * assoc, const boost::fi
 	log.Write(msg);
 
 	DcmFileFormat dcmff;
-#if defined(_WIN32)
-	std::wstring filename = fname.wstring();
-#else
-	std::string filename = fname.string();
-#endif
 	OFCondition cond = dcmff.loadFile(fname.c_str());
 
 	if (cond.bad())
