@@ -132,8 +132,7 @@ DICOMSenderImpl::DICOMSenderImpl()
 
 	patientNamePrefix = "OFFIS^TEST_PN_";   // PatientName is PN (maximum 16 chars)
 	patientIDPrefix = "PID_"; // PatientID is LO (maximum 64 chars)
-	studyIDPrefix = "SID_";   // StudyID is SH (maximum 16 chars)
-	accessionNumberPrefix;  // AccessionNumber is SH (maximum 16 chars)
+	studyIDPrefix = "SID_";   // StudyID is SH (maximum 16 chars)	
 
 	opt_timeout = 10;
 

@@ -13,7 +13,8 @@ void dovo_destination::OnInitDialog( wxInitDialogEvent& event )
 	for(unsigned int i = 0; i < m_destinations.size(); i++)
 		m_destinationList->InsertItem(i, wxString::FromUTF8(m_destinations[i].name.c_str()));
 
-	m_destinationList->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+	if(m_destinations.size() > 0)
+		m_destinationList->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
 	SetCtrlState();
 }
 
