@@ -34,8 +34,8 @@ destination::destination( wxWindow* parent, wxWindowID id, const wxString& title
 	m_delete = new wxButton( this, wxID_ANY, _("Delete"), wxDefaultPosition, wxDefaultSize, 0 );
 	bSizer30->Add( m_delete, 0, wxALL, 5 );
 	
-	m_button12 = new wxButton( this, wxID_ANY, _("Echo"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer30->Add( m_button12, 0, wxALL, 5 );
+	m_echo = new wxButton( this, wxID_ANY, _("Echo"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer30->Add( m_echo, 0, wxALL, 5 );
 	
 	
 	bSizer24->Add( bSizer30, 0, wxEXPAND, 5 );

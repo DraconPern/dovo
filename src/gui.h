@@ -47,7 +47,7 @@ class destination : public wxDialog
 		wxListCtrl* m_destinationList;
 		wxButton* m_add;
 		wxButton* m_delete;
-		wxButton* m_button12;
+		wxButton* m_echo;
 		wxStaticText* m_staticText3;
 		wxTextCtrl* m_name;
 		wxStaticText* m_staticText4;

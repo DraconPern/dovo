@@ -35,7 +35,7 @@ void dovo_sendStatus::OnTimer( wxTimerEvent& event )
 	if(m_sender->IsDone())
 	{				
 		timer.Disconnect(wxEVT_TIMER, wxTimerEventHandler( dovo_sendStatus::OnTimer ), NULL, this );
-		m_stop->SetLabel("Close");		
+		m_stop->SetLabel(_("Close"));
 		m_log->AppendText("\nDone\n");
 
 		m_progress->SetValue(100);

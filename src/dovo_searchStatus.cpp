@@ -14,8 +14,6 @@ searchStatus( parent )
 #endif
 	timer.Connect(wxEVT_TIMER, wxTimerEventHandler( dovo_searchStatus::OnTimer ), NULL, this );
 	timer.Start(500);
-	m_progress->SetRange(200);
-
 }
 
 void dovo_searchStatus::OnStop( wxCommandEvent& event )

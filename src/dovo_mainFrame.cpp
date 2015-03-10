@@ -14,19 +14,19 @@ dovo_mainFrame::dovo_mainFrame( wxWindow* parent )
 	m_exit->Hide();
 #endif 
 	// Create the UI
-	m_patients->InsertColumn(0, "Name");
+	m_patients->InsertColumn(0, _("Name"));
 	m_patients->InsertColumn(1, "ID");
-	m_patients->InsertColumn(2, "Birthday");
+	m_patients->InsertColumn(2, _("Birthday"));
 
-	m_studies->InsertColumn(0, "Date");
-	m_studies->InsertColumn(1, "Study");
+	m_studies->InsertColumn(0, _("Date"));
+	m_studies->InsertColumn(1, _("Study"));
 	m_studies->InsertColumn(2, "StudyID");
 
-	m_series->InsertColumn(0, "Series");
+	m_series->InsertColumn(0, _("Series"));
 	m_series->InsertColumn(1, "SeriesID");
 
-	m_instances->InsertColumn(0, L"SOPUid");
-	m_instances->InsertColumn(1, L"path");
+	m_instances->InsertColumn(0, "sop UID");
+	m_instances->InsertColumn(1, _("path"));
 
 	// Fill in settings
 	wxConfig::Get()->SetPath("/Settings");
@@ -150,13 +150,13 @@ void dovo_mainFrame::OnSend( wxCommandEvent& event )
 	long item = m_patients->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
 	if (item == -1)
 	{
-		wxMessageBox("Please select a Patient.", "Error", wxOK, this);
+		wxMessageBox(_("Please select a Patient."), _("Error"), wxOK, this);
 		return;
 	}
 
 	if(m_destination->GetSelection() == wxNOT_FOUND)
 	{
-		wxMessageBox("Please select a destination.", "Error", wxOK, this);
+		wxMessageBox(_("Please select a destination."), _("Error"), wxOK, this);
 		return;
 	}
 

@@ -4,16 +4,16 @@ dovo_destination::dovo_destination( wxWindow* parent )
 	:
 	destination( parent )
 {
-
+	m_echo->Hide();
 }
 
 void dovo_destination::OnInitDialog( wxInitDialogEvent& event )
 {
-	m_destinationList->InsertColumn(0, "Name", wxLIST_FORMAT_LEFT, wxLIST_AUTOSIZE_USEHEADER);
+	m_destinationList->InsertColumn(0, _("Name"), wxLIST_FORMAT_LEFT);
 	for(unsigned int i = 0; i < m_destinations.size(); i++)
 		m_destinationList->InsertItem(i, wxString::FromUTF8(m_destinations[i].name.c_str()));
 
-	m_destinationList->SetColumnWidth(0, wxLIST_AUTOSIZE);
+	m_destinationList->SetColumnWidth(0, m_destinationList->GetSize().GetWidth());
 
 	if(m_destinations.size() > 0)
 		m_destinationList->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
@@ -67,7 +67,12 @@ void dovo_destination::OnNameUpdate( wxKeyEvent& event )
 	if(sel != -1)
 	{
 		wxString name = m_name->GetValue();
-		if(name.length() > 0) 
+		if(name.Find(",") != wxNOT_FOUND)
+		{
+			wxMessageBox( _("No comma(,) allowed."), _("Error"), wxOK | wxICON_WARNING);
+			m_name->SetValue(wxString::FromUTF8(m_destinations[sel].name.c_str()));
+		}
+		else if(name.length() > 0)
 		{
 			m_destinations[sel].name = name.ToUTF8();
 
@@ -78,7 +83,7 @@ void dovo_destination::OnNameUpdate( wxKeyEvent& event )
 		}
 		else
 		{
-			wxMessageBox( wxT("Name can't be blank!"), "Error", wxOK | wxICON_WARNING);
+			wxMessageBox( _("Name can't be blank!"), _("Error"), wxOK | wxICON_WARNING);
 			m_name->SetValue(wxString::FromUTF8(m_destinations[sel].name.c_str()));
 		}
 
@@ -143,6 +148,13 @@ void dovo_destination::UpdateItem(int sel)
 		sel = GetSelectedDestinationItem(); 
 		if ( sel == -1 )
 			return;
+	}
+
+	if(m_name->GetValue().Find(",") != wxNOT_FOUND)
+	{
+		wxMessageBox(_("No comma(,) allowed."), _("Error"), wxOK | wxICON_WARNING);
+		m_name->SetValue(wxString::FromUTF8(m_destinations[sel].name.c_str()));
+		return;
 	}
 
 	m_destinations[sel].name = m_name->GetValue().ToUTF8();

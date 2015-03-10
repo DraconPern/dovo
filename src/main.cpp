@@ -7,6 +7,8 @@
 
 #include "dovo_mainFrame.h"
 
+time_t cvt_TIME(char const *time);
+
 class MyApp: public wxApp
 {
 public:
@@ -25,11 +27,15 @@ END_EVENT_TABLE()
 
 bool MyApp::OnInit()
 {
-	wxTheApp->SetAppName("fmdeye");
+
+	wxTheApp->SetAppName("dovo");
 	wxTheApp->SetVendorName("FrontMotion");
 
-	wxConfig::Get()->SetAppName("fmdeye");
+	wxConfig::Get()->SetAppName("dovo");
 	wxConfig::Get()->SetVendorName("FrontMotion");
+
+	time_t t = cvt_TIME(__DATE__);
+
 
 	dovo_mainFrame *frame = new dovo_mainFrame(NULL);
 
@@ -53,4 +59,22 @@ void MyApp::OnAbout(wxCommandEvent& evt)
 {
     dovo_about dlg(NULL);
 	dlg.ShowModal();
+}
+
+time_t cvt_TIME(char const *time) { 
+    char s_month[5];
+    int month, day, year;
+    struct tm t = {0};
+    static const char month_names[] = "JanFebMarAprMayJunJulAugSepOctNovDec";
+
+    sscanf(time, "%s %d %d", s_month, &day, &year);
+
+    month = (strstr(month_names, s_month)-month_names)/3;
+
+    t.tm_mon = month;
+    t.tm_mday = day;
+    t.tm_year = year - 1900;
+    t.tm_isdst = -1;
+
+    return mktime(&t);
 }

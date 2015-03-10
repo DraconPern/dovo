@@ -36,7 +36,8 @@ class dovo_destination : public destination
 		void SetCtrlState();
 		void UpdateItem(int sel = -1);
 		int GetSelectedDestinationItem();
-		
+
+
 
 
 };
