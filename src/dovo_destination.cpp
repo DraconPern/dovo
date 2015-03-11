@@ -84,9 +84,7 @@ void dovo_destination::OnNameText( wxCommandEvent& event )
 	int sel = GetSelectedDestinationItem();
 	if(sel != -1)
 	{
-		m_destinationList->DeleteItem(sel);
-		m_destinationList->InsertItem(sel, m_destinations[sel].name);
-		m_destinationList->SetItemState(sel, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+		m_destinationList->SetItemText(sel, m_destinations[sel].name);		
 	}
 }
 
