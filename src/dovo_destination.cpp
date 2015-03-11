@@ -114,41 +114,6 @@ void dovo_destination::OnOK( wxCommandEvent& event )
 	event.Skip();
 }
 
-
-/*
-void dovo_destination::OnNameUpdate( wxKeyEvent& event )
-{
-int sel = GetSelectedDestinationItem();
-if(sel != -1)
-{
-wxString name = m_name->GetValue();
-if(name.Find(",") != wxNOT_FOUND)
-{
-wxMessageBox( _("No comma(,) allowed."), _("Error"), wxOK | wxICON_WARNING);
-m_name->SetValue(wxString::FromUTF8(m_destinations[sel].name.c_str()));
-}
-else if(name.length() > 0)
-{
-m_destinations[sel].name = name.ToUTF8();
-
-m_destinationList->DeleteItem(sel);
-m_destinationList->InsertItem(sel, name);
-m_destinationList->SetItemState(sel, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
-event.Skip();
-}
-else
-{
-wxMessageBox( _("Name can't be blank!"), _("Error"), wxOK | wxICON_WARNING);
-m_name->SetValue(wxString::FromUTF8(m_destinations[sel].name.c_str()));
-}
-
-}
-else
-{
-event.Skip();
-}
-}
-*/
 void dovo_destination::UpdateItem(int sel)
 {
 	TransferDataFromWindow();	
@@ -159,23 +124,8 @@ void dovo_destination::UpdateItem(int sel)
 		if ( sel == -1 )
 			return;
 	}
-	/*
-	if(m_name->GetValue().Find(",") != wxNOT_FOUND)
-	{
-		wxMessageBox(_("No comma(,) allowed."), _("Error"), wxOK | wxICON_WARNING);
-		m_name->ChangeValue(wxString::FromUTF8(m_destinations[sel].name.c_str()));
-		return;
-	}
-	*/
+	
 	m_destinations[sel].name = m_name->GetValue().ToUTF8();
-	/*
-	if(m_destinationHost->GetValue().Find(",") != wxNOT_FOUND)
-	{
-		wxMessageBox(_("No comma(,) allowed."), _("Error"), wxOK | wxICON_WARNING);
-		m_destinationHost->ChangeValue(wxString::FromUTF8(m_destinations[sel].destinationHost.c_str()));
-		return;
-	}*/
-
 	m_destinations[sel].destinationHost = m_destinationHost->GetValue().ToUTF8();
 	try { m_destinations[sel].destinationPort = boost::lexical_cast<int>(m_destinationPort->GetValue()); }
 	catch(...) { m_destinations[sel].destinationPort = 104; }

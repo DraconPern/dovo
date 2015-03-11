@@ -1496,7 +1496,7 @@
             <property name="size">-1,-1</property>
             <property name="style">wxDEFAULT_FRAME_STYLE|wxRESIZE_BORDER</property>
             <property name="subclass"></property>
-            <property name="title">FileIn</property>
+            <property name="title">dovo</property>
             <property name="tooltip"></property>
             <property name="window_extra_style">wxWS_EX_VALIDATE_RECURSIVELY</property>
             <property name="window_name"></property>
