@@ -123,11 +123,11 @@ void dovo_mainFrame::OnUpdate( wxCommandEvent& event )
 	m_series->DeleteAllItems();
 	m_instances->DeleteAllItems();
 #ifdef _WIN32
-    boost::filesystem::path p = m_directory->GetValue();
+	boost::filesystem::path p = m_directory->GetValue();
 #else
 	boost::filesystem::path p = m_directory->GetValue().ToUTF8().data();
 #endif
-    m_engine.StartScan(p);
+	m_engine.StartScan(p);
 
 	dovo_searchStatus dlg(this);
 	dlg.m_scanner = &m_engine.scanner;
@@ -211,9 +211,18 @@ int dovo_mainFrame::fillstudies(void *param,int columns,char** values, char**nam
 
 	struct tm thedate;
 	memset(&thedate, 0, sizeof(struct tm));
-	thedate.tm_year = boost::lexical_cast<int>(date.substr(0, 4)) - 1900;
-	thedate.tm_mon = boost::lexical_cast<int>(date.substr(4, 2)) - 1;
-	thedate.tm_mday = boost::lexical_cast<int>(date.substr(6, 2));
+	try
+	{
+		thedate.tm_year = boost::lexical_cast<int>(date.substr(0, 4)) - 1900;
+		thedate.tm_mon = boost::lexical_cast<int>(date.substr(4, 2)) - 1;
+		thedate.tm_mday = boost::lexical_cast<int>(date.substr(6, 2));
+	}
+	catch(...)
+	{
+		thedate.tm_year = 0;
+		thedate.tm_mon = 0;
+		thedate.tm_mday = 1;
+	}
 
 	char buf[1024];
 	memset(buf, 0, 1024);

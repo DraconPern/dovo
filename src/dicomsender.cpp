@@ -832,7 +832,8 @@ int DICOMSenderImpl::countcallback(void *param,int columns,char** values, char**
 {
 	int *count = (int *) param;
 
-	*count = boost::lexical_cast<int>(values[0]);
+	try { *count = boost::lexical_cast<int>(values[0]); }
+	catch(...) { *count = 0; }
 	return 0;
 }
 

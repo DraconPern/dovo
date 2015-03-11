@@ -74,7 +74,7 @@ void engine::LoadDestinationList()
 
 		wxString data;
 		data = wxConfig::Get()->Read(str);
-		
+
 		std::vector<std::string> items;		
 		//parse(data.ToStdWstring().c_str(),
 		parse(data.ToUTF8().data(),
@@ -90,8 +90,12 @@ void engine::LoadDestinationList()
 		, space_p);
 
 		if(items.size() == 5)
-			destinations.push_back(DestinationEntry(items[0], items[1], boost::lexical_cast<int>(items[2]), items[3], items[4]));
-
+		{
+			// try, if error, just don't add it.
+			try { destinations.push_back(DestinationEntry(items[0], items[1], boost::lexical_cast<int>(items[2]), items[3], items[4])); }
+			catch(...) {}
+		}
+		
 		bCont = wxConfig::Get()->GetNextEntry(str, dummy);
 	}
 }
@@ -133,7 +137,10 @@ void engine::LoadGlobalDestinationList()
 		, space_p);
 
 		if(items.size() == 5)
-			globalDestinations.push_back(DestinationEntry(items[0].c_str(), items[1].c_str(), boost::lexical_cast<int>(items[2]), items[3].c_str(), items[4].c_str()));
+		{
+			try { globalDestinations.push_back(DestinationEntry(items[0].c_str(), items[1].c_str(), boost::lexical_cast<int>(items[2]), items[3].c_str(), items[4].c_str())); }
+			catch(...) {}
+		}
 
 		bCont = registry.GetNextValue(str, dummy);
 	}
@@ -203,7 +210,7 @@ void engine::GetStudies(std::string patientname, sqlite3_callback fillstudy, voi
 	std::string selectsql = "SELECT DISTINCT studyuid, studydesc, studydate FROM images WHERE name = ? ORDER BY studyuid";
 	sqlite3_stmt *select;
 	sqlite3_prepare_v2(db, selectsql.c_str(), selectsql.length(), &select, NULL);
-	
+
 	sqlite3_bind_text(select, 1, patientname.c_str(), patientname.length(), SQLITE_STATIC);
 
 	sqlite3_exec_stmt(select, fillstudy, obj, NULL);		
@@ -215,7 +222,7 @@ void engine::GetSeries(std::string studyuid, sqlite3_callback fillseries, void *
 	std::string selectsql = "SELECT DISTINCT seriesuid, seriesdesc FROM images WHERE (studyuid = ?)";
 	sqlite3_stmt *select;
 	sqlite3_prepare_v2(db, selectsql.c_str(), selectsql.length(), &select, NULL);
-	
+
 	sqlite3_bind_text(select, 1, studyuid.c_str(), studyuid.length(), SQLITE_STATIC);
 
 	sqlite3_exec_stmt(select, fillseries, obj, NULL);		
@@ -228,7 +235,7 @@ void engine::GetInstances(std::string seriesuid, sqlite3_callback fillinstances,
 	std::string selectsql = "SELECT sopuid, filename FROM images WHERE (seriesuid = ?)";
 	sqlite3_stmt *select;
 	sqlite3_prepare_v2(db, selectsql.c_str(), selectsql.length(), &select, NULL);
-			
+
 	sqlite3_bind_text(select, 1, seriesuid.c_str(), seriesuid.length(), SQLITE_STATIC);
 
 	sqlite3_exec_stmt(select, fillinstances, obj, NULL);		

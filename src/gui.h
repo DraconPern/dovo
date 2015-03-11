@@ -21,7 +21,6 @@
 #include <wx/sizer.h>
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
-#include <wx/valtext.h>
 #include <wx/dialog.h>
 #include <wx/combobox.h>
 #include <wx/bitmap.h>
@@ -68,12 +67,15 @@ class destination : public wxDialog
 		virtual void OnSelect( wxListEvent& event ) { event.Skip(); }
 		virtual void OnAdd( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnDelete( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnNameUpdate( wxKeyEvent& event ) { event.Skip(); }
+		virtual void OnNameText( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnDestinationHostText( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnDestinationPortText( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnDestinationAETitleText( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnOurAETitleText( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnOK( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:
-		wxString m_port; 
 		
 		destination( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Destinations"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 469,555 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
 		~destination();

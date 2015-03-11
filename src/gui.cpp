@@ -86,8 +86,6 @@ destination::destination( wxWindow* parent, wxWindowID id, const wxString& title
 	bSizer29 = new wxBoxSizer( wxHORIZONTAL );
 	
 	m_destinationPort = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	m_destinationPort->SetValidator( wxTextValidator( wxFILTER_NUMERIC, &m_port ) );
-	
 	bSizer29->Add( m_destinationPort, 1, wxALL, 5 );
 	
 	
@@ -146,7 +144,11 @@ destination::destination( wxWindow* parent, wxWindowID id, const wxString& title
 	m_destinationList->Connect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( destination::OnSelect ), NULL, this );
 	m_add->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( destination::OnAdd ), NULL, this );
 	m_delete->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( destination::OnDelete ), NULL, this );
-	m_name->Connect( wxEVT_KEY_UP, wxKeyEventHandler( destination::OnNameUpdate ), NULL, this );
+	m_name->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( destination::OnNameText ), NULL, this );
+	m_destinationHost->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( destination::OnDestinationHostText ), NULL, this );
+	m_destinationPort->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( destination::OnDestinationPortText ), NULL, this );
+	m_destinationAETitle->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( destination::OnDestinationAETitleText ), NULL, this );
+	m_ourAETitle->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( destination::OnOurAETitleText ), NULL, this );
 	m_sdbSizer2OK->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( destination::OnOK ), NULL, this );
 }
 
@@ -158,7 +160,11 @@ destination::~destination()
 	m_destinationList->Disconnect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( destination::OnSelect ), NULL, this );
 	m_add->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( destination::OnAdd ), NULL, this );
 	m_delete->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( destination::OnDelete ), NULL, this );
-	m_name->Disconnect( wxEVT_KEY_UP, wxKeyEventHandler( destination::OnNameUpdate ), NULL, this );
+	m_name->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( destination::OnNameText ), NULL, this );
+	m_destinationHost->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( destination::OnDestinationHostText ), NULL, this );
+	m_destinationPort->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( destination::OnDestinationPortText ), NULL, this );
+	m_destinationAETitle->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( destination::OnDestinationAETitleText ), NULL, this );
+	m_ourAETitle->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( destination::OnOurAETitleText ), NULL, this );
 	m_sdbSizer2OK->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( destination::OnOK ), NULL, this );
 	
 }

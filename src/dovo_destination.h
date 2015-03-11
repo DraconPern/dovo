@@ -25,7 +25,11 @@ class dovo_destination : public destination
 		void OnSelect( wxListEvent& event );
 		void OnAdd( wxCommandEvent& event );
 		void OnDelete( wxCommandEvent& event );
-		void OnNameUpdate( wxKeyEvent& event );
+		void OnNameText( wxCommandEvent& event );
+		void OnDestinationHostText( wxCommandEvent& event );
+		void OnDestinationPortText( wxCommandEvent& event );
+		void OnDestinationAETitleText( wxCommandEvent& event );
+		void OnOurAETitleText( wxCommandEvent& event );
 		void OnOK( wxCommandEvent& event );
 	public:
 		/** Constructor */
@@ -37,8 +41,7 @@ class dovo_destination : public destination
 		void UpdateItem(int sel = -1);
 		int GetSelectedDestinationItem();
 
-
-
+		wxString invalidInput;
 
 };
 
