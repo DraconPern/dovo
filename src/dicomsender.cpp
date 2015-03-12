@@ -203,6 +203,8 @@ std::string DICOMSenderImpl::GUILog::Read()
 }
 void DICOMSenderImpl::DoSend()
 {
+	OFLog::configure(OFLogger::OFF_LOG_LEVEL);
+
 	int retry = 0;
 	int countbefore = 0;
 	int countafter = 0;

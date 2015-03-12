@@ -143,6 +143,8 @@ void DICOMFileScannerImpl::DoScanThread(void *obj)
 
 void DICOMFileScannerImpl::DoScan(boost::filesystem::path path)
 {	
+	OFLog::configure(OFLogger::OFF_LOG_LEVEL);
+
 	std::string imagesql = "INSERT INTO images VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)";
 	sqlite3_prepare_v2(db, imagesql.c_str(), imagesql.length(), &insertImage, NULL);
 

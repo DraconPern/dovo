@@ -7,6 +7,9 @@
 
 #include "dovo_mainFrame.h"
 
+// Visual Leak Detector
+#include <vld.h>
+
 time_t cvt_TIME(char const *time);
 
 class MyApp: public wxApp
@@ -26,8 +29,7 @@ EVT_MENU(wxID_ABOUT, MyApp::OnAbout)
 END_EVENT_TABLE()
 
 bool MyApp::OnInit()
-{
-
+{	
 	wxTheApp->SetAppName("dovo");
 	wxTheApp->SetVendorName("FrontMotion");
 
