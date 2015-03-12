@@ -50,8 +50,7 @@ class dovo_mainFrame : public mainFrame
 		void renderPreview(wxDC& dc);
 
 		engine m_engine;
-		wxImage image;
-
+		wxImage image;		
 };
 
 #endif // __dovo_mainFrame__

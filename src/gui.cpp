@@ -242,10 +242,16 @@ mainFrame::mainFrame( wxWindow* parent, wxWindowID id, const wxString& title, co
 	bSizer141 = new wxBoxSizer( wxHORIZONTAL );
 	
 	bSizer141->SetMinSize( wxSize( 100,100 ) ); 
+	wxBoxSizer* bSizer30;
+	bSizer30 = new wxBoxSizer( wxVERTICAL );
+	
 	m_preview = new wxStaticBitmap( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
 	m_preview->SetMinSize( wxSize( 200,-1 ) );
 	
-	bSizer141->Add( m_preview, 1, wxALL|wxEXPAND, 5 );
+	bSizer30->Add( m_preview, 1, wxALL|wxEXPAND, 5 );
+	
+	
+	bSizer141->Add( bSizer30, 1, wxEXPAND, 5 );
 	
 	m_instances = new wxListCtrl( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_REPORT|wxLC_SINGLE_SEL );
 	m_instances->SetMinSize( wxSize( -1,200 ) );
@@ -310,6 +316,7 @@ mainFrame::mainFrame( wxWindow* parent, wxWindowID id, const wxString& title, co
 	m_patients->Connect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( mainFrame::OnPatientsSelected ), NULL, this );
 	m_studies->Connect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( mainFrame::OnStudiesSelected ), NULL, this );
 	m_series->Connect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( mainFrame::OnSeriesSelected ), NULL, this );
+	m_preview->Connect( wxEVT_PAINT, wxPaintEventHandler( mainFrame::OnPaintPreview ), NULL, this );
 	m_instances->Connect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( mainFrame::OnInstancesSelected ), NULL, this );
 	m_update->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnUpdate ), NULL, this );
 	m_send->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnSend ), NULL, this );
@@ -325,6 +332,7 @@ mainFrame::~mainFrame()
 	m_patients->Disconnect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( mainFrame::OnPatientsSelected ), NULL, this );
 	m_studies->Disconnect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( mainFrame::OnStudiesSelected ), NULL, this );
 	m_series->Disconnect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( mainFrame::OnSeriesSelected ), NULL, this );
+	m_preview->Disconnect( wxEVT_PAINT, wxPaintEventHandler( mainFrame::OnPaintPreview ), NULL, this );
 	m_instances->Disconnect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( mainFrame::OnInstancesSelected ), NULL, this );
 	m_update->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnUpdate ), NULL, this );
 	m_send->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnSend ), NULL, this );

@@ -207,7 +207,7 @@ void engine::GetPatients(sqlite3_callback fillname, void *obj)
 
 void engine::GetStudies(std::string patientname, sqlite3_callback fillstudy, void *obj)
 {
-	std::string selectsql = "SELECT DISTINCT studyuid, studydesc, studydate FROM images WHERE name = ? ORDER BY studyuid";
+	std::string selectsql = "SELECT DISTINCT studyuid, studydesc, studydate FROM images WHERE name = ? ORDER BY studyuid ASC";
 	sqlite3_stmt *select;
 	sqlite3_prepare_v2(db, selectsql.c_str(), selectsql.length(), &select, NULL);
 
@@ -219,7 +219,7 @@ void engine::GetStudies(std::string patientname, sqlite3_callback fillstudy, voi
 
 void engine::GetSeries(std::string studyuid, sqlite3_callback fillseries, void *obj)
 {
-	std::string selectsql = "SELECT DISTINCT seriesuid, seriesdesc FROM images WHERE (studyuid = ?)";
+	std::string selectsql = "SELECT DISTINCT seriesuid, seriesdesc FROM images WHERE (studyuid = ?) ORDER BY seriesuid ASC";
 	sqlite3_stmt *select;
 	sqlite3_prepare_v2(db, selectsql.c_str(), selectsql.length(), &select, NULL);
 
@@ -232,7 +232,7 @@ void engine::GetSeries(std::string studyuid, sqlite3_callback fillseries, void *
 
 void engine::GetInstances(std::string seriesuid, sqlite3_callback fillinstances, void *obj)
 {
-	std::string selectsql = "SELECT sopuid, filename FROM images WHERE (seriesuid = ?)";
+	std::string selectsql = "SELECT sopuid, filename FROM images WHERE (seriesuid = ?) ORDER BY sopuid ASC";
 	sqlite3_stmt *select;
 	sqlite3_prepare_v2(db, selectsql.c_str(), selectsql.length(), &select, NULL);
 

@@ -37,7 +37,7 @@ dovo_mainFrame::dovo_mainFrame( wxWindow* parent )
 
 	FillDestinationList();
 
-	image.Create(10, 10);
+	image.Create(10, 10);	
 }
 
 void dovo_mainFrame::OnBrowse( wxCommandEvent& event )
@@ -114,8 +114,7 @@ void dovo_mainFrame::OnSeriesSelected( wxListEvent& event )
 void dovo_mainFrame::OnPaintPreview( wxPaintEvent& event )
 {
 	wxPaintDC dc(m_preview);
-	// renderPreview(dc);
-	event.Skip();
+	renderPreview(dc);	
 }
 
 void dovo_mainFrame::OnInstancesSelected( wxListEvent& event )
@@ -130,7 +129,11 @@ void dovo_mainFrame::OnInstancesSelected( wxListEvent& event )
 	boost::filesystem::path filename = m_instances->GetItemText(item, 1).ToUTF8().data();
 #endif
 
-	// dcm2img(filename, image);
+	wxSize s = m_preview->GetClientSize();
+	dcm2img(filename, s.GetWidth(), s.GetHeight(), image);
+
+	wxClientDC dc(m_preview);
+    renderPreview(dc);
 }
 
 void dovo_mainFrame::OnUpdate( wxCommandEvent& event )
@@ -157,8 +160,8 @@ void dovo_mainFrame::OnUpdate( wxCommandEvent& event )
 	m_patients->SetColumnWidth(1, wxLIST_AUTOSIZE);
 	m_patients->SetColumnWidth(2, wxLIST_AUTOSIZE);
 
-	if(m_patients->GetItemCount() > 0)
-		m_patients->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+	//if(m_patients->GetItemCount() > 0)
+	//	m_patients->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
 }
 
 void dovo_mainFrame::OnSend( wxCommandEvent& event )
@@ -268,9 +271,9 @@ int dovo_mainFrame::fillseries(void *param,int columns,char** values, char**name
 	return 0; 
 }
 
-void dovo_mainFrame::renderPreview(wxDC&  dc)
+void dovo_mainFrame::renderPreview(wxDC& dc)
 {
-	dc.DrawBitmap( image, 0, 0, false );
+	dc.DrawBitmap(image, 0, 0, false );
 }
 
 int dovo_mainFrame::fillinstances(void *param,int columns,char** values, char**names)
