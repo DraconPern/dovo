@@ -241,3 +241,19 @@ void engine::GetInstances(std::string seriesuid, sqlite3_callback fillinstances,
 	sqlite3_exec_stmt(select, fillinstances, obj, NULL);		
 	sqlite3_finalize(select);
 }
+
+void engine::GetImage(std::string sopid, sqlite3_callback fillinstances, void *obj)
+{
+	/*
+	std::string selectsql = "SELECT filename FROM images WHERE (sopuid = ?)";
+	sqlite3_stmt *select;
+	sqlite3_prepare_v2(db, selectsql.c_str(), selectsql.length(), &select, NULL);
+
+	sqlite3_bind_text(select, 1, sopid.c_str(), sopid.length(), SQLITE_STATIC);
+
+	sqlite3_exec_stmt(select, fillinstances, obj, NULL);		
+	sqlite3_finalize(select);*/
+	boost::filesystem::path filename;
+	
+
+}

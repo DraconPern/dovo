@@ -37,7 +37,7 @@ set(dovo_HEADERS
 	src/destinationentry.h
 	src/dicomscanner.h
 	src/dicomsender.h
-	
+	src/dcm2img.h
 )
 
 set(dovo_SRCS
@@ -55,7 +55,7 @@ set(dovo_SRCS
 	src/engine.cpp
 	src/dicomscanner.cpp
 	src/dicomsender.cpp
-	
+	src/dcm2img.cpp
 )
 
 #VC++ stuff

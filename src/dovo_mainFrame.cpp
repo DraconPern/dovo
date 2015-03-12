@@ -12,7 +12,7 @@ dovo_mainFrame::dovo_mainFrame( wxWindow* parent )
 	SetSize(wxSize(800, 700));
 	m_about->Hide();
 	m_exit->Hide();
-#endif 
+#endif
 	// Create the UI
 	m_patients->InsertColumn(0, _("Name"));
 	m_patients->InsertColumn(1, "ID");
@@ -37,7 +37,7 @@ dovo_mainFrame::dovo_mainFrame( wxWindow* parent )
 
 	FillDestinationList();
 
-
+	image.Create(10, 10);
 }
 
 void dovo_mainFrame::OnBrowse( wxCommandEvent& event )
@@ -90,7 +90,7 @@ void dovo_mainFrame::OnStudiesSelected( wxListEvent& event )
 	m_series->DeleteAllItems();
 	m_engine.GetSeries(m_studies->GetItemText(item, 2).ToUTF8().data(), fillseries, this);
 	m_series->SetColumnWidth(0, wxLIST_AUTOSIZE);
-	m_series->SetColumnWidth(1, wxLIST_AUTOSIZE);	
+	m_series->SetColumnWidth(1, wxLIST_AUTOSIZE);
 
 	if(m_series->GetItemCount() > 0)
 		m_series->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
@@ -111,9 +111,26 @@ void dovo_mainFrame::OnSeriesSelected( wxListEvent& event )
 		m_instances->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
 }
 
+void dovo_mainFrame::OnPaintPreview( wxPaintEvent& event )
+{
+	wxPaintDC dc(m_preview);
+	// renderPreview(dc);
+	event.Skip();
+}
+
 void dovo_mainFrame::OnInstancesSelected( wxListEvent& event )
 {
-	// draw it
+	long item = m_instances->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+	if (item == -1)
+		return;
+
+#ifdef _WIN32
+	boost::filesystem::path filename = m_instances->GetItemText(item, 1);
+#else
+	boost::filesystem::path filename = m_instances->GetItemText(item, 1).ToUTF8().data();
+#endif
+
+	// dcm2img(filename, image);
 }
 
 void dovo_mainFrame::OnUpdate( wxCommandEvent& event )
@@ -194,14 +211,6 @@ void dovo_mainFrame::FillDestinationList()
 		m_destination->Append(wxString::FromUTF8((*itr).name.c_str()));	
 }
 
-
-dovo_mainFrame::~dovo_mainFrame()
-{
-	wxConfig::Get()->SetPath("/Settings");	
-	wxConfig::Get()->Write("LastDir", m_directory->GetValue());
-	wxConfig::Get()->Flush();
-}
-
 int dovo_mainFrame::fillstudies(void *param,int columns,char** values, char**names)
 {
 	dovo_mainFrame *win = (dovo_mainFrame *) param;	
@@ -235,6 +244,13 @@ int dovo_mainFrame::fillstudies(void *param,int columns,char** values, char**nam
 	return 0; 
 }
 
+dovo_mainFrame::~dovo_mainFrame()
+{
+	wxConfig::Get()->SetPath("/Settings");	
+	wxConfig::Get()->Write("LastDir", m_directory->GetValue());
+	wxConfig::Get()->Flush();
+}
+
 int dovo_mainFrame::fillpatients(void *param,int columns,char** values, char**names)
 {
 	dovo_mainFrame *win = (dovo_mainFrame *) param;	
@@ -250,6 +266,11 @@ int dovo_mainFrame::fillseries(void *param,int columns,char** values, char**name
 	win->m_series->InsertItem(0, wxString::FromUTF8(values[1]));
 	win->m_series->SetItem(0, 1, wxString::FromUTF8(values[0]));	
 	return 0; 
+}
+
+void dovo_mainFrame::renderPreview(wxDC&  dc)
+{
+	dc.DrawBitmap( image, 0, 0, false );
 }
 
 int dovo_mainFrame::fillinstances(void *param,int columns,char** values, char**names)

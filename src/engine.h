@@ -24,6 +24,7 @@ public:
 	void GetStudies(std::string patientname, sqlite3_callback fillstudy, void *obj);
 	void GetSeries(std::string studyuid, sqlite3_callback fillseries, void *obj);
 	void GetInstances(std::string seriesuid, sqlite3_callback fillinstances, void *obj);
+	void GetImage(std::string sopid, sqlite3_callback fillinstances, void *obj);
 	DICOMFileScanner scanner;
 	DICOMSender sender;
 protected:
