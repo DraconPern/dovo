@@ -8,7 +8,9 @@
 #include "dovo_mainFrame.h"
 
 // Visual Leak Detector
+#ifdef _WIN32
 #include <vld.h>
+#endif 
 
 time_t cvt_TIME(char const *time);
 
