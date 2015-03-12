@@ -26,6 +26,7 @@
 #endif
 
 #include <wx/image.h>
+#include <wx/rawbmp.h>
 
 void dcm2img(boost::filesystem::path filename, int clientWidth, int clientHeight, wxImage &image)
 {
@@ -64,39 +65,30 @@ void dcm2img(boost::filesystem::path filename, int clientWidth, int clientHeight
 		small = di.createScaledImage((unsigned long) clientWidth, 0, 3, 0);
 		if(small == NULL)
 			throw std::runtime_error("");
-		
-		unsigned int height = small->getHeight();
+				
 		unsigned int width = small->getWidth();
+		unsigned int height = small->getHeight();
 
-		if(!image.Create(height, width, true))
+		if(!image.Create(width, height, true))
 			throw std::runtime_error("");
 		
-		source = new char[height * width * 4];
-			
-		small->createWindowsDIB((void * &)source, height * width * 4, 0, 32);			
-		unsigned char *output = image.GetData();
+		source = new char[width * height * 4];
+		char *source2 = source;
+
+		small->createWindowsDIB((void * &)source, width * height * 4, 0, 32);			
 		
-#if 1
+		wxImagePixelData data(image);
+		wxImagePixelData::Iterator p(data);
 		for(int j = 0; j < height; j++)
+		{			
 			for(int i = 0; i < width; i++)
 			{
-				output[(width * j + i) * 3] = source[(width * j + i) * 4 + 2];
-				output[(width * j + i) * 3 + 1] = source[(width * j + i) * 4 + 1];
-				output[(width * j + i) * 3 + 2] = source[(width * j + i) * 4];
-			}			
-#else	
-		unsigned int components = height * width * 3;
-		unsigned char *outputptr = output;
-		unsigned char *endoutputptr = output + components;
-		char *sourceptr = source;
-		while(outputptr < endoutputptr)
-		{
-			*outputptr = sourceptr[2]; outputptr++;
-			*outputptr = sourceptr[1]; outputptr++;
-			*outputptr = sourceptr[0]; outputptr++;
-			sourceptr += 4;
-		}
-#endif	
+				p.MoveTo(data, i, j);
+				p.Red() = source[(width * j + i) * 4 + 2];
+				p.Green() = source[(width * j + i) * 4 + 1];
+				p.Blue() = source[(width * j + i) * 4];
+			}
+		}		
 	}
 	catch(...)
 	{
