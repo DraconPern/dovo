@@ -13,13 +13,10 @@
 <category name="DOVO" displayName="$(string.DOVO)">
 <parentCategory ref="FRONTMOTION" />
 </category>
-<category name="DESTINATIONS" displayName="$(string.DESTINATIONS)">
-<parentCategory ref="DOVO" />
-</category>
 </categories>
 <policies>
 <policy name="DESTINATIONS" class="Machine" displayName="$(string.DESTINATIONS)" explainText="$(string.DESTINATIONS_HELP)" presentation="$(presentation.DESTINATIONS)" key="Software\Policies\FrontMotion\dovo">
-<parentCategory ref="DESTINATIONS" />
+<parentCategory ref="DOVO" />
 <supportedOn ref="windows:SUPPORTED_ProductOnly" />
 <elements>
 <list id="DESTINATIONS" key="Software\Policies\FrontMotion\dovo\destinations"/>

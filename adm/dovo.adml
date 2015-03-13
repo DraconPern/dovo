@@ -11,7 +11,7 @@
   </stringTable> 
   <presentationTable>
     <presentation id="DESTINATIONS">
-	  <listBox refId="DESTINATIONS">PACS:</listBox>
+	  <listBox refId="DESTINATIONS">Destinations:</listBox>
 	</presentation>
   </presentationTable>
 </resources>
