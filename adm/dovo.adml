@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<policyDefinitionResources xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" revision="1.0" schemaVersion="1.0" xmlns="http://www.microsoft.com/GroupPolicy/PolicyDefinitions">
+<displayName>enter display name here</displayName>
+<description>enter description here</description>
+<resources>
+  <stringTable>
+    <string id="FRONTMOTION">FrontMotion</string>
+	<string id="DOVO">dovo</string>
+	<string id="DESTINATIONS">Destinations</string>
+	<string id="DESTINATIONS_HELP">Each entry is a comma delimited list.  The format is "displayname,host,port,aetitle,ouraetitle".  The display name will be visible to the user. Host can be a host name or ip address. AE Title can be a maximum of 16 characters.</string>
+  </stringTable> 
+  <presentationTable>
+    <presentation id="DESTINATIONS">
+	  <listBox refId="DESTINATIONS">PACS:</listBox>
+	</presentation>
+  </presentationTable>
+</resources>
+</policyDefinitionResources>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--  (c) 2011 FrontMotion  -->
+<!--      Use with FrontMotion dovo -->
+<policyDefinitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" revision="1.0" schemaVersion="1.0" xmlns="http://schemas.microsoft.com/GroupPolicy/2006/07/PolicyDefinitions">
+<policyNamespaces>
+<target prefix="frontmotion" namespace="FrontMotion.Policies.dovo" />
+<using prefix="windows" namespace="Microsoft.Policies.Windows" />
+</policyNamespaces>
+<supersededAdm fileName="dovo.adm" />
+<resources minRequiredRevision="1.0" />
+<categories>
+<category name="FRONTMOTION" displayName="$(string.FRONTMOTION)" />
+<category name="DOVO" displayName="$(string.DOVO)">
+<parentCategory ref="FRONTMOTION" />
+</category>
+<category name="DESTINATIONS" displayName="$(string.DESTINATIONS)">
+<parentCategory ref="DOVO" />
+</category>
+</categories>
+<policies>
+<policy name="DESTINATIONS" class="Machine" displayName="$(string.DESTINATIONS)" explainText="$(string.DESTINATIONS_HELP)" presentation="$(presentation.DESTINATIONS)" key="Software\Policies\FrontMotion\dovo">
+<parentCategory ref="DESTINATIONS" />
+<supportedOn ref="windows:SUPPORTED_ProductOnly" />
+<elements>
+<list id="DESTINATIONS" key="Software\Policies\FrontMotion\dovo\destinations"/>
+</elements>
+</policy>
+</policies>
+</policyDefinitions>
+<!--  (c) 2015 FrontMotion  -->
+<!--      Use with FrontMotion dovo -->
