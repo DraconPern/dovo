@@ -109,7 +109,7 @@ void engine::LoadGlobalDestinationList()
 	// only valid for windows
 #if defined(__WINDOWS__) && wxUSE_CONFIG_NATIVE
 	wxRegKey registry;
-	registry.SetName(wxRegKey::HKLM, "Software\\Policies\\FrontMotion\\fmdeye\\Destinations");
+	registry.SetName(wxRegKey::HKLM, "Software\\Policies\\FrontMotion\\dovo\\Destinations");
 	registry.Open(wxRegKey::Read);
 
 	wxString str;

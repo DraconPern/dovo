@@ -1,0 +1,43 @@
+CLASS MACHINE
+	CATEGORY "FrontMotion"
+		CATEGORY "dovo"
+		
+		KEYNAME "Software\Policies\FrontMotion\dovo"
+#if version >= 5
+		POLICY "Destinations"
+			EXPLAIN !!Destinations_Explain
+			PART Destinations LISTBOX
+				VALUEPREFIX ""
+				KEYNAME "Software\Policies\FrontMotion\dovo\Destinations"
+			END PART
+		END POLICY
+#else
+    POLICY "Destinations"
+      EXPLAIN !!Destinations_Explain
+      KEYNAME "Software\Policies\FrontMotion\dovo\Destinations"        
+      PART "1" EDITTEXT
+        VALUENAME "1"
+      END PART
+      PART "2" EDITTEXT
+        VALUENAME "2"
+      END PART
+      PART "3" EDITTEXT
+        VALUENAME "3"
+      END PART
+      PART "4" EDITTEXT
+        VALUENAME "4"
+      END PART
+      PART "5" EDITTEXT
+        VALUENAME "5"
+      END PART
+      PART "6" EDITTEXT
+        VALUENAME "6"
+      END PART        
+    END POLICY
+#endif
+			
+	END CATEGORY
+END CATEGORY
+
+[strings]
+Destinations_Explain="Each entry is a comma delimited list.  The format is "displayname,host,port,aetitle,ouraetitle".  The display name will be visible to the user. Host can be a host name or ip address. AE Title can be a maximum of 16 characters."
