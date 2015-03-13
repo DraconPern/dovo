@@ -15,6 +15,6 @@ The program is http://utf8everywhere.org/
 
 ## Third party dependency
 - wxWidgets http://www.wxwidgets.org/ please extract under ./wxWidgets
-- DCMTK http://dicom.offis.de/download/dcmtk/snapshot/ please extract under ./dcmtk
-- boost http://www.boost.org/users/history/version_1_57_0.html please extract under ./boost
+- DCMTK http://dicom.offis.de/ please use snapshot or git, and extract under ./dcmtk
+- boost http://www.boost.org/ please extract under ./boost
  
