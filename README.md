@@ -7,11 +7,18 @@ Cross-platform software for Importing DICOM files and sending to PACS. Tested on
 - Image preview (coming soon)
 - No dll's need to be distributed.
 
+## Download
+Binary http://www.draconpern.com/software/dovo
+Source https://github.com/DraconPern/dovo
+
 ## Development notes
 The program is http://utf8everywhere.org/
 
 ## Requirements
 - CMake http://www.cmake.org/download/
+- XCode on OS X
+- Visual Studio 2012 or higher on Windows
+- gcc on Linux
 
 ## Third party dependency
 - wxWidgets http://www.wxwidgets.org/ please extract under ./wxWidgets
