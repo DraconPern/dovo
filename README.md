@@ -1,5 +1,5 @@
 # dovo
-Cross-platform software for Importing DICOM files and sending to PACS. Tested on Windows and OS X.
+Point of care, cross-platform software for importing DICOM CD and files then sending it to PACS. Usage scenario is front desk staff getting handed a CD with patient's images.  This tool allows the front desk to preview the images, and send to PACS.  Tested on Windows and OS X.
 
 - Supports Group Policy for PACS destinations on Windows.
 - 32bit on Windows, 64bit on OS X.
