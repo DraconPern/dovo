@@ -133,7 +133,7 @@ void dovo_mainFrame::OnInstancesSelected( wxListEvent& event )
 	dcm2img(filename, s.GetWidth(), s.GetHeight(), image);
 
 	wxClientDC dc(m_preview);
-    renderPreview(dc);
+	renderPreview(dc);
 }
 
 void dovo_mainFrame::OnUpdate( wxCommandEvent& event )
@@ -181,13 +181,33 @@ void dovo_mainFrame::OnSend( wxCommandEvent& event )
 	}
 
 	wxString patientname = m_patients->GetItemText(item);
-	m_engine.StartSend(patientname.ToUTF8().data(), "", "", "", m_destination->GetSelection());
+	wxString patientid = m_patients->GetItemText(item, 1);
+	wxString birthday = m_patients->GetItemText(item, 2);
+	dovo_changePatientInfo changepatinfo(this);
+	changepatinfo.m_patientName = m_patients->GetItemText(item);	
+	changepatinfo.m_patientID = m_patients->GetItemText(item, 1);
+	changepatinfo.m_birthday = m_patients->GetItemText(item, 2);	
 
-	dovo_sendStatus dlg(this);
-	dlg.m_sender = &m_engine.sender;
+	wxString new_patientName, new_patientID, new_birthday;
+	if(changepatinfo.ShowModal() == wxID_OK)
+	{
+		if(changepatinfo.m_patientName != m_patients->GetItemText(item))
+			new_patientName = changepatinfo.m_patientName;
 
-	// show and wait for thread to end.
-	dlg.ShowModal();
+		if(changepatinfo.m_patientID != m_patients->GetItemText(item, 1))
+			new_patientID = changepatinfo.m_patientID;
+
+		if(changepatinfo.m_birthday != m_patients->GetItemText(item, 2))
+			new_birthday = changepatinfo.m_birthday;
+
+		m_engine.StartSend(patientname.ToUTF8().data(), patientid.ToUTF8().data(), birthday.ToUTF8().data(), new_patientName.ToUTF8().data(), new_patientID.ToUTF8().data(), new_birthday.ToUTF8().data(), m_destination->GetSelection());
+
+		dovo_sendStatus dlg(this);
+		dlg.m_sender = &m_engine.sender;
+
+		// show and wait for thread to end.
+		dlg.ShowModal();
+	}
 }
 
 void dovo_mainFrame::OnAbout( wxCommandEvent& event )

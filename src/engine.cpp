@@ -161,7 +161,7 @@ void engine::StopScan()
 }
 
 
-void engine::StartSend(std::string PatientName, std::string NewPatientName, std::string NewPatientID, std::string NewBirthDay, int destination)
+void engine::StartSend(std::string PatientName, std::string PatientID, std::string BirthDay, std::string NewPatientName, std::string NewPatientID, std::string NewBirthDay, int destination)
 {
 	// find the destination
 	std::string destinationHost;
@@ -184,7 +184,8 @@ void engine::StartSend(std::string PatientName, std::string NewPatientName, std:
 		ourAETitle = destinations[destination].ourAETitle;
 	}
 
-	sender.Initialize(db, PatientName, NewPatientName, NewPatientID, NewBirthDay,
+	sender.Initialize(db, PatientName, PatientID, BirthDay, 
+		NewPatientName, NewPatientID, NewBirthDay,
 		destinationHost, destinationPort, destinationAETitle, ourAETitle);
 
 	boost::thread t(DICOMSender::DoSendThread, &sender);
@@ -198,7 +199,7 @@ void engine::StopSend()
 
 void engine::GetPatients(sqlite3_callback fillname, void *obj)
 {	
-	std::string selectsql = "SELECT name, patid, birthday FROM images GROUP BY name, patid ORDER BY name";
+	std::string selectsql = "SELECT name, patid, birthday FROM images GROUP BY name, patid, birthday ORDER BY name";
 	sqlite3_stmt *select;
 	sqlite3_prepare_v2(db, selectsql.c_str(), selectsql.length(), &select, NULL);
 	sqlite3_exec_stmt(select, fillname, obj, NULL);

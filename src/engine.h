@@ -18,7 +18,7 @@ public:
 	void SaveDestinationList();
 	void StartScan(boost::filesystem::path path);
 	void StopScan();
-	void StartSend(std::string PatientName, std::string NewPatientName, std::string NewPatientID, std::string NewBirthDay, int destination);
+	void StartSend(std::string PatientName, std::string PatientID, std::string BirthDay, std::string NewPatientName, std::string NewPatientID, std::string NewBirthDay, int destination);
 	void StopSend();
 	void GetPatients(sqlite3_callback fillname, void *obj);
 	void GetStudies(std::string patientname, sqlite3_callback fillstudy, void *obj);

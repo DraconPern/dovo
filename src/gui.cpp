@@ -408,8 +408,8 @@ changePatientInfo::changePatientInfo( wxWindow* parent, wxWindowID id, const wxS
 	wxBoxSizer* bSizer261;
 	bSizer261 = new wxBoxSizer( wxHORIZONTAL );
 	
-	m_textCtrl3 = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer261->Add( m_textCtrl3, 1, wxALL, 5 );
+	m_patientIDCtrl = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer261->Add( m_patientIDCtrl, 1, wxALL, 5 );
 	
 	
 	fgSizer2->Add( bSizer261, 1, wxEXPAND, 5 );
@@ -421,8 +421,8 @@ changePatientInfo::changePatientInfo( wxWindow* parent, wxWindowID id, const wxS
 	wxBoxSizer* bSizer271;
 	bSizer271 = new wxBoxSizer( wxHORIZONTAL );
 	
-	m_textCtrl4 = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer271->Add( m_textCtrl4, 1, wxALL, 5 );
+	m_patientNameCtrl = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer271->Add( m_patientNameCtrl, 1, wxALL, 5 );
 	
 	
 	fgSizer2->Add( bSizer271, 1, wxEXPAND, 5 );
@@ -434,8 +434,8 @@ changePatientInfo::changePatientInfo( wxWindow* parent, wxWindowID id, const wxS
 	wxBoxSizer* bSizer29;
 	bSizer29 = new wxBoxSizer( wxHORIZONTAL );
 	
-	m_textCtrl5 = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer29->Add( m_textCtrl5, 1, wxALL, 5 );
+	m_birthdayCtrl = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer29->Add( m_birthdayCtrl, 1, wxALL, 5 );
 	
 	
 	fgSizer2->Add( bSizer29, 1, wxEXPAND, 5 );
@@ -446,42 +446,33 @@ changePatientInfo::changePatientInfo( wxWindow* parent, wxWindowID id, const wxS
 	
 	bSizer23->Add( 0, 5, 0, wxEXPAND, 5 );
 	
-	wxBoxSizer* bSizer27;
-	bSizer27 = new wxBoxSizer( wxHORIZONTAL );
+	m_sdbSizer3 = new wxStdDialogButtonSizer();
+	m_sdbSizer3OK = new wxButton( this, wxID_OK );
+	m_sdbSizer3->AddButton( m_sdbSizer3OK );
+	m_sdbSizer3Cancel = new wxButton( this, wxID_CANCEL );
+	m_sdbSizer3->AddButton( m_sdbSizer3Cancel );
+	m_sdbSizer3->Realize();
 	
-	wxBoxSizer* bSizer28;
-	bSizer28 = new wxBoxSizer( wxVERTICAL );
-	
-	m_panel4 = new wxPanel( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
-	bSizer28->Add( m_panel4, 1, wxEXPAND | wxALL, 5 );
-	
-	
-	bSizer27->Add( bSizer28, 1, wxEXPAND, 5 );
-	
-	wxBoxSizer* bSizer26;
-	bSizer26 = new wxBoxSizer( wxHORIZONTAL );
-	
-	m_button13 = new wxButton( this, wxID_ANY, _("OK"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer26->Add( m_button13, 0, wxALL, 5 );
-	
-	m_button14 = new wxButton( this, wxID_ANY, _("Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer26->Add( m_button14, 0, wxALL, 5 );
-	
-	
-	bSizer27->Add( bSizer26, 0, wxEXPAND, 5 );
-	
-	
-	bSizer23->Add( bSizer27, 0, wxALL|wxEXPAND, 5 );
+	bSizer23->Add( m_sdbSizer3, 1, wxEXPAND, 5 );
 	
 	
 	this->SetSizer( bSizer23 );
 	this->Layout();
+	bSizer23->Fit( this );
 	
 	this->Centre( wxBOTH );
+	
+	// Connect Events
+	this->Connect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( changePatientInfo::OnInitDialog ) );
+	m_sdbSizer3OK->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( changePatientInfo::OnOK ), NULL, this );
 }
 
 changePatientInfo::~changePatientInfo()
 {
+	// Disconnect Events
+	this->Disconnect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( changePatientInfo::OnInitDialog ) );
+	m_sdbSizer3OK->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( changePatientInfo::OnOK ), NULL, this );
+	
 }
 
 sendStatus::sendStatus( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )

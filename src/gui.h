@@ -160,18 +160,23 @@ class changePatientInfo : public wxDialog
 	
 	protected:
 		wxStaticText* m_staticText3;
-		wxTextCtrl* m_textCtrl3;
+		wxTextCtrl* m_patientIDCtrl;
 		wxStaticText* m_staticText4;
-		wxTextCtrl* m_textCtrl4;
+		wxTextCtrl* m_patientNameCtrl;
 		wxStaticText* m_staticText5;
-		wxTextCtrl* m_textCtrl5;
-		wxPanel* m_panel4;
-		wxButton* m_button13;
-		wxButton* m_button14;
+		wxTextCtrl* m_birthdayCtrl;
+		wxStdDialogButtonSizer* m_sdbSizer3;
+		wxButton* m_sdbSizer3OK;
+		wxButton* m_sdbSizer3Cancel;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnInitDialog( wxInitDialogEvent& event ) { event.Skip(); }
+		virtual void OnOK( wxCommandEvent& event ) { event.Skip(); }
+		
 	
 	public:
 		
-		changePatientInfo( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Change Patient Info"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 353,208 ), long style = wxDEFAULT_DIALOG_STYLE ); 
+		changePatientInfo( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Change Patient Info"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE ); 
 		~changePatientInfo();
 	
 };

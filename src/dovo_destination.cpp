@@ -109,8 +109,7 @@ void dovo_destination::OnOurAETitleText( wxCommandEvent& event )
 }
 
 void dovo_destination::OnOK( wxCommandEvent& event )
-{
-	// UpdateItem();
+{	
 	event.Skip();
 }
 

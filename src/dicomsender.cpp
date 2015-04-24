@@ -34,8 +34,9 @@ public:
 	DICOMSenderImpl(void);
 	~DICOMSenderImpl(void);
 
-	void Initialize(sqlite3 *db, const std::string m_PatientName, std::string m_NewPatientName, std::string m_NewPatientID ,std::string m_NewBirthDay,
-		std::string m_destinationHost, unsigned int m_destinationPort, std::string m_destinationAETitle, std::string m_ourAETitle);	
+	void Initialize(sqlite3 *db, const std::string PatientName, std::string PatientID ,std::string BirthDay,
+		std::string NewPatientName, std::string NewPatientID ,std::string NewBirthDay,
+		std::string destinationHost, unsigned int destinationPort, std::string destinationAETitle, std::string ourAETitle);	
 
 	static void DoSendThread(void *obj);
 
@@ -47,6 +48,8 @@ public:
 	sqlite3 *db;
 
 	std::string m_PatientName;
+	std::string m_PatientID;
+	std::string m_BirthDay;
 	std::string m_NewPatientName;
 	std::string m_NewPatientID;
 	std::string m_NewBirthDay;
@@ -143,12 +146,15 @@ DICOMSenderImpl::~DICOMSenderImpl()
 {
 }
 
-void DICOMSenderImpl::Initialize(sqlite3 *db, const std::string PatientName, std::string NewPatientName, std::string NewPatientID, std::string NewBirthDay,
-								 std::string destinationHost, unsigned int destinationPort, std::string destinationAETitle, std::string ourAETitle)
+void DICOMSenderImpl::Initialize(sqlite3 *db, const std::string PatientName, std::string PatientID ,std::string BirthDay,
+		std::string NewPatientName, std::string NewPatientID ,std::string NewBirthDay,
+		std::string destinationHost, unsigned int destinationPort, std::string destinationAETitle, std::string ourAETitle)
 {
 	cancelEvent = doneEvent = false;
 	this->db = db;
 	this->m_PatientName = PatientName;
+	this->m_PatientID = PatientID;
+	this->m_BirthDay = BirthDay;
 	this->m_NewPatientName = NewPatientName;
 	this->m_NewPatientID = NewPatientID;
 	this->m_NewBirthDay = NewBirthDay;
@@ -617,20 +623,27 @@ bool DICOMSenderImpl::updateStringAttributeValue(DcmItem* dataset, const DcmTagK
 void DICOMSenderImpl::replacePatientInfoInformation(DcmDataset* dataset)
 {
 	std::stringstream msg;		
-	/*
-	msg << "Changing PatientID = " << m_NewPatientID << std::endl;
-	msg << "Changing PatientName = " << m_NewPatientName << std::endl;
-	msg << "Changing Birthday = " << m_NewBirthDay << std::endl;
-	log.Write(msg);
-	*/
+
 	if (m_NewPatientID.length() != 0)
+	{
+		msg << "Changing PatientID from " << m_PatientID << " to " << m_NewPatientID << std::endl;
+		log.Write(msg);
 		updateStringAttributeValue(dataset, DCM_PatientID, m_NewPatientID.c_str());
+	}
 
 	if (m_NewPatientName.length() != 0)
+	{
+		msg << "Changing PatientName from " << m_PatientName << "to " << m_NewPatientName << std::endl;
+		log.Write(msg);
 		updateStringAttributeValue(dataset, DCM_PatientName, m_NewPatientName.c_str());
+	}
 
 	if (m_NewBirthDay.length() != 0)
+	{
+		msg << "Changing Birthday from " << m_BirthDay << " to " << m_NewBirthDay << std::endl;
+		log.Write(msg);
 		updateStringAttributeValue(dataset, DCM_PatientBirthDate, m_NewBirthDay.c_str());
+	}
 }
 
 
@@ -873,10 +886,11 @@ DICOMSender::~DICOMSender(void)
 	delete impl;
 }
 
-void DICOMSender::Initialize(sqlite3 *db, const std::string PatientName, std::string NewPatientName, std::string NewPatientID, std::string NewBirthDay,
+void DICOMSender::Initialize(sqlite3 *db, const std::string PatientName, std::string PatientID, std::string BirthDay, 
+							 std::string NewPatientName, std::string NewPatientID, std::string NewBirthDay,
 							 std::string destinationHost, unsigned int destinationPort, std::string destinationAETitle, std::string ourAETitle)
 {
-	impl->Initialize(db, PatientName, NewPatientName, NewPatientID, NewBirthDay,
+	impl->Initialize(db, PatientName, PatientID, BirthDay, NewPatientName, NewPatientID, NewBirthDay,
 		destinationHost, destinationPort, destinationAETitle, ourAETitle);
 }
 
