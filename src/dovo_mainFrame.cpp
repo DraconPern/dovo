@@ -72,7 +72,7 @@ void dovo_mainFrame::OnPatientsSelected( wxListEvent& event )
 		return;
 
 	m_studies->DeleteAllItems();
-	m_engine.GetStudies(m_patients->GetItemText(item).ToUTF8().data(), fillstudies, this);
+	m_engine.GetStudies(m_patients->GetItemText(item, 1).ToUTF8().data(), fillstudies, this);
 	m_studies->SetColumnWidth(0, wxLIST_AUTOSIZE);
 	m_studies->SetColumnWidth(1, wxLIST_AUTOSIZE);
 	m_studies->SetColumnWidth(2, wxLIST_AUTOSIZE);

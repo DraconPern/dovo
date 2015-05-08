@@ -34,9 +34,8 @@ void dcm2img(boost::filesystem::path filename, int clientWidth, int clientHeight
 
 	DcmRLEDecoderRegistration::registerCodecs();
 	DJDecoderRegistration::registerCodecs();	
-	
-	DicomImage *small = NULL;
-	char *source = NULL;
+		
+	unsigned char *source = NULL;
 
 	try
 	{
@@ -61,21 +60,18 @@ void dcm2img(boost::filesystem::path filename, int clientWidth, int clientHeight
 			else
 				di.setHistogramWindow();
 		}
-				
-		small = di.createScaledImage((unsigned long) clientWidth, 0, 3, 0);
-		if(small == NULL)
-			throw std::runtime_error("");
-				
-		unsigned int width = small->getWidth();
-		unsigned int height = small->getHeight();
+		
+		// don't use di.createScaledImage, it is broken!!
+
+		unsigned int width = di.getWidth();
+		unsigned int height = di.getHeight();
 
 		if(!image.Create(width, height, true))
 			throw std::runtime_error("");
 		
-		source = new char[width * height * 4];
-		char *source2 = source;
+		source = new unsigned char[width * height * 4];		
 
-		small->createWindowsDIB((void * &)source, width * height * 4, 0, 32);			
+		di.createWindowsDIB((void * &)source, width * height * 4, 0, 32);			
 		
 		wxImagePixelData data(image);
 		wxImagePixelData::Iterator p(data);
@@ -88,7 +84,22 @@ void dcm2img(boost::filesystem::path filename, int clientWidth, int clientHeight
 				p.Green() = source[(width * j + i) * 4 + 1];
 				p.Blue() = source[(width * j + i) * 4];
 			}
-		}		
+		}	
+		
+		// scale
+		float widthFactor = (float) clientWidth / (float) width;
+        float heightFactor = (float) clientHeight / (float) height;
+
+		float scaleFactor = 0;
+        if (widthFactor < heightFactor) 
+            scaleFactor = widthFactor;
+        else
+            scaleFactor = heightFactor;
+
+        int scaledWidth  = width * scaleFactor;
+        int scaledHeight = height * scaleFactor;
+
+		image.Rescale(scaledWidth, scaledHeight);
 	}
 	catch(...)
 	{
@@ -97,9 +108,6 @@ void dcm2img(boost::filesystem::path filename, int clientWidth, int clientHeight
 
 	if(source != NULL)
 		delete source;
-
-	if(small != NULL)
-		delete small;
 
 	DJDecoderRegistration::cleanup();
 	DcmRLEDecoderRegistration::cleanup();

@@ -199,20 +199,20 @@ void engine::StopSend()
 
 void engine::GetPatients(sqlite3_callback fillname, void *obj)
 {	
-	std::string selectsql = "SELECT name, patid, birthday FROM images GROUP BY name, patid, birthday ORDER BY name";
+	std::string selectsql = "SELECT MIN(name), patid, MIN(birthday) FROM images GROUP BY patid ORDER BY name";
 	sqlite3_stmt *select;
 	sqlite3_prepare_v2(db, selectsql.c_str(), selectsql.length(), &select, NULL);
 	sqlite3_exec_stmt(select, fillname, obj, NULL);
 	sqlite3_finalize(select);
 }
 
-void engine::GetStudies(std::string patientname, sqlite3_callback fillstudy, void *obj)
+void engine::GetStudies(std::string patientid, sqlite3_callback fillstudy, void *obj)
 {
-	std::string selectsql = "SELECT DISTINCT studyuid, studydesc, studydate FROM images WHERE name = ? ORDER BY studyuid ASC";
+	std::string selectsql = "SELECT studyuid, MIN(studydesc), MIN(studydate) FROM images WHERE (patid = ?) GROUP BY studyuid ORDER BY studyuid ASC";
 	sqlite3_stmt *select;
 	sqlite3_prepare_v2(db, selectsql.c_str(), selectsql.length(), &select, NULL);
 
-	sqlite3_bind_text(select, 1, patientname.c_str(), patientname.length(), SQLITE_STATIC);
+	sqlite3_bind_text(select, 1, patientid.c_str(), patientid.length(), SQLITE_STATIC);
 
 	sqlite3_exec_stmt(select, fillstudy, obj, NULL);		
 	sqlite3_finalize(select);
@@ -220,7 +220,7 @@ void engine::GetStudies(std::string patientname, sqlite3_callback fillstudy, voi
 
 void engine::GetSeries(std::string studyuid, sqlite3_callback fillseries, void *obj)
 {
-	std::string selectsql = "SELECT DISTINCT seriesuid, seriesdesc FROM images WHERE (studyuid = ?) ORDER BY seriesuid ASC";
+	std::string selectsql = "SELECT seriesuid, MIN(seriesdesc) FROM images WHERE (studyuid = ?) GROUP BY seriesuid ORDER BY seriesuid ASC";
 	sqlite3_stmt *select;
 	sqlite3_prepare_v2(db, selectsql.c_str(), selectsql.length(), &select, NULL);
 
