@@ -2,10 +2,11 @@
 Point of care, cross-platform software for importing DICOM CD and files then sending it to PACS. Usage scenario is front desk staff getting handed a CD with patient's images.  This tool allows the front desk to preview the images, and send to PACS.  Tested on Windows and OS X.
 
 - Supports Group Policy for PACS destinations on Windows.
-- 32bit on Windows, 64bit on OS X.
+- Available on Windows, OS X, and Linux
 - Supports Unicode file and path.
-- Image preview (coming soon)
+- Image preview
 - No dll's need to be distributed.
+- Native, no Java required.
 
 ## Download
 Binary http://www.draconpern.com/software/dovo
