@@ -103,19 +103,19 @@ void DICOMFileScannerImpl::ScanFile(boost::filesystem::path path)
 
 		dfile.getDataset()->findAndGetOFString(DCM_SOPInstanceUID, sopuid);
 
-		sqlite3_bind_text(insertImage, 1, patientname.c_str(), patientname.length(), SQLITE_STATIC);
-		sqlite3_bind_text(insertImage, 2, patientid.c_str(), patientid.length(), SQLITE_STATIC);
-		sqlite3_bind_text(insertImage, 3, birthday.c_str(), birthday.length(), SQLITE_STATIC);
+		sqlite3_bind_text(insertImage, 1, patientname.c_str(), strlen(patientname.c_str()), SQLITE_STATIC);
+		sqlite3_bind_text(insertImage, 2, patientid.c_str(), strlen(patientid.c_str()), SQLITE_STATIC);
+		sqlite3_bind_text(insertImage, 3, birthday.c_str(), strlen(birthday.c_str()), SQLITE_STATIC);
 
-		sqlite3_bind_text(insertImage, 4, studyuid.c_str(), studyuid.length(), SQLITE_STATIC);
-		sqlite3_bind_text(insertImage, 5, modality.c_str(), modality.length(), SQLITE_STATIC);
-		sqlite3_bind_text(insertImage, 6, studydesc.c_str(), studydesc.length(), SQLITE_STATIC);
-		sqlite3_bind_text(insertImage, 7, studydate.c_str(), studydate.length(), SQLITE_STATIC);
+		sqlite3_bind_text(insertImage, 4, studyuid.c_str(), strlen(studyuid.c_str()), SQLITE_STATIC);
+		sqlite3_bind_text(insertImage, 5, modality.c_str(), strlen(modality.c_str()), SQLITE_STATIC);
+		sqlite3_bind_text(insertImage, 6, studydesc.c_str(), strlen(studydesc.c_str()), SQLITE_STATIC);
+		sqlite3_bind_text(insertImage, 7, studydate.c_str(), strlen(studydate.c_str()), SQLITE_STATIC);
 
-		sqlite3_bind_text(insertImage, 8, seriesuid.c_str(), seriesuid.length(), SQLITE_STATIC);
-		sqlite3_bind_text(insertImage, 9, seriesdesc.c_str(), seriesdesc.length(), SQLITE_STATIC);
+		sqlite3_bind_text(insertImage, 8, seriesuid.c_str(), strlen(seriesuid.c_str()), SQLITE_STATIC);
+		sqlite3_bind_text(insertImage, 9, seriesdesc.c_str(), strlen(seriesdesc.c_str()), SQLITE_STATIC);
 
-		sqlite3_bind_text(insertImage, 10, sopuid.c_str(), sopuid.length(), SQLITE_STATIC);
+		sqlite3_bind_text(insertImage, 10, sopuid.c_str(), strlen(sopuid.c_str()), SQLITE_STATIC);
 
 #ifdef _WIN32
 		std::string p = path.string(std::codecvt_utf8<boost::filesystem::path::value_type>());

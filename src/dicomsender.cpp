@@ -106,15 +106,8 @@ protected:
 	OFCmdUnsignedInt opt_maxSendPDULength;
 	E_TransferSyntax opt_networkTransferSyntax;
 
-	
 	bool opt_combineProposedTransferSyntaxes;
-
-	bool opt_correctUIDPadding;
-	OFString patientNamePrefix;   // PatientName is PN (maximum 16 chars)
-	OFString patientIDPrefix; // PatientID is LO (maximum 64 chars)
-	OFString studyIDPrefix;   // StudyID is SH (maximum 16 chars)
-	OFString accessionNumberPrefix;  // AccessionNumber is SH (maximum 16 chars)
-	bool opt_secureConnection; /* default: no secure connection */		
+	
 	T_DIMSE_BlockingMode opt_blockMode;
 	int opt_dimse_timeout;	
 	int opt_timeout;
@@ -132,10 +125,6 @@ DICOMSenderImpl::DICOMSenderImpl()
 
 	
 	opt_combineProposedTransferSyntaxes = true;
-
-	patientNamePrefix = "OFFIS^TEST_PN_";   // PatientName is PN (maximum 16 chars)
-	patientIDPrefix = "PID_"; // PatientID is LO (maximum 64 chars)
-	studyIDPrefix = "SID_";   // StudyID is SH (maximum 16 chars)	
 
 	opt_timeout = 10;
 
