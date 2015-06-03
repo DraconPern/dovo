@@ -352,6 +352,10 @@ about::about( wxWindow* parent, wxWindowID id, const wxString& title, const wxPo
 	m_version->Wrap( -1 );
 	bSizer28->Add( m_version, 0, wxALL, 5 );
 	
+	m_buildinfo = new wxStaticText( this, wxID_ANY, _("Build Info"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_buildinfo->Wrap( -1 );
+	bSizer28->Add( m_buildinfo, 0, wxALL, 5 );
+	
 	m_copyright = new wxStaticText( this, wxID_ANY, _("Copyright (C) 2007-2015 Ing-Long Eric Kuo"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_copyright->Wrap( -1 );
 	bSizer28->Add( m_copyright, 0, wxALL, 5 );

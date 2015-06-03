@@ -138,6 +138,7 @@ class about : public wxDialog
 	
 	protected:
 		wxStaticText* m_version;
+		wxStaticText* m_buildinfo;
 		wxStaticText* m_copyright;
 		wxStaticText* m_staticText13;
 		wxHyperlinkCtrl* m_hyperlink1;

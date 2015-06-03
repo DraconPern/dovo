@@ -3,8 +3,7 @@
 dovo_about::dovo_about( wxWindow* parent )
 :
 about( parent )
-{
-	wxString date = __DATE__;
-	wxString time = __TIME__;
-	m_version->SetLabel(wxString("Version ") + __DATE__);
+{	
+	m_version->SetLabel(wxString("Version ") + DOVO_VERSION);
+	m_buildinfo->SetLabel(wxString("Build date: ") + __DATE__);
 }

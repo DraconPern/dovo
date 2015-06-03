@@ -60,6 +60,8 @@ set(dovo_SRCS
 	src/dcm2img.cpp
 )
 
+add_definitions(-DDOVO_VERSION="${VERSION}")
+
 #VC++ stuff
 add_definitions(-D_UNICODE)
 add_definitions(-D_BIND_TO_CURRENT_VCLIBS_VERSION=1)
