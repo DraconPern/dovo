@@ -25,4 +25,4 @@ The program is http://utf8everywhere.org/
 - wxWidgets http://www.wxwidgets.org/ please extract under ./wxWidgets
 - DCMTK http://dicom.offis.de/ please use snapshot or git, and extract under ./dcmtk
 - boost http://www.boost.org/ please extract under ./boost
- 
+- Visual Leak Detector https://vld.codeplex.com/ installed for debug release
