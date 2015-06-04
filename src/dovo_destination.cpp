@@ -1,6 +1,7 @@
 #include "dovo_destination.h"
 #include <wx/valtext.h>
 #include <wx/valnum.h>
+#include <boost/lexical_cast.hpp>
 
 dovo_destination::dovo_destination( wxWindow* parent )
 	:

@@ -1,8 +1,6 @@
 #ifndef _DICOMSENDER_
 #define _DICOMSENDER_
 
-#include <string>
-#include <boost/thread/mutex.hpp>
 #include <boost/filesystem.hpp>
 #include "sqlite3.h"
 

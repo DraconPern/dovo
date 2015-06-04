@@ -1,5 +1,6 @@
 
 #include "dicomsender.h"
+#include <boost/thread/mutex.hpp>
 #include "sqlite3_exec_stmt.h"
 #include <boost/lexical_cast.hpp>
 #include <codecvt>

@@ -1,6 +1,8 @@
 #ifndef _DESTINATIONENTRY_
 #define _DESTINATIONENTRY_
 
+#include <string>
+
 class DestinationEntry
 {
 public:

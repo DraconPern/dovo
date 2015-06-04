@@ -1,4 +1,5 @@
 #include "dovo_mainFrame.h"
+#include <boost/lexical_cast.hpp>
 
 dovo_mainFrame::dovo_mainFrame( wxWindow* parent )
 	:

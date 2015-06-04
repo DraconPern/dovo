@@ -1,10 +1,8 @@
 
 #include "dicomscanner.h"
+#include <boost/thread/mutex.hpp>
 #include "sqlite3_exec_stmt.h"
 #include <codecvt>
-
-// #include <locale>
-
 
 // work around the fact that dcmtk doesn't work in unicode mode, so all string operation needs to be converted from/to mbcs
 #ifdef _UNICODE
