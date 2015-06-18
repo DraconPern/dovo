@@ -18,6 +18,7 @@ class MyApp: public wxApp
 {
 public:
 	virtual bool OnInit();	
+	virtual int OnExit();
 
 public:
     DECLARE_EVENT_TABLE() 
@@ -61,9 +62,14 @@ bool MyApp::OnInit()
 #endif
 
 	frame->Show( true );	
-
-	DeregisterCodecs();
+	
 	return true;
+}
+
+int MyApp::OnExit()
+{
+	DeregisterCodecs();
+	return wxApp::OnExit();
 }
 
 void MyApp::OnAbout(wxCommandEvent& evt)

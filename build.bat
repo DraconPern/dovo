@@ -38,14 +38,14 @@ cd ..\..
 cd %DEVSPACE%\fmjpeg2k
 mkdir build-%TYPE%
 cd build-%TYPE%
-cmake .. -G "Visual Studio 11" -DIMAGEMAGICK=%DEVSPACE%\ImageMagick -DDCMTK_WITH_ZLIB=1 -DWITH_ZLIBINC=%DEVSPACE%\zlib\build-%TYPE% -DDCMTK_DIR=%DEVSPACE%\dcmtk\build-%TYPE% -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\fmjpeg2k\%TYPE%
+cmake .. -G "Visual Studio 11" -DIMAGEMAGICK=%DEVSPACE%\ImageMagick -DDCMTK_DIR=%DEVSPACE%\dcmtk\build-%TYPE% -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\fmjpeg2k\%TYPE%
 msbuild /P:Configuration=%TYPE% INSTALL.vcxproj
 cd ..\..
 
 cd %DEVSPACE%
 mkdir build-%TYPE%
 cd build-%TYPE%
-cmake .. -G "Visual Studio 11" -DwxWidgets_ROOT_DIR=%WXWIN% -DIMAGEMAGICK=%DEVSPACE%\ImageMagick -DBOOST_ROOT=%DEVSPACE%\boost -DDCMTK_DIR=%DEVSPACE%\dcmtk\build-%TYPE% -DFMJPEG2K=%DEVSPACE%\fmjpeg2k\%TYPE%
+cmake .. -G "Visual Studio 11" -DwxWidgets_ROOT_DIR=%WXWIN% -DIMAGEMAGICK=%DEVSPACE%\ImageMagick -DBOOST_ROOT=%DEVSPACE%\boost -DDCMTK_DIR=%DEVSPACE%\dcmtk\build-%TYPE% -DDCMTK_WITH_ZLIB=1 -DWITH_ZLIBINC=%DEVSPACE%\zlib\build-%TYPE% -DFMJPEG2K=%DEVSPACE%\fmjpeg2k\%TYPE%
 msbuild /P:Configuration=%TYPE% ALL_BUILD.vcxproj
 cd ..
 

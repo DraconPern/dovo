@@ -48,7 +48,7 @@ void dcm2img(boost::filesystem::path filename, int clientWidth, int clientHeight
 		if(dfile.loadAllDataIntoMemory().bad())
 			throw std::runtime_error("");
 
-		E_TransferSyntax xfer = EXS_Unknown; //dfile.getDataset()->getOriginalXfer();
+		E_TransferSyntax xfer = dfile.getDataset()->getOriginalXfer();
 		DicomImage di(&dfile, xfer, CIF_MayDetachPixelData, 0, 1);
 		
 		if(di.getStatus() != EIS_Normal)
@@ -121,7 +121,7 @@ void RegisterCodecs()
 	DcmRLEEncoderRegistration::registerCodecs();    
 	DcmRLEDecoderRegistration::registerCodecs();
 	DcmJPEG2000DecoderRegistration::registerCodecs();
-	DiRegister::Pointer = new DiRegister();
+	// DiRegister::Pointer = new DiRegister();
 }
 
 
