@@ -40,6 +40,11 @@ bool MyApp::OnInit()
 
 	time_t t = cvt_TIME(__DATE__);
 
+	// check for update
+	wxConfig::Get()->SetPath("/Settings");
+	wxConfig::Get()->Read("LastUpdateCheck");
+	
+	RegisterCodecs();
 
 	dovo_mainFrame *frame = new dovo_mainFrame(NULL);
 
@@ -56,6 +61,8 @@ bool MyApp::OnInit()
 #endif
 
 	frame->Show( true );	
+
+	DeregisterCodecs();
 	return true;
 }
 

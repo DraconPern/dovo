@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 
 project(dovo)
 
-set(VERSION "1.0.0")
+set(VERSION "1.0.1")
 
 SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DDEBUG")
 SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
@@ -10,19 +10,29 @@ SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
 
+add_definitions(-DDOVO_VERSION="${VERSION}")
+
+#VC++ stuff
+add_definitions(-D_UNICODE)
+add_definitions(-D_BIND_TO_CURRENT_VCLIBS_VERSION=1)
+
 set(Boost_USE_STATIC_LIBS        ON)
 set(Boost_USE_MULTITHREADED      ON)
 set(Boost_USE_STATIC_RUNTIME     ON)
 find_package(Boost REQUIRED thread filesystem system)
 
 set(wxWidgets_USE_STATIC   ON)
+#define this so that wxWidgets doesn't define it. Conflicts w/ dcmtk's declaration
+add_definitions(-DHAVE_SSIZE_T)
 find_package(wxWidgets COMPONENTS core base adv REQUIRED)
 include(${wxWidgets_USE_FILE})
 
+#enable dcmtk filename to have wide version, only affects WIN32.  http://utf8everywhere.org/
+add_definitions(-DDCMTK_WIDE_CHAR_FILE_IO_FUNCTIONS=1)
 find_package(dcmtk REQUIRED CONFIG HINTS ${DCMTK_DIR})
 
-INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/sqlite3 ${Boost_INCLUDE_DIRS} ${DCMTK_INCLUDE_DIRS} ${DCMJPEG2000}/include )
-LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})
+INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/sqlite3 ${Boost_INCLUDE_DIRS} ${FMJPEG2K}/include ${DCMTK_INCLUDE_DIRS} )
+LINK_DIRECTORIES(${FMJPEG2K}/lib ${Boost_LIBRARY_DIRS} ${IMAGEMAGICK}/VisualMagick/lib)
 
 set(dovo_HEADERS	
 	src/gui.h
@@ -60,18 +70,6 @@ set(dovo_SRCS
 	src/dcm2img.cpp
 )
 
-add_definitions(-DDOVO_VERSION="${VERSION}")
-
-#VC++ stuff
-add_definitions(-D_UNICODE)
-add_definitions(-D_BIND_TO_CURRENT_VCLIBS_VERSION=1)
-
-#define this so that wxWidgets doesn't define it. Conflicts w/ dcmtk's declaration
-add_definitions(-DHAVE_SSIZE_T)
-
-#enable dcmtk filename to have wide version, only affects WIN32.  http://utf8everywhere.org/
-add_definitions(-DDCMTK_WIDE_CHAR_FILE_IO_FUNCTIONS=1)
-
 ADD_EXECUTABLE(dovo WIN32 ${dovo_SRCS})
 
 IF(WIN32)
@@ -81,6 +79,11 @@ ELSE(WIN32)
 ENDIF(WIN32)
 
 TARGET_LINK_LIBRARIES(dovo
+	fmjpeg2k
+	
+	debug CORE_DB_jp2_.lib
+	
+	optimized CORE_RL_jp2_.lib
 	
 	${DCMTK_LIBRARIES}
 	${wxWidgets_LIBRARIES}

@@ -15,6 +15,12 @@
 
 #include "dcmtk/dcmdata/dcrledrg.h"	// rle decoder
 #include "dcmtk/dcmjpeg/djdecode.h"	// jpeg decoder
+#include "dcmtk/dcmjpeg/djencode.h" 
+#include "dcmtk/dcmdata/dcrledrg.h" 
+#include "dcmtk/dcmdata/dcrleerg.h" 
+#include "fmjpeg2k/fmjpeg2kdrg.h"
+#include "fmjpeg2k/fmjpeg2kccd.h"
+
 // check DCMTK functionality
 #if !defined(WIDE_CHAR_FILE_IO_FUNCTIONS) && defined(_WIN32)
 #error "DCMTK and this program must be compiled with DCMTK_WIDE_CHAR_FILE_IO_FUNCTIONS"
@@ -30,10 +36,7 @@
 
 void dcm2img(boost::filesystem::path filename, int clientWidth, int clientHeight, wxImage &image)
 {
-	OFLog::configure(OFLogger::OFF_LOG_LEVEL);
-
-	DcmRLEDecoderRegistration::registerCodecs();
-	DJDecoderRegistration::registerCodecs();	
+	OFLog::configure(OFLogger::OFF_LOG_LEVEL);	
 		
 	unsigned char *source = NULL;
 
@@ -108,7 +111,25 @@ void dcm2img(boost::filesystem::path filename, int clientWidth, int clientHeight
 
 	if(source != NULL)
 		delete source;
+	
+}
 
+void RegisterCodecs()
+{
+	DJDecoderRegistration::registerCodecs();
+	DJEncoderRegistration::registerCodecs();    
+	DcmRLEEncoderRegistration::registerCodecs();    
+	DcmRLEDecoderRegistration::registerCodecs();
+	DcmJPEG2000DecoderRegistration::registerCodecs();
+	DiRegister::Pointer = new DiRegister();
+}
+
+
+void DeregisterCodecs()
+{
 	DJDecoderRegistration::cleanup();
-	DcmRLEDecoderRegistration::cleanup();
+	DJEncoderRegistration::cleanup();    
+	DcmRLEEncoderRegistration::cleanup();    
+	DcmRLEDecoderRegistration::cleanup();	
+	DcmJPEG2000DecoderRegistration::cleanup();
 }
