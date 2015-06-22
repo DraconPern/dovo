@@ -16,6 +16,8 @@
 #include "dcmtk/dcmdata/dcrledrg.h"	// rle decoder
 #include "dcmtk/dcmjpeg/djdecode.h"	// jpeg decoder
 #include "dcmtk/dcmjpeg/djencode.h" 
+#include "dcmtk/dcmjpls/djdecode.h"	// jpeg-ls decoder
+#include "dcmtk/dcmjpls/djencode.h" 
 #include "dcmtk/dcmdata/dcrledrg.h" 
 #include "dcmtk/dcmdata/dcrleerg.h" 
 #include "fmjpeg2k/fmjpeg2kdrg.h"
@@ -48,8 +50,8 @@ void dcm2img(boost::filesystem::path filename, int clientWidth, int clientHeight
 		if(dfile.loadAllDataIntoMemory().bad())
 			throw std::runtime_error("");
 
-		E_TransferSyntax xfer = dfile.getDataset()->getOriginalXfer();
-		DicomImage di(&dfile, xfer, CIF_MayDetachPixelData, 0, 1);
+		// uncompress
+		DicomImage di(&dfile, EXS_LittleEndianImplicit, CIF_MayDetachPixelData, 0, 1);
 		
 		if(di.getStatus() != EIS_Normal)
 			throw std::runtime_error("");
@@ -118,6 +120,8 @@ void RegisterCodecs()
 {
 	DJDecoderRegistration::registerCodecs();
 	DJEncoderRegistration::registerCodecs();    
+	DJLSEncoderRegistration::registerCodecs();    
+	DJLSEncoderRegistration::registerCodecs();    
 	DcmRLEEncoderRegistration::registerCodecs();    
 	DcmRLEDecoderRegistration::registerCodecs();
 	DcmJPEG2000DecoderRegistration::registerCodecs();
@@ -129,6 +133,8 @@ void DeregisterCodecs()
 {
 	DJDecoderRegistration::cleanup();
 	DJEncoderRegistration::cleanup();    
+	DJLSDecoderRegistration::cleanup();
+	DJLSEncoderRegistration::cleanup();   
 	DcmRLEEncoderRegistration::cleanup();    
 	DcmRLEDecoderRegistration::cleanup();	
 	DcmJPEG2000DecoderRegistration::cleanup();
