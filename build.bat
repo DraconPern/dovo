@@ -1,5 +1,5 @@
 SET TYPE=Release
-SET TYPE=Debug
+rem SET TYPE=Debug
 
 REM a top level directory for all PACS related code
 SET DEVSPACE="%CD%"
@@ -10,7 +10,7 @@ IF "%TYPE%" == "Release" nmake /f makefile.vc BUILD=release RUNTIME_LIBS=static
 IF "%TYPE%" == "Debug"   nmake /f makefile.vc BUILD=debug RUNTIME_LIBS=static
 
 cd %DEVSPACE%\boost	
-call bootstrap toolset=vc11 
+call bootstrap 
 IF "%TYPE%" == "Release" b2 toolset=msvc-11.0 runtime-link=static define=_BIND_TO_CURRENT_VCLIBS_VERSION=1 -j 4 stage release
 IF "%TYPE%" == "Debug"   b2 toolset=msvc-11.0 runtime-link=static define=_BIND_TO_CURRENT_VCLIBS_VERSION=1 -j 4 stage debug
 cd ..
@@ -41,6 +41,12 @@ cd build-%TYPE%
 cmake .. -G "Visual Studio 11" -DIMAGEMAGICK=%DEVSPACE%\ImageMagick -DDCMTK_DIR=%DEVSPACE%\dcmtk\build-%TYPE% -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\fmjpeg2k\%TYPE%
 msbuild /P:Configuration=%TYPE% INSTALL.vcxproj
 cd ..\..
+
+cd %DEVSPACE%\openjpeg
+mkdir build-%TYPE%
+cd build-%TYPE%
+cmake .. -G "Visual Studio 11" -DBUILD_THIRDPARTY=1 -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\openjpeg\%TYPE%
+msbuild /P:Configuration=%TYPE% INSTALL.vcxproj
 
 cd %DEVSPACE%
 mkdir build-%TYPE%
