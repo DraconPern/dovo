@@ -44,6 +44,12 @@ bool MyApp::OnInit()
 	// check for update
 	wxConfig::Get()->SetPath("/Settings");
 	wxConfig::Get()->Read("LastUpdateCheck");
+
+	/* 
+		Update notice, message
+		Exit notice, message
+
+	*/
 	
 	RegisterCodecs();
 

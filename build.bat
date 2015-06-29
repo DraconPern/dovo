@@ -45,7 +45,7 @@ cd ..\..
 cd %DEVSPACE%\openjpeg
 mkdir build-%TYPE%
 cd build-%TYPE%
-cmake .. -G "Visual Studio 11" -DBUILD_THIRDPARTY=1 -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\openjpeg\%TYPE%
+cmake .. -G "Visual Studio 11" -DBUILD_THIRDPARTY=1 -DCMAKE_C_FLAGS_RELEASE="/MT /O2 /D NDEBUG" -DCMAKE_C_FLAGS_DEBUG="/D_DEBUG /MTd /Od" -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\openjpeg\%TYPE%
 msbuild /P:Configuration=%TYPE% INSTALL.vcxproj
 
 cd %DEVSPACE%
