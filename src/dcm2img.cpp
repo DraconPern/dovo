@@ -20,8 +20,10 @@
 #include "dcmtk/dcmjpls/djencode.h" 
 #include "dcmtk/dcmdata/dcrledrg.h" 
 #include "dcmtk/dcmdata/dcrleerg.h" 
-#include "fmjpeg2k/fmjpeg2kdrg.h"
-#include "fmjpeg2k/fmjpeg2kccd.h"
+#include "fmjpeg2k/djencode.h"
+#include "fmjpeg2k/djdecode.h"
+
+#include "dcmtk/dcmjpls/djrparam.h"   /* for class DJLSRepresentationParameter */
 
 // check DCMTK functionality
 #if !defined(WIDE_CHAR_FILE_IO_FUNCTIONS) && defined(_WIN32)
@@ -51,8 +53,8 @@ void dcm2img(boost::filesystem::path filename, int clientWidth, int clientHeight
 			throw std::runtime_error("");
 
 		// uncompress
-		DicomImage di(&dfile, EXS_LittleEndianImplicit, CIF_MayDetachPixelData, 0, 1);
-		
+		DicomImage di(&dfile, EXS_Unknown);
+
 		if(di.getStatus() != EIS_Normal)
 			throw std::runtime_error("");
 
@@ -105,6 +107,14 @@ void dcm2img(boost::filesystem::path filename, int clientWidth, int clientHeight
         int scaledHeight = height * scaleFactor;
 
 		image.Rescale(scaledWidth, scaledHeight);
+
+		boost::filesystem::path a = "test.jp2.dcm";
+		
+		DJLSRepresentationParameter rp(2, OFTrue);
+		OFCondition result;
+		result = dfile.getDataset()->chooseRepresentation(EXS_LittleEndianExplicit, NULL);
+		result = dfile.getDataset()->chooseRepresentation(EXS_JPEGLSLossless, &rp);		
+		result = dfile.saveFile(a.c_str(), EXS_JPEGLSLossless);
 	}
 	catch(...)
 	{
@@ -123,9 +133,9 @@ void RegisterCodecs()
 	DJLSEncoderRegistration::registerCodecs();    
 	DJLSEncoderRegistration::registerCodecs();    
 	DcmRLEEncoderRegistration::registerCodecs();    
-	DcmRLEDecoderRegistration::registerCodecs();
-	DcmJPEG2000DecoderRegistration::registerCodecs();
-	// DiRegister::Pointer = new DiRegister();
+	DcmRLEDecoderRegistration::registerCodecs();			
+	FMJP2KEncoderRegistration::registerCodecs();
+	FMJP2KDecoderRegistration::registerCodecs();	
 }
 
 
@@ -136,6 +146,7 @@ void DeregisterCodecs()
 	DJLSDecoderRegistration::cleanup();
 	DJLSEncoderRegistration::cleanup();   
 	DcmRLEEncoderRegistration::cleanup();    
-	DcmRLEDecoderRegistration::cleanup();	
-	DcmJPEG2000DecoderRegistration::cleanup();
+	DcmRLEDecoderRegistration::cleanup();		
+	FMJP2KEncoderRegistration::cleanup();
+	FMJP2KDecoderRegistration::cleanup();
 }

@@ -1,5 +1,5 @@
 SET TYPE=Release
-rem SET TYPE=Debug
+SET TYPE=Debug
 
 REM a top level directory for all PACS related code
 SET DEVSPACE="%CD%"
@@ -18,16 +18,16 @@ cd ..
 cd %DEVSPACE%\zlib
 mkdir build-%TYPE%
 cd build-%TYPE%
-cmake.exe .. -G "Visual Studio 11" -DCMAKE_C_FLAGS_RELEASE="/MT /O2 /D NDEBUG" -DCMAKE_C_FLAGS_DEBUG="/D_DEBUG /MTd /Od" -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\zlib\build-%TYPE%
+cmake.exe .. -G "Visual Studio 11" -DCMAKE_C_FLAGS_RELEASE="/MT /O2 /D NDEBUG" -DCMAKE_C_FLAGS_DEBUG="/D_DEBUG /MTd /Od" -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\zlib\%TYPE%
 msbuild /P:Configuration=%TYPE% INSTALL.vcxproj
 cd ..\..
-IF "%TYPE%" == "Release" copy /Y %DEVSPACE%\zlib\build-Release\lib\zlibstatic.lib %DEVSPACE%\zlib\build-Release\lib\zlib_o.lib
-IF "%TYPE%" == "Debug"   copy /Y %DEVSPACE%\zlib\build-Debug\lib\zlibstaticd.lib %DEVSPACE%\zlib\build-Debug\lib\zlib_d.lib
+IF "%TYPE%" == "Release" copy /Y %DEVSPACE%\zlib\Release\lib\zlibstatic.lib %DEVSPACE%\zlib\Release\lib\zlib_o.lib
+IF "%TYPE%" == "Debug"   copy /Y %DEVSPACE%\zlib\Debug\lib\zlibstaticd.lib %DEVSPACE%\zlib\Debug\lib\zlib_d.lib
 
 cd %DEVSPACE%\dcmtk
 mkdir build-%TYPE%
 cd build-%TYPE%
-cmake .. -G "Visual Studio 11" -DDCMTK_WIDE_CHAR_FILE_IO_FUNCTIONS=1 -DDCMTK_WITH_ZLIB=1 -DWITH_ZLIBINC=%DEVSPACE%\zlib\build-%TYPE% -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\dcmtk\build-%TYPE%
+cmake .. -G "Visual Studio 11" -DDCMTK_WIDE_CHAR_FILE_IO_FUNCTIONS=1 -DDCMTK_WITH_ZLIB=1 -DWITH_ZLIBINC=%DEVSPACE%\zlib\%TYPE% -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\dcmtk\%TYPE%
 msbuild /P:Configuration=%TYPE% INSTALL.vcxproj 
 cd ..\..
 
@@ -35,23 +35,23 @@ cd %DEVSPACE%\ImageMagick\VisualMagick
 msbuild /P:Configuration=%TYPE% /T:CORE_JP2 VisualStaticMT.sln
 cd ..\..
 
-cd %DEVSPACE%\fmjpeg2k
-mkdir build-%TYPE%
-cd build-%TYPE%
-cmake .. -G "Visual Studio 11" -DIMAGEMAGICK=%DEVSPACE%\ImageMagick -DDCMTK_DIR=%DEVSPACE%\dcmtk\build-%TYPE% -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\fmjpeg2k\%TYPE%
-msbuild /P:Configuration=%TYPE% INSTALL.vcxproj
-cd ..\..
-
 cd %DEVSPACE%\openjpeg
 mkdir build-%TYPE%
 cd build-%TYPE%
-cmake .. -G "Visual Studio 11" -DBUILD_THIRDPARTY=1 -DCMAKE_C_FLAGS_RELEASE="/MT /O2 /D NDEBUG" -DCMAKE_C_FLAGS_DEBUG="/D_DEBUG /MTd /Od" -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\openjpeg\%TYPE%
+cmake .. -G "Visual Studio 11" -DBUILD_THIRDPARTY=1 -DBUILD_SHARED_LIBS=0 -DCMAKE_C_FLAGS_RELEASE="/MT /O2 /D NDEBUG" -DCMAKE_C_FLAGS_DEBUG="/D_DEBUG /MTd /Od" -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\openjpeg\%TYPE%
 msbuild /P:Configuration=%TYPE% INSTALL.vcxproj
+
+cd %DEVSPACE%\fmjpeg2koj
+mkdir build-%TYPE%
+cd build-%TYPE%
+cmake .. -G "Visual Studio 11" -DOPENJPEG=%DEVSPACE%\openjpeg\%TYPE% -DDCMTK_DIR=%DEVSPACE%\dcmtk\build-%TYPE% -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\fmjpeg2koj\%TYPE%
+msbuild /P:Configuration=%TYPE% INSTALL.vcxproj
+cd ..\..
 
 cd %DEVSPACE%
 mkdir build-%TYPE%
 cd build-%TYPE%
-cmake .. -G "Visual Studio 11" -DwxWidgets_ROOT_DIR=%WXWIN% -DIMAGEMAGICK=%DEVSPACE%\ImageMagick -DBOOST_ROOT=%DEVSPACE%\boost -DDCMTK_DIR=%DEVSPACE%\dcmtk\build-%TYPE% -DDCMTK_WITH_ZLIB=1 -DWITH_ZLIBINC=%DEVSPACE%\zlib\build-%TYPE% -DFMJPEG2K=%DEVSPACE%\fmjpeg2k\%TYPE%
+cmake .. -G "Visual Studio 11" -DwxWidgets_ROOT_DIR=%WXWIN% -DBOOST_ROOT=%DEVSPACE%\boost -DDCMTK_DIR=%DEVSPACE%\dcmtk\build-%TYPE% -DZLIB_ROOT=%DEVSPACE%\zlib\%TYPE% -DFMJPEG2K=%DEVSPACE%\fmjpeg2koj\%TYPE% -DOPENJPEG=%DEVSPACE%\openjpeg\%TYPE%
 msbuild /P:Configuration=%TYPE% ALL_BUILD.vcxproj
 cd ..
 

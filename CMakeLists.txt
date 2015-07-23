@@ -31,8 +31,15 @@ include(${wxWidgets_USE_FILE})
 add_definitions(-DDCMTK_WIDE_CHAR_FILE_IO_FUNCTIONS=1)
 find_package(dcmtk REQUIRED CONFIG HINTS ${DCMTK_DIR})
 
-INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/sqlite3 ${ZLIB_INCDIR} ${Boost_INCLUDE_DIRS} ${FMJPEG2K}/include ${DCMTK_INCLUDE_DIRS} )
-LINK_DIRECTORIES(${FMJPEG2K}/lib ${Boost_LIBRARY_DIRS} ${ZLIB_LIBDIR} ${IMAGEMAGICK}/VisualMagick/lib)
+#include zlib
+find_package(zlib REQUIRED ${ZLIB_ROOT})
+
+#include openjpeg
+include(${OPENJPEG}/lib/openjpeg-2.1/OpenJPEGConfig.cmake)
+add_definitions(-DOPJ_STATIC)
+
+INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/sqlite3 ${Boost_INCLUDE_DIRS} ${FMJPEG2K}/include ${DCMTK_INCLUDE_DIRS} )
+LINK_DIRECTORIES(${FMJPEG2K}/lib ${Boost_LIBRARY_DIRS} ${OPENJPEG}/lib)
 
 set(dovo_HEADERS	
 	src/gui.h
@@ -80,12 +87,11 @@ ENDIF(WIN32)
 
 TARGET_LINK_LIBRARIES(dovo
 	fmjpeg2k
+
+	openjp2
 	
-	debug CORE_DB_jp2_.lib
+	${ZLIB_LIBRARIES}
 	
-	optimized CORE_RL_jp2_.lib
-	
-	${ZLIB_LIBS}
 	${DCMTK_LIBRARIES}
 	${wxWidgets_LIBRARIES}
 	${Boost_LIBRARIES}
