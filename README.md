@@ -29,3 +29,6 @@ The program is http://utf8everywhere.org/
 - ImageMagick please extract under ./ImageMagick and create project (/MT 
 for Windows)
 - zlib please extract under ./zlib and apply zlib.patch
+
+## Author
+draconpern@hotmail.com
