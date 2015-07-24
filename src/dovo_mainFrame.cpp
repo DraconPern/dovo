@@ -131,6 +131,8 @@ void dovo_mainFrame::OnInstancesSelected( wxListEvent& event )
 #endif
 
 	wxSize s = m_preview->GetClientSize();
+	
+	wxBusyCursor wait;
 	dcm2img(filename, s.GetWidth(), s.GetHeight(), image);
 
 	wxClientDC dc(m_preview);
