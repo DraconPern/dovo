@@ -29,6 +29,8 @@ The program is http://utf8everywhere.org/
 - ImageMagick please extract under ./ImageMagick and create project (/MT 
 for Windows)
 - zlib please extract under ./zlib 
+- fmjpeg2koj https://github.com/DraconPern/fmjpeg2koj please extract 
+under fmjpeg2koj
 
 ## Author
 Ing-Long Eric Kuo <draconpern@hotmail.com>

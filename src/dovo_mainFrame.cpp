@@ -38,7 +38,7 @@ dovo_mainFrame::dovo_mainFrame( wxWindow* parent )
 
 	FillDestinationList();
 
-	image.Create(10, 10);	
+	image.Create(1, 1);	
 }
 
 void dovo_mainFrame::OnBrowse( wxCommandEvent& event )

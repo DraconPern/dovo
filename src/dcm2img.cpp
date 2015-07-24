@@ -107,14 +107,6 @@ void dcm2img(boost::filesystem::path filename, int clientWidth, int clientHeight
         int scaledHeight = height * scaleFactor;
 
 		image.Rescale(scaledWidth, scaledHeight);
-
-		boost::filesystem::path a = "test.jp2.dcm";
-		
-		DJLSRepresentationParameter rp(2, OFTrue);
-		OFCondition result;
-		result = dfile.getDataset()->chooseRepresentation(EXS_LittleEndianExplicit, NULL);
-		result = dfile.getDataset()->chooseRepresentation(EXS_JPEGLSLossless, &rp);		
-		result = dfile.saveFile(a.c_str(), EXS_JPEGLSLossless);
 	}
 	catch(...)
 	{
