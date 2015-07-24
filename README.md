@@ -28,7 +28,10 @@ The program is http://utf8everywhere.org/
 - Visual Leak Detector https://vld.codeplex.com/ installed for debug release
 - ImageMagick please extract under ./ImageMagick and create project (/MT 
 for Windows)
-- zlib please extract under ./zlib and apply zlib.patch
+- zlib please extract under ./zlib 
 
 ## Author
-draconpern@hotmail.com
+Ing-Long Eric Kuo <draconpern@hotmail.com>
+
+## License
+This software is licensed under the GPL.  For use under another license, please contact Ing-Long Eric Kuo <eric@frontmotion.com>
