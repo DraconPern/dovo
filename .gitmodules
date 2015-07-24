@@ -1,0 +1,3 @@
+[submodule "fmjpeg2koj"]
+	path = fmjpeg2koj
+	url = git@github.com:DraconPern/fmjpeg2koj.git
