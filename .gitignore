@@ -1,11 +1,9 @@
-CMake/
 ImageMagick/
 boost/
 build-Debug/
 build-Release/
 dcmtk/
-fmjpeg2k/
-jasper/
+fmjpeg2koj/
 openjpeg/
 wxWidgets/
 zlib/
