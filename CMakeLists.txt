@@ -56,6 +56,7 @@ set(dovo_HEADERS
 	src/dicomscanner.h
 	src/dicomsender.h
 	src/dcm2img.h
+	src/update.h
 )
 
 set(dovo_SRCS
@@ -75,6 +76,7 @@ set(dovo_SRCS
 	src/dicomscanner.cpp
 	src/dicomsender.cpp
 	src/dcm2img.cpp
+	src/update.cpp
 )
 
 ADD_EXECUTABLE(dovo WIN32 ${dovo_SRCS})
