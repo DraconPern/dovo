@@ -30,6 +30,7 @@
 #include <wx/panel.h>
 #include <wx/frame.h>
 #include <wx/hyperlink.h>
+#include <wx/checkbox.h>
 #include <wx/gauge.h>
 
 ///////////////////////////////////////////////////////////////////////////
@@ -166,12 +167,14 @@ class changePatientInfo : public wxDialog
 		wxTextCtrl* m_patientNameCtrl;
 		wxStaticText* m_staticText5;
 		wxTextCtrl* m_birthdayCtrl;
+		wxCheckBox* m_enableEdit;
 		wxStdDialogButtonSizer* m_sdbSizer3;
 		wxButton* m_sdbSizer3OK;
 		wxButton* m_sdbSizer3Cancel;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnInitDialog( wxInitDialogEvent& event ) { event.Skip(); }
+		virtual void m_enableEditOnCheckBox( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnOK( wxCommandEvent& event ) { event.Skip(); }
 		
 	

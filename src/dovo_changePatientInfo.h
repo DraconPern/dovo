@@ -16,6 +16,7 @@ class dovo_changePatientInfo : public changePatientInfo
 	protected:
 		// Handlers for changePatientInfo events.
 		void OnInitDialog( wxInitDialogEvent& event );
+		void m_enableEditOnCheckBox( wxCommandEvent& event );
 		void OnOK( wxCommandEvent& event );
 	public:
 		/** Constructor */
@@ -25,6 +26,7 @@ class dovo_changePatientInfo : public changePatientInfo
 		wxString m_patientID;
 		wxString m_patientName;
 		wxString m_birthday;
+
 
 
 };

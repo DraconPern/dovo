@@ -450,6 +450,9 @@ changePatientInfo::changePatientInfo( wxWindow* parent, wxWindowID id, const wxS
 	
 	bSizer23->Add( 0, 5, 0, wxEXPAND, 5 );
 	
+	m_enableEdit = new wxCheckBox( this, wxID_ANY, _("Change Patient Info"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer23->Add( m_enableEdit, 0, wxALL, 5 );
+	
 	m_sdbSizer3 = new wxStdDialogButtonSizer();
 	m_sdbSizer3OK = new wxButton( this, wxID_OK );
 	m_sdbSizer3->AddButton( m_sdbSizer3OK );
@@ -468,6 +471,7 @@ changePatientInfo::changePatientInfo( wxWindow* parent, wxWindowID id, const wxS
 	
 	// Connect Events
 	this->Connect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( changePatientInfo::OnInitDialog ) );
+	m_enableEdit->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( changePatientInfo::m_enableEditOnCheckBox ), NULL, this );
 	m_sdbSizer3OK->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( changePatientInfo::OnOK ), NULL, this );
 }
 
@@ -475,6 +479,7 @@ changePatientInfo::~changePatientInfo()
 {
 	// Disconnect Events
 	this->Disconnect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( changePatientInfo::OnInitDialog ) );
+	m_enableEdit->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( changePatientInfo::m_enableEditOnCheckBox ), NULL, this );
 	m_sdbSizer3OK->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( changePatientInfo::OnOK ), NULL, this );
 	
 }
