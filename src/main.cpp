@@ -21,11 +21,14 @@ class MyApp: public wxApp
 public:
 	virtual bool OnInit();	
 	virtual int OnExit();
+	virtual int OnRun();
 
 public:
     DECLARE_EVENT_TABLE() 
     void OnAbout(wxCommandEvent& evt);
+
 	boost::thread updater;
+	int m_shouldExit;
 };
 
 wxIMPLEMENT_APP(MyApp);
@@ -45,11 +48,13 @@ BEGIN_EVENT_TABLE(MyApp, wxApp)
 	// see if there's a new version. Note that we just look at what we downloaded on a previous run
 	wxString json = wxConfig::Get()->Read("/Settings/UpdateInfo");
 
+	m_shouldExit = 0;
 	if(informUserOfUpdate(json.ToUTF8().data()))
 	{
 		// we need to exit...
 		// get update w/o threading
 		updateChecker();
+		m_shouldExit = 1;
 		return true;
 	}
 
@@ -96,4 +101,12 @@ void MyApp::OnAbout(wxCommandEvent& evt)
 {
 	dovo_about dlg(NULL);
 	dlg.ShowModal();
+}
+
+int MyApp::OnRun()
+{
+	if(m_shouldExit == 0)	// run normal code if we aren't exiting immediatly
+        wxApp::OnRun();
+
+    return m_shouldExit;
 }
