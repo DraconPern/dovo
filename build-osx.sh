@@ -12,7 +12,7 @@ cd $DEVSPACE/wxWidgets
 mkdir build$TYPE
 cd build$TYPE
 COMMONwxWidgetsFlag="--disable-shared --with-macosx-version-min=$MACOSX_DEPLOYMENT_TARGET --with-macosx-sdk=$SYSROOT"
-if [ "$TYPE" = "Release" ] ; then 
+if [ "$TYPE" = "Release" ] ; then
   ../configure $COMMONwxWidgetsFlag
 elif [ "$TYPE" = "Debug" ] ; then
   ../configure $COMMONwxWidgetsFlag --enable-debug
@@ -21,25 +21,39 @@ make -j8
 cd ../..
 
 cd $DEVSPACE/boost
-./bootstrap.sh 
+./bootstrap.sh
 if [ "$TYPE" = "Release" ] ; then
   ./b2 toolset=clang link=static variant=release -j 4 macosx-version-min=$MACOSX_DEPLOYMENT_TARGET stage
 elif [ "$TYPE" = "Debug" ] ; then
-  ./b2 link=static variant=debug -j 4 runtime-link=static macosx-version-min=10.9 stage 
+  ./b2 link=static variant=debug -j 4 runtime-link=static macosx-version-min=10.9 stage
 fi
 cd ..
 
 cd $DEVSPACE/dcmtk
 mkdir build-$TYPE
 cd build-$TYPE
-cmake .. -DDCMTK_WIDE_CHAR_FILE_IO_FUNCTIONS=1 -DCMAKE_INSTALL_PREFIX=$DEVSPACE/dcmtk/build-$TYPE -DCMAKE_OSX_SYSROOT=$SYSROOT -DCMAKE_OSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET
-make -j8 install 
+cmake .. -DDCMTK_WIDE_CHAR_FILE_IO_FUNCTIONS=1 -DCMAKE_INSTALL_PREFIX=$DEVSPACE/dcmtk/$TYPE -DCMAKE_OSX_SYSROOT=$SYSROOT -DCMAKE_OSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET
+make -j8 install
+cd ../..
+
+cd $DEVSPACE/openjpeg
+mkdir build-$TYPE
+cd build-$TYPE
+cmake .. -DBUILD_SHARED_LIBS=0 -DCMAKE_INSTALL_PREFIX=$DEVSPACE/openjpeg/$TYPE
+make -j8 install
+cd ../..
+
+cd $DEVSPACE/fmjpeg2koj
+mkdir build-$TYPE
+cd build-$TYPE
+cmake .. -DOPENJPEG=$DEVSPACE/openjpeg/$TYPE -DDCMTK_DIR=$DEVSPACE/dcmtk/$TYPE -DCMAKE_INSTALL_PREFIX=$DEVSPACE/fmjpeg2koj/$TYPE
+make -j8 install
 cd ../..
 
 cd $DEVSPACE
 mkdir build-$TYPE
 cd build-$TYPE
-cmake .. -DwxWidgets_CONFIG_EXECUTABLE=$DEVSPACE/wxWidgets/build$TYPE/wx-config -DBOOST_ROOT=$DEVSPACE/boost -DDCMTK_DIR=$DEVSPACE/dcmtk/build-$TYPE -DCMAKE_OSX_SYSROOT=$SYSROOT -DCMAKE_OSX_DEPLOYMENT_TARGET=$CMAKE_OSX_DEPLOYMENT_TARGET
+cmake .. -DwxWidgets_CONFIG_EXECUTABLE=$DEVSPACE/wxWidgets/build$TYPE/wx-config -DBOOST_ROOT=$DEVSPACE/boost -DDCMTK_DIR=$DEVSPACE/dcmtk/$TYPE -DFMJPEG2K=$DEVSPACE/fmjpeg2koj/$TYPE -DOPENJPEG=$DEVSPACE/openjpeg/$TYPE -DCMAKE_OSX_SYSROOT=$SYSROOT -DCMAKE_OSX_DEPLOYMENT_TARGET=$CMAKE_OSX_DEPLOYMENT_TARGET
 make -j8
 cd ..
 

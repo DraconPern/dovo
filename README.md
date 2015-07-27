@@ -26,11 +26,11 @@ The program is http://utf8everywhere.org/
 - DCMTK http://dicom.offis.de/ please use snapshot or git, and extract under ./dcmtk
 - boost http://www.boost.org/ please extract under ./boost
 - Visual Leak Detector https://vld.codeplex.com/ installed for debug release
-- ImageMagick please extract under ./ImageMagick and create project (/MT 
+- ImageMagick please extract under ./ImageMagick and create project (/MT
 for Windows)
-- zlib please extract under ./zlib 
-- fmjpeg2koj https://github.com/DraconPern/fmjpeg2koj please extract 
-under fmjpeg2koj
+- zlib please extract under ./zlib
+- openjpeg http://www.openjpeg.org please extract under ./openjpeg
+- fmjpeg2koj https://github.com/DraconPern/fmjpeg2koj please extract under ./fmjpeg2koj
 
 ## Author
 Ing-Long Eric Kuo <draconpern@hotmail.com>
