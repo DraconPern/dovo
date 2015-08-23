@@ -41,7 +41,7 @@ add_definitions(-DOPJ_STATIC)
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/sqlite3 ${Boost_INCLUDE_DIRS} ${FMJPEG2K}/include ${DCMTK_INCLUDE_DIRS} )
 LINK_DIRECTORIES(${FMJPEG2K}/lib ${Boost_LIBRARY_DIRS} ${OPENJPEG}/lib)
 
-set(dovo_HEADERS	
+set(dovo_HEADERS
 	src/gui.h
 	src/dovo_about.h
 	src/dovo_changePatientInfo.h
@@ -60,7 +60,7 @@ set(dovo_HEADERS
 )
 
 set(dovo_SRCS
-    ${dovo_HEADERS}    
+  ${dovo_HEADERS}
 	src/main.cpp
 	src/gui.cpp
 	src/dovo_about.cpp
@@ -77,9 +77,11 @@ set(dovo_SRCS
 	src/dicomsender.cpp
 	src/dcm2img.cpp
 	src/update.cpp
+	src/osx/dovo.icns
+	src/osx/PkgInfo
 )
 
-ADD_EXECUTABLE(dovo WIN32 ${dovo_SRCS})
+ADD_EXECUTABLE(dovo WIN32 MACOSX_BUNDLE ${dovo_SRCS})
 
 IF(WIN32)
   SET(OS_SPECIFIC_LIBS netapi32 wsock32 odbc32 Rpcrt4)
@@ -87,17 +89,20 @@ ELSE(WIN32)
   SET(OS_SPECIFIC_LIBS )
 ENDIF(WIN32)
 
+#if (APPLE)
+  set_target_properties(dovo PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/src/osx/Info.plist)
+  set_target_properties(dovo PROPERTIES MACOSX_BUNDLE_ICON_FILE dovo)
+	SET_SOURCE_FILES_PROPERTIES(${CMAKE_SOURCE_DIR}/src/osx/dovo.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+#	SET_SOURCE_FILES_PROPERTIES(${CMAKE_SOURCE_DIR}/src/osx/PkgInfo PROPERTIES MACOSX_PACKAGE_LOCATION .)
+#endif()
+
 TARGET_LINK_LIBRARIES(dovo
 	fmjpeg2k
 
 	openjp2
-	
 	${ZLIB_LIBRARIES}
-	
 	${DCMTK_LIBRARIES}
 	${wxWidgets_LIBRARIES}
 	${Boost_LIBRARIES}
 	${OS_SPECIFIC_LIBS}
 	)
-
-	
