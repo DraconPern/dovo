@@ -1,0 +1,3 @@
+aaaaaaaa ICON "dovo.ico"
+
+#include "wx/msw/wx.rc"

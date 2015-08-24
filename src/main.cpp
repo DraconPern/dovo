@@ -84,6 +84,7 @@ BEGIN_EVENT_TABLE(MyApp, wxApp)
 	frame->SetMenuBar(menubar);
 #endif
 
+	frame->SetIcon(wxICON(aaaaaaaa));
 	frame->Show( true );	
 
 	return true;

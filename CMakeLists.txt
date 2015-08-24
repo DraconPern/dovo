@@ -77,8 +77,15 @@ set(dovo_SRCS
 	src/dicomsender.cpp
 	src/dcm2img.cpp
 	src/update.cpp
-	src/osx/dovo.icns
 )
+
+if(WIN32)
+  set(dovo_SRCS ${dovo_SRCS} src/win/dovo.rc)
+endif(WIN32)
+
+if(APPLE)
+  set(dovo_SRCS ${dovo_SRCS} src/osx/dovo.icns)
+endif(APPLE)
 
 ADD_EXECUTABLE(dovo WIN32 MACOSX_BUNDLE ${dovo_SRCS})
 
@@ -88,11 +95,11 @@ ELSE(WIN32)
   SET(OS_SPECIFIC_LIBS )
 ENDIF(WIN32)
 
-#if (APPLE)
+if(APPLE)
   set_target_properties(dovo PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/src/osx/Info.plist)
   set_target_properties(dovo PROPERTIES MACOSX_BUNDLE_ICON_FILE dovo)
 	SET_SOURCE_FILES_PROPERTIES(${CMAKE_SOURCE_DIR}/src/osx/dovo.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
-#endif()
+ENDIF()
 
 TARGET_LINK_LIBRARIES(dovo
 	fmjpeg2k
