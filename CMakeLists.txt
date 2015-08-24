@@ -78,7 +78,6 @@ set(dovo_SRCS
 	src/dcm2img.cpp
 	src/update.cpp
 	src/osx/dovo.icns
-	src/osx/PkgInfo
 )
 
 ADD_EXECUTABLE(dovo WIN32 MACOSX_BUNDLE ${dovo_SRCS})
@@ -93,7 +92,6 @@ ENDIF(WIN32)
   set_target_properties(dovo PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/src/osx/Info.plist)
   set_target_properties(dovo PROPERTIES MACOSX_BUNDLE_ICON_FILE dovo)
 	SET_SOURCE_FILES_PROPERTIES(${CMAKE_SOURCE_DIR}/src/osx/dovo.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
-#	SET_SOURCE_FILES_PROPERTIES(${CMAKE_SOURCE_DIR}/src/osx/PkgInfo PROPERTIES MACOSX_PACKAGE_LOCATION .)
 #endif()
 
 TARGET_LINK_LIBRARIES(dovo
