@@ -31,10 +31,6 @@ cmake .. -G "Visual Studio 11" -DDCMTK_WIDE_CHAR_FILE_IO_FUNCTIONS=1 -DDCMTK_WIT
 msbuild /P:Configuration=%TYPE% INSTALL.vcxproj 
 cd ..\..
 
-cd %DEVSPACE%\ImageMagick\VisualMagick
-msbuild /P:Configuration=%TYPE% /T:CORE_JP2 VisualStaticMT.sln
-cd ..\..
-
 cd %DEVSPACE%\openjpeg
 mkdir build-%TYPE%
 cd build-%TYPE%
