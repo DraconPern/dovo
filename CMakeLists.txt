@@ -35,11 +35,11 @@ find_package(dcmtk REQUIRED CONFIG HINTS ${DCMTK_DIR})
 find_package(zlib REQUIRED ${ZLIB_ROOT})
 
 #include openjpeg
-include(${OPENJPEG}/lib/openjpeg-2.1/OpenJPEGConfig.cmake)
+find_package(openjpeg HINTS ${OPENJPEG})
 add_definitions(-DOPJ_STATIC)
 
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/sqlite3 ${Boost_INCLUDE_DIRS} ${FMJPEG2K}/include ${DCMTK_INCLUDE_DIRS} )
-LINK_DIRECTORIES(${FMJPEG2K}/lib ${Boost_LIBRARY_DIRS} ${OPENJPEG}/lib)
+LINK_DIRECTORIES(${FMJPEG2K}/lib ${Boost_LIBRARY_DIRS})
 
 set(dovo_HEADERS
 	src/gui.h
@@ -104,7 +104,7 @@ ENDIF()
 TARGET_LINK_LIBRARIES(dovo
 	fmjpeg2k
 
-	openjp2
+	${OPENJPEG_LIBRARIES}
 	${ZLIB_LIBRARIES}
 	${DCMTK_LIBRARIES}
 	${wxWidgets_LIBRARIES}
