@@ -57,6 +57,7 @@ set(dovo_HEADERS
 	src/dicomsender.h
 	src/dcm2img.h
 	src/update.h
+	src/alphanum.hpp
 )
 
 set(dovo_SRCS
