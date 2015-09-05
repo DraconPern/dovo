@@ -43,6 +43,13 @@ dovo_mainFrame::dovo_mainFrame( wxWindow* parent )
 	image.Create(1, 1);
 }
 
+dovo_mainFrame::~dovo_mainFrame()
+{
+	wxConfig::Get()->SetPath("/Settings");
+	wxConfig::Get()->Write("LastDir", m_directory->GetValue());
+	wxConfig::Get()->Flush();
+}
+
 void dovo_mainFrame::OnBrowse( wxCommandEvent& event )
 {
 	wxDirDialog dlg(this, "", m_directory->GetValue(), wxRESIZE_BORDER | wxDD_DIR_MUST_EXIST);
@@ -68,90 +75,16 @@ void dovo_mainFrame::OnDestinationEdit( wxCommandEvent& event )
 	}
 }
 
-void dovo_mainFrame::OnPatientsSelected( wxListEvent& event )
+void dovo_mainFrame::FillDestinationList()
 {
-	long item = m_patients->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-	if (item == -1)
-		return;
+	// add to combo box
+	m_destination->Clear();
+	std::vector<DestinationEntry>::iterator itr;
+	for(itr = m_engine.globalDestinations.begin(); itr != m_engine.globalDestinations.end(); itr++)
+		m_destination->Append(wxString::FromUTF8((*itr).name.c_str()) + L" (*)");
 
-	m_studies->DeleteAllItems();
-	m_engine.GetStudies(m_patients->GetItemText(item, 1).ToUTF8().data(), fillstudies, this);
-	m_studies->SetColumnWidth(0, wxLIST_AUTOSIZE);
-	m_studies->SetColumnWidth(1, wxLIST_AUTOSIZE);
-	m_studies->SetColumnWidth(2, wxLIST_AUTOSIZE);
-
-	if(m_studies->GetItemCount() > 0)
-		m_studies->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
-}
-
-void dovo_mainFrame::OnStudiesSelected( wxListEvent& event )
-{
-	long item = m_studies->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-	if (item == -1)
-		return;
-
-	m_series->DeleteAllItems();
-	m_engine.GetSeries(m_studies->GetItemText(item, 2).ToUTF8().data(), fillseries, this);
-	m_series->SetColumnWidth(0, wxLIST_AUTOSIZE);
-	m_series->SetColumnWidth(1, wxLIST_AUTOSIZE);
-
-	if(m_series->GetItemCount() > 0)
-		m_series->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
-}
-
-typedef std::map<std::string, std::string, doj::alphanum_less<std::string> > naturalmap;
-
-void dovo_mainFrame::OnSeriesSelected( wxListEvent& event )
-{
-	long item = m_series->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-	if (item == -1)
-		return;
-
-	naturalmap entries;
-
-	m_instances->DeleteAllItems();
-	m_engine.GetInstances(m_series->GetItemText(item, 1).ToUTF8().data(), fillinstances, &entries);
-
-	int j = 0;
-	for(naturalmap::iterator ii = entries.begin(); ii != entries.end(); ++ii)
-	{
-		m_instances->InsertItem(j, wxString::FromUTF8((*ii).first.c_str()));
-		m_instances->SetItem(j, 1, wxString::FromUTF8((*ii).second.c_str()));
-		j++;
-	}
-
-	m_instances->SetColumnWidth(0, wxLIST_AUTOSIZE);
-	m_instances->SetColumnWidth(1, wxLIST_AUTOSIZE);
-
-	if(m_instances->GetItemCount() > 0)
-		m_instances->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
-}
-
-void dovo_mainFrame::OnPaintPreview( wxPaintEvent& event )
-{
-	wxPaintDC dc(m_preview);
-	renderPreview(dc);
-}
-
-void dovo_mainFrame::OnInstancesSelected( wxListEvent& event )
-{
-	long item = m_instances->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-	if (item == -1)
-		return;
-
-#ifdef _WIN32
-	boost::filesystem::path filename = m_instances->GetItemText(item, 1);
-#else
-	boost::filesystem::path filename = m_instances->GetItemText(item, 1).ToUTF8().data();
-#endif
-
-	wxSize s = m_preview->GetClientSize();
-
-	wxBusyCursor wait;
-	dcm2img(filename, s.GetWidth(), s.GetHeight(), image);
-
-	wxClientDC dc(m_preview);
-	renderPreview(dc);
+	for(itr = m_engine.destinations.begin(); itr != m_engine.destinations.end(); itr++)
+		m_destination->Append(wxString::FromUTF8((*itr).name.c_str()));
 }
 
 void dovo_mainFrame::OnUpdate( wxCommandEvent& event )
@@ -182,9 +115,156 @@ void dovo_mainFrame::OnUpdate( wxCommandEvent& event )
 	//	m_patients->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
 }
 
+int dovo_mainFrame::fillpatients(void *param,int columns,char** values, char**names)
+{
+	dovo_mainFrame *win = (dovo_mainFrame *) param;
+	win->m_patients->InsertItem(0, values[0]);
+	win->m_patients->SetItem(0, 1, values[1]);
+	win->m_patients->SetItem(0, 2, values[2]);
+	return 0;
+}
+
+void dovo_mainFrame::OnPatientsSelected( wxListEvent& event )
+{
+	long item = m_patients->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+	if (item == -1)
+		return;
+
+	m_studies->DeleteAllItems();
+	m_engine.GetStudies(m_patients->GetItemText(item, 1).ToUTF8().data(), fillstudies, this);
+	m_studies->SetColumnWidth(0, wxLIST_AUTOSIZE);
+	m_studies->SetColumnWidth(1, wxLIST_AUTOSIZE);
+	m_studies->SetColumnWidth(2, wxLIST_AUTOSIZE);
+
+	if(m_studies->GetItemCount() > 0)
+		m_studies->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+}
+
+int dovo_mainFrame::fillstudies(void *param,int columns,char** values, char**names)
+{
+	dovo_mainFrame *win = (dovo_mainFrame *) param;
+
+	std::string date;
+	date = values[2];
+
+	struct tm thedate;
+	memset(&thedate, 0, sizeof(struct tm));
+	try
+	{
+		thedate.tm_year = boost::lexical_cast<int>(date.substr(0, 4)) - 1900;
+		thedate.tm_mon = boost::lexical_cast<int>(date.substr(4, 2)) - 1;
+		thedate.tm_mday = boost::lexical_cast<int>(date.substr(6, 2));
+	}
+	catch(...)
+	{
+		thedate.tm_year = 0;
+		thedate.tm_mon = 0;
+		thedate.tm_mday = 1;
+	}
+
+	char buf[1024];
+	memset(buf, 0, 1024);
+
+	strftime(buf, 1024, "%x", &thedate);
+
+	win->m_studies->InsertItem(0, buf);
+	win->m_studies->SetItem(0, 1, wxString::FromUTF8(values[1]));
+	win->m_studies->SetItem(0, 2, wxString::FromUTF8(values[0]));
+	return 0;
+}
+
+void dovo_mainFrame::OnStudiesSelected( wxListEvent& event )
+{
+	long item = m_studies->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+	if (item == -1)
+		return;
+
+	m_series->DeleteAllItems();
+	m_engine.GetSeries(m_studies->GetItemText(item, 2).ToUTF8().data(), fillseries, this);
+	m_series->SetColumnWidth(0, wxLIST_AUTOSIZE);
+	m_series->SetColumnWidth(1, wxLIST_AUTOSIZE);
+
+	if(m_series->GetItemCount() > 0)
+		m_series->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+}
+
+int dovo_mainFrame::fillseries(void *param,int columns,char** values, char**names)
+{
+	dovo_mainFrame *win = (dovo_mainFrame *) param;
+	win->m_series->InsertItem(0, wxString::FromUTF8(values[1]));
+	win->m_series->SetItem(0, 1, wxString::FromUTF8(values[0]));
+	return 0;
+}
+
+typedef std::map<std::string, std::string, doj::alphanum_less<std::string> > naturalmap;
+
+void dovo_mainFrame::OnSeriesSelected( wxListEvent& event )
+{
+	long item = m_series->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+	if (item == -1)
+		return;
+
+	naturalmap entries;
+
+	m_instances->DeleteAllItems();
+	m_engine.GetInstances(m_series->GetItemText(item, 1).ToUTF8().data(), fillinstances, &entries);
+
+	int j = 0;
+	for(naturalmap::iterator ii = entries.begin(); ii != entries.end(); ++ii)
+	{
+		m_instances->InsertItem(j, wxString::FromUTF8((*ii).first.c_str()));
+		m_instances->SetItem(j, 1, wxString::FromUTF8((*ii).second.c_str()));
+		j++;
+	}
+
+	m_instances->SetColumnWidth(0, wxLIST_AUTOSIZE);
+	m_instances->SetColumnWidth(1, wxLIST_AUTOSIZE);
+
+	if(m_instances->GetItemCount() > 0)
+		m_instances->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+}
+
+int dovo_mainFrame::fillinstances(void *param,int columns,char** values, char**names)
+{
+	naturalmap *entries = (naturalmap *)param;
+	entries->insert(std::pair<std::string, std::string>(values[0],values[1]));
+	return 0;
+}
+
+void dovo_mainFrame::OnInstancesSelected( wxListEvent& event )
+{
+	long item = m_instances->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+	if (item == -1)
+		return;
+
+#ifdef _WIN32
+	boost::filesystem::path filename = m_instances->GetItemText(item, 1);
+#else
+	boost::filesystem::path filename = m_instances->GetItemText(item, 1).ToUTF8().data();
+#endif
+
+	wxSize s = m_preview->GetClientSize();
+
+	wxBusyCursor wait;
+	dcm2img(filename, s.GetWidth(), s.GetHeight(), image);
+
+	wxClientDC dc(m_preview);
+	renderPreview(dc);
+}
+
+void dovo_mainFrame::OnPaintPreview( wxPaintEvent& event )
+{
+	wxPaintDC dc(m_preview);
+	renderPreview(dc);
+}
+
+void dovo_mainFrame::renderPreview(wxDC& dc)
+{
+	dc.DrawBitmap(image, 0, 0, false );
+}
+
 void dovo_mainFrame::OnSend( wxCommandEvent& event )
 {
-
 	long item = m_patients->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
 	if (item == -1)
 	{
@@ -239,84 +319,3 @@ void dovo_mainFrame::OnExit( wxCommandEvent& event )
 	Close();
 }
 
-
-void dovo_mainFrame::FillDestinationList()
-{
-	// add to combo box
-	m_destination->Clear();
-	std::vector<DestinationEntry>::iterator itr;
-	for(itr = m_engine.globalDestinations.begin(); itr != m_engine.globalDestinations.end(); itr++)
-		m_destination->Append(wxString::FromUTF8((*itr).name.c_str()) + L" (*)");
-
-	for(itr = m_engine.destinations.begin(); itr != m_engine.destinations.end(); itr++)
-		m_destination->Append(wxString::FromUTF8((*itr).name.c_str()));
-}
-
-int dovo_mainFrame::fillstudies(void *param,int columns,char** values, char**names)
-{
-	dovo_mainFrame *win = (dovo_mainFrame *) param;
-
-	std::string date;
-	date = values[2];
-
-	struct tm thedate;
-	memset(&thedate, 0, sizeof(struct tm));
-	try
-	{
-		thedate.tm_year = boost::lexical_cast<int>(date.substr(0, 4)) - 1900;
-		thedate.tm_mon = boost::lexical_cast<int>(date.substr(4, 2)) - 1;
-		thedate.tm_mday = boost::lexical_cast<int>(date.substr(6, 2));
-	}
-	catch(...)
-	{
-		thedate.tm_year = 0;
-		thedate.tm_mon = 0;
-		thedate.tm_mday = 1;
-	}
-
-	char buf[1024];
-	memset(buf, 0, 1024);
-
-	strftime(buf, 1024, "%x", &thedate);
-
-	win->m_studies->InsertItem(0, buf);
-	win->m_studies->SetItem(0, 1, wxString::FromUTF8(values[1]));
-	win->m_studies->SetItem(0, 2, wxString::FromUTF8(values[0]));
-	return 0;
-}
-
-dovo_mainFrame::~dovo_mainFrame()
-{
-	wxConfig::Get()->SetPath("/Settings");
-	wxConfig::Get()->Write("LastDir", m_directory->GetValue());
-	wxConfig::Get()->Flush();
-}
-
-int dovo_mainFrame::fillpatients(void *param,int columns,char** values, char**names)
-{
-	dovo_mainFrame *win = (dovo_mainFrame *) param;
-	win->m_patients->InsertItem(0, values[0]);
-	win->m_patients->SetItem(0, 1, values[1]);
-	win->m_patients->SetItem(0, 2, values[2]);
-	return 0;
-}
-
-int dovo_mainFrame::fillseries(void *param,int columns,char** values, char**names)
-{
-	dovo_mainFrame *win = (dovo_mainFrame *) param;
-	win->m_series->InsertItem(0, wxString::FromUTF8(values[1]));
-	win->m_series->SetItem(0, 1, wxString::FromUTF8(values[0]));
-	return 0;
-}
-
-void dovo_mainFrame::renderPreview(wxDC& dc)
-{
-	dc.DrawBitmap(image, 0, 0, false );
-}
-
-int dovo_mainFrame::fillinstances(void *param,int columns,char** values, char**names)
-{
-	naturalmap *entries = (naturalmap *)param;
-	entries->insert(std::pair<std::string, std::string>(values[0],values[1]));
-	return 0;
-}
