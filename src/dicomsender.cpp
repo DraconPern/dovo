@@ -197,13 +197,14 @@ std::string DICOMSenderImpl::GUILog::Read()
 	mycout.str("");
 	return str;
 }
+
 void DICOMSenderImpl::DoSend()
 {
 	OFLog::configure(OFLogger::OFF_LOG_LEVEL);
 
 	int retry = 0;
-	int countbefore = 0;
-	int countafter = 0;
+	int unsentcountbefore = 0;
+	int unsentcountafter = 0;
 	do
 	{
 		// get number of unsent images
@@ -211,17 +212,17 @@ void DICOMSenderImpl::DoSend()
 		sqlite3_stmt *select;
 		sqlite3_prepare_v2(db, anymoresql.c_str(), anymoresql.length(), &select, NULL);
 		sqlite3_bind_text(select, 1, m_PatientName.c_str(), m_PatientName.length(), SQLITE_STATIC);
-		sqlite3_exec_stmt(select, &countcallback, &countbefore, NULL);
+		sqlite3_exec_stmt(select, &countcallback, &unsentcountbefore, NULL);
 
 		// batch send
-		if (countbefore > 0)
+		if (unsentcountbefore > 0)
 			SendABatch();		
 
-		sqlite3_exec_stmt(select, &countcallback, &countafter, NULL);
+		sqlite3_exec_stmt(select, &countcallback, &unsentcountafter, NULL);
 		sqlite3_finalize(select);
 
 		// only do a sleep if there's more to send, we didn't send anything out, and we still want to retry
-		if (countafter > 0 && countbefore == countafter && retry < 10000)
+		if (unsentcountafter > 0 && unsentcountbefore == unsentcountafter && retry < 10000)
 		{
 			retry++;
 			log.Write("Waiting 5 mins before retry\n");
@@ -245,7 +246,7 @@ void DICOMSenderImpl::DoSend()
 			retry = 0;
 		}
 	}
-	while (!IsCanceled() && countafter > 0 && retry < 10000);
+	while (!IsCanceled() && unsentcountafter > 0 && retry < 10000);
 
 
 	// reset
@@ -253,6 +254,7 @@ void DICOMSenderImpl::DoSend()
 	sqlite3_exec(db, updatesql.c_str(), NULL, NULL, NULL);    
 }
 
+// 
 int DICOMSenderImpl::SendABatch()
 {
 	T_ASC_Network *net = NULL;
@@ -285,6 +287,7 @@ int DICOMSenderImpl::SendABatch()
 		peerHost << m_destinationHost << ":" << m_destinationPort;
 		ASC_setPresentationAddresses(params, localHost, peerHost.str().c_str());
 
+		// get the list of files to send from the database and save it in fileNameList
 		log.Write("Loading files...\n");
 		addfiles();
 		cond = addStoragePresentationContexts(params, sopClassUIDList);
@@ -340,7 +343,7 @@ int DICOMSenderImpl::SendABatch()
 		{
 			if (IsCanceled())
 				break;
-			cond = storeSCU(assoc, *iter);			
+			cond = storeSCU(assoc, *iter);
 		}
 
 		fileNameList.clear();
@@ -751,7 +754,17 @@ OFCondition DICOMSenderImpl::storeSCU(T_ASC_Association * assoc, const boost::fi
 		DIMSE_NONBLOCKING, 10,
 		&rsp, &statusDetail, NULL, boost::filesystem::file_size(fname));	
 	
-	if (cond.bad())	
+	// update the sent status
+	if (cond.good())
+	{
+		std::string updatesql = "UPDATE images SET sent = 1 WHERE sopuid = ?";
+		sqlite3_stmt *update;
+		sqlite3_prepare_v2(db, updatesql.c_str(), updatesql.length(), &update, NULL);
+		sqlite3_bind_text(update, 1, sopInstance, strlen(sopInstance), SQLITE_STATIC);
+		sqlite3_exec_stmt(update, NULL, NULL, NULL);
+		sqlite3_finalize(update);
+	}
+	else
 	{		
 		log.Write("Store Failed\n");
 		log.Write(cond);		
@@ -765,16 +778,7 @@ OFCondition DICOMSenderImpl::storeSCU(T_ASC_Association * assoc, const boost::fi
 		log.Write(msg);
 	}
 
-	// update the sent status
-	if (cond.good())
-	{
-		std::string updatesql = "UPDATE images SET sent = 1 WHERE sopuid = ?";
-		sqlite3_stmt *update;
-		sqlite3_prepare_v2(db, updatesql.c_str(), updatesql.length(), &update, NULL);
-		sqlite3_bind_text(update, 1, sopInstance, strlen(sopInstance), SQLITE_STATIC);
-		sqlite3_exec_stmt(update, NULL, NULL, NULL);
-		sqlite3_finalize(update);
-	}
+	
 	return cond;
 }
 
