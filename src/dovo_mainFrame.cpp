@@ -87,6 +87,8 @@ void dovo_mainFrame::FillDestinationList()
 		m_destination->Append(wxString::FromUTF8((*itr).name.c_str()));
 }
 
+typedef std::map<std::string, std::string, doj::alphanum_less<std::string> > naturalmap;
+
 void dovo_mainFrame::OnUpdate( wxCommandEvent& event )
 {
 	m_patients->DeleteAllItems();
@@ -179,8 +181,19 @@ void dovo_mainFrame::OnStudiesSelected( wxListEvent& event )
 	if (item == -1)
 		return;
 
+	naturalmap entries;
+
 	m_series->DeleteAllItems();
-	m_engine.GetSeries(m_studies->GetItemText(item, 2).ToUTF8().data(), fillseries, this);
+	m_engine.GetSeries(m_studies->GetItemText(item, 2).ToUTF8().data(), fillseries, &entries);
+
+	int j = 0;
+	for(naturalmap::iterator ii = entries.begin(); ii != entries.end(); ++ii)
+	{
+		m_series->InsertItem(j, wxString::FromUTF8((*ii).first.c_str()));
+		m_series->SetItem(j, 1, wxString::FromUTF8((*ii).second.c_str()));
+		j++;
+	}
+
 	m_series->SetColumnWidth(0, wxLIST_AUTOSIZE);
 	m_series->SetColumnWidth(1, wxLIST_AUTOSIZE);
 
@@ -190,13 +203,10 @@ void dovo_mainFrame::OnStudiesSelected( wxListEvent& event )
 
 int dovo_mainFrame::fillseries(void *param,int columns,char** values, char**names)
 {
-	dovo_mainFrame *win = (dovo_mainFrame *) param;
-	win->m_series->InsertItem(0, wxString::FromUTF8(values[1]));
-	win->m_series->SetItem(0, 1, wxString::FromUTF8(values[0]));
+	naturalmap *entries = (naturalmap *)param;
+	entries->insert(std::pair<std::string, std::string>(values[1],values[0]));	
 	return 0;
 }
-
-typedef std::map<std::string, std::string, doj::alphanum_less<std::string> > naturalmap;
 
 void dovo_mainFrame::OnSeriesSelected( wxListEvent& event )
 {
