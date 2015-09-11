@@ -188,6 +188,7 @@ void engine::StartSend(std::string PatientName, std::string PatientID, std::stri
 		NewPatientName, NewPatientID, NewBirthDay,
 		destinationHost, destinationPort, destinationAETitle, ourAETitle);
 
+	// start the thread, let the sender manage (e.g. cancel), so we don't need to track anymore
 	boost::thread t(DICOMSender::DoSendThread, &sender);
 	t.detach(); 
 }
