@@ -180,7 +180,7 @@ class changePatientInfo : public wxDialog
 	
 	public:
 		
-		changePatientInfo( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Change Patient Info"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE ); 
+		changePatientInfo( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Change Patient Info"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 433,271 ), long style = wxDEFAULT_DIALOG_STYLE ); 
 		~changePatientInfo();
 	
 };

@@ -213,11 +213,16 @@ mainFrame::mainFrame( wxWindow* parent, wxWindowID id, const wxString& title, co
 	wxBoxSizer* bSizer13;
 	bSizer13 = new wxBoxSizer( wxHORIZONTAL );
 	
-	bSizer13->SetMinSize( wxSize( 100,100 ) ); 
-	m_patients = new wxListCtrl( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_REPORT|wxLC_SINGLE_SEL );
-	m_patients->SetMinSize( wxSize( 200,150 ) );
+	wxBoxSizer* bSizer301;
+	bSizer301 = new wxBoxSizer( wxVERTICAL );
 	
-	bSizer13->Add( m_patients, 1, wxALL|wxEXPAND, 5 );
+	m_patients = new wxListCtrl( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_REPORT|wxLC_SINGLE_SEL );
+	m_patients->SetMinSize( wxSize( 200,-1 ) );
+	
+	bSizer301->Add( m_patients, 1, wxALL|wxEXPAND, 5 );
+	
+	
+	bSizer13->Add( bSizer301, 1, wxEXPAND, 5 );
 	
 	wxBoxSizer* bSizer15;
 	bSizer15 = new wxBoxSizer( wxVERTICAL );
@@ -245,6 +250,7 @@ mainFrame::mainFrame( wxWindow* parent, wxWindowID id, const wxString& title, co
 	wxBoxSizer* bSizer30;
 	bSizer30 = new wxBoxSizer( wxVERTICAL );
 	
+	bSizer30->SetMinSize( wxSize( 200,150 ) ); 
 	m_preview = new wxStaticBitmap( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDefaultSize, 0 );
 	m_preview->SetMinSize( wxSize( 200,-1 ) );
 	
@@ -253,10 +259,15 @@ mainFrame::mainFrame( wxWindow* parent, wxWindowID id, const wxString& title, co
 	
 	bSizer141->Add( bSizer30, 1, wxEXPAND, 5 );
 	
-	m_instances = new wxListCtrl( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_REPORT|wxLC_SINGLE_SEL );
-	m_instances->SetMinSize( wxSize( -1,200 ) );
+	wxBoxSizer* bSizer29;
+	bSizer29 = new wxBoxSizer( wxVERTICAL );
 	
-	bSizer141->Add( m_instances, 2, wxALL|wxEXPAND, 5 );
+	bSizer29->SetMinSize( wxSize( -1,200 ) ); 
+	m_instances = new wxListCtrl( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_REPORT|wxLC_SINGLE_SEL );
+	bSizer29->Add( m_instances, 1, wxALL|wxEXPAND, 5 );
+	
+	
+	bSizer141->Add( bSizer29, 2, wxEXPAND, 5 );
 	
 	
 	bSizer16->Add( bSizer141, 2, wxEXPAND, 5 );
@@ -398,7 +409,6 @@ changePatientInfo::changePatientInfo( wxWindow* parent, wxWindowID id, const wxS
 	wxBoxSizer* bSizer23;
 	bSizer23 = new wxBoxSizer( wxVERTICAL );
 	
-	bSizer23->SetMinSize( wxSize( 353,243 ) ); 
 	wxFlexGridSizer* fgSizer2;
 	fgSizer2 = new wxFlexGridSizer( 0, 2, 0, 0 );
 	fgSizer2->AddGrowableCol( 1 );
@@ -450,8 +460,14 @@ changePatientInfo::changePatientInfo( wxWindow* parent, wxWindowID id, const wxS
 	
 	bSizer23->Add( 0, 5, 0, wxEXPAND, 5 );
 	
+	wxBoxSizer* bSizer28;
+	bSizer28 = new wxBoxSizer( wxHORIZONTAL );
+	
 	m_enableEdit = new wxCheckBox( this, wxID_ANY, _("Change Patient Info"), wxDefaultPosition, wxDefaultSize, 0 );
-	bSizer23->Add( m_enableEdit, 0, wxALL, 5 );
+	bSizer28->Add( m_enableEdit, 0, wxALL, 5 );
+	
+	
+	bSizer23->Add( bSizer28, 1, wxEXPAND, 5 );
 	
 	m_sdbSizer3 = new wxStdDialogButtonSizer();
 	m_sdbSizer3OK = new wxButton( this, wxID_OK );
@@ -460,12 +476,11 @@ changePatientInfo::changePatientInfo( wxWindow* parent, wxWindowID id, const wxS
 	m_sdbSizer3->AddButton( m_sdbSizer3Cancel );
 	m_sdbSizer3->Realize();
 	
-	bSizer23->Add( m_sdbSizer3, 1, wxEXPAND, 5 );
+	bSizer23->Add( m_sdbSizer3, 1, wxALIGN_BOTTOM|wxALL|wxEXPAND, 5 );
 	
 	
 	this->SetSizer( bSizer23 );
 	this->Layout();
-	bSizer23->Fit( this );
 	
 	this->Centre( wxBOTH );
 	
