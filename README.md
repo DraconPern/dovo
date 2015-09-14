@@ -1,4 +1,6 @@
 # dovo
+[![Build Status](https://travis-ci.org/DraconPern/dovo.svg)](https://travis-ci.org/DraconPern/dovo)
+
 Point of care, cross-platform software for importing DICOM CD and files then sending it to PACS. Usage scenario is front desk staff getting handed a CD with patient's images.  This tool allows the front desk to preview the images, and send to PACS.  Tested on Windows and OS X.
 
 - Supports Group Policy for PACS destinations on Windows.
