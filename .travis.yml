@@ -40,8 +40,16 @@ install:
   - cd wxWidgets && git pull && mkdir -p build$TYPE && cd build$TYPE
   - ../configure --disable-shared --with-macosx-version-min=10.9 --with-macosx-sdk=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk
   - make -j8
-  
+
   #boost preinstalled
+
+  #fmjpeg2koj
+  - cd $HOME
+  - "[ -d fmjpeg2koj ] || git clone git@github.com:DraconPern/fmjpeg2koj.git"
+  - cd fmjpeg2koj && git pull && mkdir -p build-$TYPE && cd build-$TYPE
+  - cmake .. -DOPENJPEG=$DEVSPACE/openjpeg/$TYPE -DDCMTK_DIR=$DEVSPACE/dcmtk/$TYPE -DCMAKE_INSTALL_PREFIX=$DEVSPACE/fmjpeg2koj/$TYPE
+  - make -j8 install
+
 script:
   - cd $TRAVIS_BUILD_DIR && mkdir -p build-$TYPE && cd build-$TYPE
   - cmake .. -DwxWidgets_CONFIG_EXECUTABLE=$DEVSPACE/wxWidgets/build$TYPE/wx-config -DBOOST_ROOT=$DEVSPACE/boost -DDCMTK_DIR=$DEVSPACE/dcmtk/$TYPE -DFMJPEG2K=$DEVSPACE/fmjpeg2koj/$TYPE -DOPENJPEG=$DEVSPACE/openjpeg/$TYPE -DCMAKE_OSX_SYSROOT=$SYSROOT -DCMAKE_OSX_DEPLOYMENT_TARGET=$CMAKE_OSX_DEPLOYMENT_TARGET
