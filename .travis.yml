@@ -16,6 +16,7 @@ cache:
   directories:
     - $HOME/dcmtk
     - $HOME/openjpeg-version.2.1
+    - $HOME/wxWidgets
 
 install:
   #dcmtk
@@ -33,6 +34,15 @@ install:
   - cmake .. -DBUILD_SHARED_LIBS=0 -DCMAKE_INSTALL_PREFIX=$HOME/openjpeg/$TYPE
   - make -j8 install
 
+   #wxWidgets
+  - cd $HOME
+  - "[ -d wxWidgets ] || git clone https://github.com/wxWidgets/wxWidgets.git"
+  - cd wxWidgets && git pull && mkdir -p build$TYPE && cd build$TYPE
+  - ../configure --disable-shared --with-macosx-version-min=10.9 --with-macosx-sdk=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk
+  - make -j8
+  
+  #boost preinstalled
 script:
   - cd $TRAVIS_BUILD_DIR && mkdir -p build-$TYPE && cd build-$TYPE
-  - cmake .. -DOPENJPEG=$HOME/openjpeg/$TYPE -DDCMTK_DIR=$HOME/dcmtk/$TYPE -DCMAKE_INSTALL_PREFIX=$HOME/fmjpeg2koj/$TYPE && make -j8 install
+  - cmake .. -DwxWidgets_CONFIG_EXECUTABLE=$DEVSPACE/wxWidgets/build$TYPE/wx-config -DBOOST_ROOT=$DEVSPACE/boost -DDCMTK_DIR=$DEVSPACE/dcmtk/$TYPE -DFMJPEG2K=$DEVSPACE/fmjpeg2koj/$TYPE -DOPENJPEG=$DEVSPACE/openjpeg/$TYPE -DCMAKE_OSX_SYSROOT=$SYSROOT -DCMAKE_OSX_DEPLOYMENT_TARGET=$CMAKE_OSX_DEPLOYMENT_TARGET
+  - make -j8
