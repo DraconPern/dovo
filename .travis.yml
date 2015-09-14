@@ -45,7 +45,7 @@ install:
 
   #fmjpeg2koj
   - cd $HOME
-  - "[ -d fmjpeg2koj ] || git clone git@github.com:DraconPern/fmjpeg2koj.git"
+  - "[ -d fmjpeg2koj ] || git clone https://github.com/DraconPern/fmjpeg2koj.git"
   - cd fmjpeg2koj && git pull && mkdir -p build-$TYPE && cd build-$TYPE
   - cmake .. -DOPENJPEG=$DEVSPACE/openjpeg/$TYPE -DDCMTK_DIR=$DEVSPACE/dcmtk/$TYPE -DCMAKE_INSTALL_PREFIX=$DEVSPACE/fmjpeg2koj/$TYPE
   - make -j8 install
