@@ -344,6 +344,13 @@ int DICOMSenderImpl::SendABatch()
 			if (IsCanceled())
 				break;
 			cond = storeSCU(assoc, *iter);
+
+			if(cond.bad())
+			{
+				// skip this if it's bad data or invalid presentation
+				if(cond != DIMSE_BADDATA && cond != DIMSE_NOVALIDPRESENTATIONCONTEXTID)
+					break;
+			}
 		}
 
 		fileNameList.clear();
