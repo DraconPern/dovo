@@ -35,8 +35,11 @@ find_package(dcmtk REQUIRED CONFIG HINTS ${DCMTK_DIR})
 find_package(zlib REQUIRED ${ZLIB_ROOT})
 
 #include openjpeg
-find_package(openjpeg HINTS ${OPENJPEG})
+find_package(openjpeg REQUIRED HINTS ${OPENJPEG})
 add_definitions(-DOPJ_STATIC)
+
+#include fmjpeg2k
+find_package(fmjpeg2k REQUIRED HINTS ${FMJPEG2K})
 
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/sqlite3 ${Boost_INCLUDE_DIRS} ${FMJPEG2K}/include ${DCMTK_INCLUDE_DIRS} )
 LINK_DIRECTORIES(${FMJPEG2K}/lib ${Boost_LIBRARY_DIRS})
