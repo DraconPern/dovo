@@ -29,7 +29,7 @@ install:
   - cd %DEVSPACE%\dcmtk
   - mkdir build-%TYPE%
   - cd build-%TYPE%
-  - cmake .. -G "Visual Studio 11" -DDCMTK_WIDE_CHAR_FILE_IO_FUNCTIONS=1 -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\dcmtk\%TYPE%
+  - cmake .. -G "Visual Studio 11" -DDCMTK_WIDE_CHAR_FILE_IO_FUNCTIONS=1 -DDCMTK_WITH_ZLIB=1 -DWITH_ZLIBINC=%DEVSPACE%\zlib\%TYPE% -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\dcmtk\%TYPE%
   - msbuild /maxcpucount:2 /P:Configuration=%TYPE% INSTALL.vcxproj /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
 # openjpeg
@@ -45,10 +45,12 @@ install:
 #wxWidgets
   - cd %DEVSPACE%
   - git clone https://github.com/wxWidgets/wxWidgets.git
+  - git checkout v3.0.2
   - set WXWIN=%DEVSPACE%\wxWidgets
   - cd %WXWIN%\build\msw
-  - IF "%TYPE%" == "Release" nmake /f makefile.vc BUILD=release RUNTIME_LIBS=static
-  - IF "%TYPE%" == "Debug"   nmake /f makefile.vc BUILD=debug RUNTIME_LIBS=static
+  - copy /Y %WXWIN%\include\wx\msw\setup0.h %WXWIN%\include\wx\msw\setup.h
+  - powershell "gci %WXWIN%\build\msw *.vcxproj -recurse | ForEach { (Get-Content $_ | ForEach {$_ -replace 'MultiThreadedDebugDLL', 'MultiThreadedDebug'}) | Set-Content $_ }"
+  - msbuild /maxcpucount:2 /P:Configuration=%TYPE% wx_vc11.sln /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
 #boost
   - cd C:\Libraries\boost_1_59_0

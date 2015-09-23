@@ -4,17 +4,6 @@ SET TYPE=Debug
 REM a top level directory for all PACS related code
 SET DEVSPACE=%CD%
 
-set WXWIN=%DEVSPACE%\wxWidgets
-cd %WXWIN%\build\msw
-IF "%TYPE%" == "Release" nmake /f makefile.vc BUILD=release RUNTIME_LIBS=static
-IF "%TYPE%" == "Debug"   nmake /f makefile.vc BUILD=debug RUNTIME_LIBS=static
-
-cd %DEVSPACE%\boost	
-call bootstrap 
-IF "%TYPE%" == "Release" b2 toolset=msvc-11.0 runtime-link=static define=_BIND_TO_CURRENT_VCLIBS_VERSION=1 -j 4 stage release
-IF "%TYPE%" == "Debug"   b2 toolset=msvc-11.0 runtime-link=static define=_BIND_TO_CURRENT_VCLIBS_VERSION=1 -j 4 stage debug
-cd ..
-
 cd %DEVSPACE%\zlib
 mkdir build-%TYPE%
 cd build-%TYPE%
@@ -28,7 +17,7 @@ cd %DEVSPACE%\dcmtk
 mkdir build-%TYPE%
 cd build-%TYPE%
 cmake .. -G "Visual Studio 11" -DDCMTK_WIDE_CHAR_FILE_IO_FUNCTIONS=1 -DDCMTK_WITH_ZLIB=1 -DWITH_ZLIBINC=%DEVSPACE%\zlib\%TYPE% -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\dcmtk\%TYPE%
-msbuild /P:Configuration=%TYPE% INSTALL.vcxproj 
+msbuild /maxcpucount:5 /P:Configuration=%TYPE% INSTALL.vcxproj
 cd ..\..
 
 cd %DEVSPACE%\openjpeg
@@ -36,6 +25,18 @@ mkdir build-%TYPE%
 cd build-%TYPE%
 cmake .. -G "Visual Studio 11" -DBUILD_THIRDPARTY=1 -DBUILD_SHARED_LIBS=0 -DCMAKE_C_FLAGS_RELEASE="/MT /O2 /D NDEBUG" -DCMAKE_C_FLAGS_DEBUG="/D_DEBUG /MTd /Od" -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\openjpeg\%TYPE%
 msbuild /P:Configuration=%TYPE% INSTALL.vcxproj
+
+set WXWIN=%DEVSPACE%\wxWidgets
+cd %WXWIN%\build\msw
+copy /Y %WXWIN%\include\wx\msw\setup0.h %WXWIN%\include\wx\msw\setup.h
+powershell "gci %WXWIN%\build\msw *.vcxproj -recurse | ForEach { (Get-Content $_ | ForEach {$_ -replace 'MultiThreadedDebugDLL', 'MultiThreadedDebug'}) | Set-Content $_ }"
+msbuild /maxcpucount:5 /P:Configuration=%TYPE% wx_vc11.sln
+
+cd %DEVSPACE%\boost
+call bootstrap
+IF "%TYPE%" == "Release" b2 toolset=msvc-11.0 runtime-link=static define=_BIND_TO_CURRENT_VCLIBS_VERSION=1 -j 4 stage release
+IF "%TYPE%" == "Debug"   b2 toolset=msvc-11.0 runtime-link=static define=_BIND_TO_CURRENT_VCLIBS_VERSION=1 -j 4 stage debug
+cd ..
 
 cd %DEVSPACE%\fmjpeg2koj
 mkdir build-%TYPE%
