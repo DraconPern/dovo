@@ -51,7 +51,7 @@ install:
   - cd %WXWIN%\build\msw
   - copy /Y %WXWIN%\include\wx\msw\setup0.h %WXWIN%\include\wx\msw\setup.h
   - powershell "gci %WXWIN%\build\msw *.vcxproj -recurse | ForEach { (Get-Content $_ | ForEach {$_ -replace 'MultiThreadedDebugDLL', 'MultiThreadedDebug'}) | Set-Content $_ }"
-  - msbuild /maxcpucount:2 /P:Configuration=%TYPE% wx_vc11.sln /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+  - msbuild /maxcpucount:2 /P:Configuration=%TYPE%|Win32 wx_vc11.sln /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
 #boost
   - cd C:\Libraries\boost_1_59_0
