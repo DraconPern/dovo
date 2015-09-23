@@ -2,7 +2,7 @@ SET TYPE=Release
 SET TYPE=Debug
 
 REM a top level directory for all PACS related code
-SET DEVSPACE="%CD%"
+SET DEVSPACE=%CD%
 
 set WXWIN=%DEVSPACE%\wxWidgets
 cd %WXWIN%\build\msw
