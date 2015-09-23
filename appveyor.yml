@@ -16,6 +16,8 @@ install:
   - cd %DEVSPACE%
   - git clone https://github.com/madler/zlib.git
   - cd %DEVSPACE%\zlib
+  - mkdir build-%TYPE%
+  - cd build-%TYPE%
   - cmake.exe .. -G "Visual Studio 11" -DCMAKE_C_FLAGS_RELEASE="/MT /O2 /D NDEBUG" -DCMAKE_C_FLAGS_DEBUG="/D_DEBUG /MTd /Od" -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\zlib\%TYPE%
   - msbuild /P:Configuration=%TYPE% INSTALL.vcxproj
   - IF "%TYPE%" == "Release" copy /Y %DEVSPACE%\zlib\Release\lib\zlibstatic.lib %DEVSPACE%\zlib\Release\lib\zlib_o.lib
