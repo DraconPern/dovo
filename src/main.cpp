@@ -9,9 +9,9 @@
 #include "update.h"
 
 // Visual Leak Detector
-#ifdef _WIN32
+#if defined(_WIN32) && defined(_DEBUG)
 #include <vld.h>
-#endif 
+#endif
 
 #include <boost/thread.hpp>
 
@@ -19,12 +19,12 @@
 class MyApp: public wxApp
 {
 public:
-	virtual bool OnInit();	
+	virtual bool OnInit();
 	virtual int OnExit();
 	virtual int OnRun();
 
 public:
-    DECLARE_EVENT_TABLE() 
+    DECLARE_EVENT_TABLE()
     void OnAbout(wxCommandEvent& evt);
 
 	boost::thread updater;
@@ -38,7 +38,7 @@ BEGIN_EVENT_TABLE(MyApp, wxApp)
 	END_EVENT_TABLE()
 
 	bool MyApp::OnInit()
-{	
+{
 	wxTheApp->SetAppName("dovo");
 	wxTheApp->SetVendorName("FrontMotion");
 
@@ -62,7 +62,7 @@ BEGIN_EVENT_TABLE(MyApp, wxApp)
 	updater = boost::thread(&updateChecker);
 
 
-	/* 
+	/*
 	Update notice, message
 	Exit notice, message
 
@@ -72,11 +72,11 @@ BEGIN_EVENT_TABLE(MyApp, wxApp)
 
 	dovo_mainFrame *frame = new dovo_mainFrame(NULL);
 
-#ifdef __WXMAC__	
+#ifdef __WXMAC__
 	wxMenuBar* menubar = new wxMenuBar();
 	wxMenu* menu = new  wxMenu();
 
-	menu->Append(wxID_ABOUT, _("About")); 
+	menu->Append(wxID_ABOUT, _("About"));
 	menu->Append(wxID_EXIT, _("Exit"));
 
 	menubar->Append(menu, _("File"));
@@ -88,7 +88,7 @@ BEGIN_EVENT_TABLE(MyApp, wxApp)
 	frame->SetIcon(wxICON(aaaaaaaa));
 #endif
 
-	frame->Show( true );	
+	frame->Show( true );
 
 	return true;
 }
