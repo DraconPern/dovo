@@ -60,6 +60,8 @@ install:
   - IF "%TYPE%" == "Debug"   b2 toolset=msvc-11.0 runtime-link=static define=_BIND_TO_CURRENT_VCLIBS_VERSION=1 -j 4 stage debug
 
 #fmjpeg2koj
+  - cd %DEVSPACE%
+  - git clone git@github.com:DraconPern/fmjpeg2koj.git
   - cd %DEVSPACE%\fmjpeg2koj
   - mkdir build-%TYPE%
   - cd build-%TYPE%
