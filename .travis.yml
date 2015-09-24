@@ -10,7 +10,7 @@ os:
 sudo: false
 
 env:
-  - TYPE=Debug DEVSPACE=$HOME
+  - TYPE=Debug
 
 cache:
   directories:
@@ -19,23 +19,28 @@ cache:
     - $HOME/wxWidgets
 
 install:
+  - export TYPE=Debug
+  - export DEVSPACE=$HOME
+
+  #zlib preinstalled
+
   #dcmtk
-  - cd $HOME
+  - cd $DEVSPACE
   - "[ -d dcmtk ] || git clone git://git.dcmtk.org/dcmtk.git"
   - cd dcmtk && git pull && mkdir -p build-$TYPE && cd build-$TYPE
-  - cmake .. -DDCMTK_WIDE_CHAR_FILE_IO_FUNCTIONS=1 -DCMAKE_INSTALL_PREFIX=$HOME/dcmtk/$TYPE
+  - cmake .. -DDCMTK_WIDE_CHAR_FILE_IO_FUNCTIONS=1 -DCMAKE_INSTALL_PREFIX=$DEVSPACE/dcmtk/$TYPE
   - make -j8 install
 
   #openjpeg
-  - cd $HOME
+  - cd $DEVSPACE
   - wget https://github.com/uclouvain/openjpeg/archive/version.2.1.tar.gz
   - tar -xzf version.2.1.tar.gz
   - cd openjpeg-version.2.1 && mkdir -p build-$TYPE && cd build-$TYPE
-  - cmake .. -DBUILD_SHARED_LIBS=0 -DCMAKE_INSTALL_PREFIX=$HOME/openjpeg/$TYPE
+  - cmake .. -DBUILD_SHARED_LIBS=0 -DCMAKE_INSTALL_PREFIX=$DEVSPACE/openjpeg/$TYPE
   - make -j8 install
 
    #wxWidgets
-  - cd $HOME
+  - cd $DEVSPACE
   - "[ -d wxWidgets ] || git clone https://github.com/wxWidgets/wxWidgets.git"
   - cd wxWidgets && git pull && mkdir -p build$TYPE && cd build$TYPE
   - ../configure --disable-shared --with-macosx-version-min=10.9 --with-macosx-sdk=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk
@@ -44,13 +49,16 @@ install:
   #boost preinstalled
 
   #fmjpeg2koj
-  - cd $HOME
+  - cd $DEVSPACE
   - "[ -d fmjpeg2koj ] || git clone https://github.com/DraconPern/fmjpeg2koj.git"
   - cd fmjpeg2koj && git pull && mkdir -p build-$TYPE && cd build-$TYPE
   - cmake .. -DOPENJPEG=$DEVSPACE/openjpeg/$TYPE -DDCMTK_DIR=$DEVSPACE/dcmtk/$TYPE -DCMAKE_INSTALL_PREFIX=$DEVSPACE/fmjpeg2koj/$TYPE
   - make -j8 install
 
-script:
+before_script:
   - cd $TRAVIS_BUILD_DIR && mkdir -p build-$TYPE && cd build-$TYPE
   - cmake .. -DwxWidgets_CONFIG_EXECUTABLE=$DEVSPACE/wxWidgets/build$TYPE/wx-config -DBOOST_ROOT=$DEVSPACE/boost -DDCMTK_DIR=$DEVSPACE/dcmtk/$TYPE -DFMJPEG2K=$DEVSPACE/fmjpeg2koj/$TYPE -DOPENJPEG=$DEVSPACE/openjpeg/$TYPE -DCMAKE_OSX_SYSROOT=$SYSROOT -DCMAKE_OSX_DEPLOYMENT_TARGET=$CMAKE_OSX_DEPLOYMENT_TARGET
+
+script:
+  - cd $TRAVIS_BUILD_DIR/build-$TYPE
   - make -j8

@@ -15,9 +15,7 @@ install:
 #zlib
   - cd %DEVSPACE%
   - git clone https://github.com/madler/zlib.git
-  - cd %DEVSPACE%\zlib
-  - mkdir build-%TYPE%
-  - cd build-%TYPE%
+  - cd zlib && mkdir build-%TYPE% && cd build-%TYPE%
   - cmake.exe .. -G "Visual Studio 11" -DCMAKE_C_FLAGS_RELEASE="/MT /O2 /D NDEBUG" -DCMAKE_C_FLAGS_DEBUG="/D_DEBUG /MTd /Od" -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\zlib\%TYPE%
   - msbuild /P:Configuration=%TYPE% INSTALL.vcxproj
   - IF "%TYPE%" == "Release" copy /Y %DEVSPACE%\zlib\Release\lib\zlibstatic.lib %DEVSPACE%\zlib\Release\lib\zlib_o.lib
@@ -26,32 +24,25 @@ install:
 # dcmtk
   - cd %DEVSPACE%
   - git clone git://git.dcmtk.org/dcmtk.git
-  - cd %DEVSPACE%\dcmtk
-  - mkdir build-%TYPE%
-  - cd build-%TYPE%
+  - cd dcmtk && mkdir build-%TYPE% && cd build-%TYPE%
   - cmake .. -G "Visual Studio 11" -DDCMTK_WIDE_CHAR_FILE_IO_FUNCTIONS=1 -DDCMTK_WITH_ZLIB=1 -DWITH_ZLIBINC=%DEVSPACE%\zlib\%TYPE% -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\dcmtk\%TYPE%
   - msbuild /maxcpucount:2 /P:Configuration=%TYPE% INSTALL.vcxproj /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
 # openjpeg
   - cd %DEVSPACE%
   - git clone https://github.com/uclouvain/openjpeg.git
-  - cd %DEVSPACE%\openjpeg
-  - git checkout openjpeg-2.1
-  - mkdir build-%TYPE%
-  - cd build-%TYPE%
+  - cd openjpeg && git checkout openjpeg-2.1 && mkdir build-%TYPE% && cd build-%TYPE%
   - cmake .. -G "Visual Studio 11" -DBUILD_THIRDPARTY=1 -DBUILD_SHARED_LIBS=OFF -DCMAKE_C_FLAGS_RELEASE="/MT /O2 /D NDEBUG" -DCMAKE_C_FLAGS_DEBUG="/D_DEBUG /MTd /Od" -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\openjpeg\%TYPE%
   - msbuild /P:Configuration=%TYPE% INSTALL.vcxproj /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
 #wxWidgets
   - cd %DEVSPACE%
   - git clone https://github.com/wxWidgets/wxWidgets.git
-  - cd %DEVSPACE%\wxWidgets
-  - git checkout v3.0.2
-  - set WXWIN=%DEVSPACE%\wxWidgets
-  - cd %WXWIN%\build\msw
+  - cd wxWidgets && git checkout v3.0.2 && cd %WXWIN%\build\msw
   - copy /Y %WXWIN%\include\wx\msw\setup0.h %WXWIN%\include\wx\msw\setup.h
   - powershell "gci %WXWIN%\build\msw *.vcxproj -recurse | ForEach { (Get-Content $_ | ForEach {$_ -replace 'MultiThreadedDebugDLL', 'MultiThreadedDebug'}) | Set-Content $_ }"
   - msbuild /maxcpucount:2 /P:Configuration=%TYPE% /p:Platform="Win32" wx_vc11.sln /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+  - set WXWIN=%DEVSPACE%\wxWidgets
 
 #boost
   - cd C:\Libraries\boost_1_59_0
@@ -61,17 +52,13 @@ install:
 
 #fmjpeg2koj
   - cd %DEVSPACE%
-  - git clone git@github.com:DraconPern/fmjpeg2koj.git
-  - cd %DEVSPACE%\fmjpeg2koj
-  - mkdir build-%TYPE%
-  - cd build-%TYPE%
+  - git clone https://github.com/DraconPern/fmjpeg2koj.git
+  - cd fmjpeg2koj && mkdir build-%TYPE% && cd build-%TYPE%
   - cmake .. -G "Visual Studio 11" -DBUILD_SHARED_LIBS=OFF -DCMAKE_CXX_FLAGS_RELEASE="/MT /O2 /D NDEBUG" -DCMAKE_CXX_FLAGS_DEBUG="/D_DEBUG /MTd /Od" -DOPENJPEG=%DEVSPACE%\openjpeg\%TYPE% -DDCMTK_DIR=%DEVSPACE%\dcmtk\build-%TYPE% -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\fmjpeg2koj\%TYPE%
   - msbuild /P:Configuration=%TYPE% INSTALL.vcxproj
 
 before_build:
-  - cd %DEVSPACE%
-  - mkdir build-%TYPE%
-  - cd build-%TYPE%
+  - cd %DEVSPACE% && mkdir build-%TYPE% && cd build-%TYPE%
   - cmake .. -G "Visual Studio 11" -DwxWidgets_ROOT_DIR=%WXWIN% -DBOOST_ROOT=C:\Libraries\boost_1_59_0 -DDCMTK_DIR=%DEVSPACE%\dcmtk\build-%TYPE% -DZLIB_ROOT=%DEVSPACE%\zlib\%TYPE% -DFMJPEG2K=%DEVSPACE%\fmjpeg2koj\%TYPE% -DOPENJPEG=%DEVSPACE%\openjpeg\%TYPE%
 
 build_script:
