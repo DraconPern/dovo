@@ -39,10 +39,11 @@ install:
   - cd %DEVSPACE%
   - git clone https://github.com/wxWidgets/wxWidgets.git
   - cd wxWidgets && git checkout v3.0.2 && cd %WXWIN%\build\msw
+  - set WXWIN=%DEVSPACE%\wxWidgets
   - copy /Y %WXWIN%\include\wx\msw\setup0.h %WXWIN%\include\wx\msw\setup.h
   - powershell "gci %WXWIN%\build\msw *.vcxproj -recurse | ForEach { (Get-Content $_ | ForEach {$_ -replace 'MultiThreadedDebugDLL', 'MultiThreadedDebug'}) | Set-Content $_ }"
+  - powershell "gci %WXWIN%\build\msw *.vcxproj -recurse | ForEach { (Get-Content $_ | ForEach {$_ -replace 'MultiThreadedDLL', 'MultiThreaded'}) | Set-Content $_ }"
   - msbuild /maxcpucount:2 /P:Configuration=%TYPE% /p:Platform="Win32" wx_vc11.sln /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
-  - set WXWIN=%DEVSPACE%\wxWidgets
 
 #boost
   - cd C:\Libraries\boost_1_59_0
