@@ -38,8 +38,8 @@ install:
 #wxWidgets
   - cd %DEVSPACE%
   - git clone https://github.com/wxWidgets/wxWidgets.git
-  - cd wxWidgets && git checkout v3.0.2 && cd %WXWIN%\build\msw
   - set WXWIN=%DEVSPACE%\wxWidgets
+  - cd wxWidgets && git checkout v3.0.2 && cd %WXWIN%\build\msw
   - copy /Y %WXWIN%\include\wx\msw\setup0.h %WXWIN%\include\wx\msw\setup.h
   - powershell "gci %WXWIN%\build\msw *.vcxproj -recurse | ForEach { (Get-Content $_ | ForEach {$_ -replace 'MultiThreadedDebugDLL', 'MultiThreadedDebug'}) | Set-Content $_ }"
   - powershell "gci %WXWIN%\build\msw *.vcxproj -recurse | ForEach { (Get-Content $_ | ForEach {$_ -replace 'MultiThreadedDLL', 'MultiThreaded'}) | Set-Content $_ }"
