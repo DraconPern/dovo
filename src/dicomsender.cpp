@@ -4,6 +4,8 @@
 #include "sqlite3_exec_stmt.h"
 #include <boost/lexical_cast.hpp>
 #include <codecvt>
+#include "alphanum.hpp"
+#include <set>
 
 // work around the fact that dcmtk doesn't work in unicode mode, so all string operation needs to be converted from/to mbcs
 #ifdef _UNICODE
@@ -98,7 +100,8 @@ protected:
 	void addfiles();
 	static int addimage(void *param,int columns,char** values, char**names);
 
-	std::vector<boost::filesystem::path> fileNameList;
+	typedef std::set<boost::filesystem::path, doj::alphanum_less<boost::filesystem::path> > naturalset;
+	naturalset fileNameList;
 	OFList<OFString> sopClassUIDList;    // the list of sop classes
 
 
@@ -339,7 +342,7 @@ int DICOMSenderImpl::SendABatch()
 		/* command line, transmit the encapsulated DICOM objects to the SCP. */
 		cond = EC_Normal;
 
-		for(std::vector<boost::filesystem::path>::iterator iter = fileNameList.begin(); iter != fileNameList.end(); iter++)		
+		for(naturalset::iterator iter = fileNameList.begin(); iter != fileNameList.end(); iter++)		
 		{
 			if (IsCanceled())
 				break;
@@ -829,7 +832,7 @@ int DICOMSenderImpl::addimage(void *param,int columns,char** values, char**names
 	}
 
 	sender->sopClassUIDList.push_back(sopClassUID);
-	sender->fileNameList.push_back(currentFilename);
+	sender->fileNameList.insert(currentFilename);
 
 	return 0;
 }
