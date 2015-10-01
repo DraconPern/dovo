@@ -4,8 +4,6 @@
 #include "sqlite3_exec_stmt.h"
 #include <boost/lexical_cast.hpp>
 #include <codecvt>
-#include "alphanum.hpp"
-#include <set>
 
 // work around the fact that dcmtk doesn't work in unicode mode, so all string operation needs to be converted from/to mbcs
 #ifdef _UNICODE
@@ -37,9 +35,12 @@ public:
 	DICOMSenderImpl(void);
 	~DICOMSenderImpl(void);
 
-	void Initialize(sqlite3 *db, const std::string PatientName, std::string PatientID ,std::string BirthDay,
+	void Initialize(const std::string PatientName, std::string PatientID ,std::string BirthDay,
 		std::string NewPatientName, std::string NewPatientID ,std::string NewBirthDay,
 		std::string destinationHost, unsigned int destinationPort, std::string destinationAETitle, std::string ourAETitle);	
+
+	void SetFileList(sqlite3 *db);
+	void SetFileList(const naturalset &files);
 
 	static void DoSendThread(void *obj);
 
@@ -47,7 +48,12 @@ public:
 
 	void Cancel();
 	bool IsDone();
+	
+	// list of dicom images to send, all images should be in the same patient
+	typedef std::set<boost::filesystem::path, doj::alphanum_less<boost::filesystem::path> > naturalset;	
+	naturalset filestosend;
 
+	// source db if we are populating filestosend from a db.  We do the load in the thread 
 	sqlite3 *db;
 
 	std::string m_PatientName;
@@ -63,9 +69,9 @@ public:
 	std::string m_ourAETitle;
 
 protected:
-	static int countcallback(void *param,int columns,char** values, char**names);
-
+	
 	void DoSend();
+	static int addimage(void *param,int columns,char** values, char**names);
 
 	int SendABatch();
 
@@ -96,15 +102,11 @@ protected:
 	OFString makeUID(OFString basePrefix, int counter);
 	bool updateStringAttributeValue(DcmItem* dataset, const DcmTagKey& key, OFString value);
 
-	/*  glue functions to transfer our db to the list*/
-	void addfiles();
-	static int addimage(void *param,int columns,char** values, char**names);
-
-	typedef std::set<boost::filesystem::path, doj::alphanum_less<boost::filesystem::path> > naturalset;
-	naturalset fileNameList;
+	// scan files to build sopClassUID
+	void scanFiles();
+	bool scanFile(boost::filesystem::path currentFilename);
+		
 	OFList<OFString> sopClassUIDList;    // the list of sop classes
-
-
 
 	OFCmdUnsignedInt opt_maxReceivePDULength;
 	OFCmdUnsignedInt opt_maxSendPDULength;
@@ -133,18 +135,20 @@ DICOMSenderImpl::DICOMSenderImpl()
 	opt_timeout = 10;
 
 	opt_compressionLevel = 0;
+
+	db = NULL;
 }
 
 DICOMSenderImpl::~DICOMSenderImpl()
 {
 }
 
-void DICOMSenderImpl::Initialize(sqlite3 *db, const std::string PatientName, std::string PatientID ,std::string BirthDay,
+void DICOMSenderImpl::Initialize(const std::string PatientName, std::string PatientID ,std::string BirthDay,
 		std::string NewPatientName, std::string NewPatientID ,std::string NewBirthDay,
 		std::string destinationHost, unsigned int destinationPort, std::string destinationAETitle, std::string ourAETitle)
 {
 	cancelEvent = doneEvent = false;
-	this->db = db;
+	
 	this->m_PatientName = PatientName;
 	this->m_PatientID = PatientID;
 	this->m_BirthDay = BirthDay;
@@ -156,6 +160,16 @@ void DICOMSenderImpl::Initialize(sqlite3 *db, const std::string PatientName, std
 	this->m_destinationPort = destinationPort;
 	this->m_destinationAETitle = destinationAETitle;
 	this->m_ourAETitle = ourAETitle;
+}
+
+void DICOMSenderImpl::SetFileList(sqlite3 *db)
+{
+	this->db = db;
+}
+
+void DICOMSenderImpl::SetFileList(const naturalset &files)
+{
+	filestosend = files;
 }
 
 void DICOMSenderImpl::DoSendThread(void *obj)
@@ -205,25 +219,37 @@ void DICOMSenderImpl::DoSend()
 {
 	OFLog::configure(OFLogger::OFF_LOG_LEVEL);
 
+	log.Write("Loading files...\n");
+
+	// are we loading from the db?
+	if(db != NULL)
+	{
+		// add filepath to the list		
+		std::string selectsql = "SELECT filename FROM images WHERE name = ?";
+		sqlite3_stmt *select;
+		sqlite3_prepare_v2(db, selectsql.c_str(), selectsql.length(), &select, NULL);
+		sqlite3_bind_text(select, 1, m_PatientName.c_str(), m_PatientName.length(), SQLITE_STATIC);
+		sqlite3_exec_stmt(select, &addimage, &filestosend, NULL);
+		sqlite3_finalize(select);
+	}
+
+	// Scan the files for info to used later	
+	scanFiles();
+
 	int retry = 0;
 	int unsentcountbefore = 0;
 	int unsentcountafter = 0;
 	do
 	{
 		// get number of unsent images
-		std::string anymoresql = "SELECT COUNT(*) FROM images WHERE name = ? AND sent = '0'";
-		sqlite3_stmt *select;
-		sqlite3_prepare_v2(db, anymoresql.c_str(), anymoresql.length(), &select, NULL);
-		sqlite3_bind_text(select, 1, m_PatientName.c_str(), m_PatientName.length(), SQLITE_STATIC);
-		sqlite3_exec_stmt(select, &countcallback, &unsentcountbefore, NULL);
+		unsentcountbefore = filestosend.size();
 
 		// batch send
 		if (unsentcountbefore > 0)
 			SendABatch();		
 
-		sqlite3_exec_stmt(select, &countcallback, &unsentcountafter, NULL);
-		sqlite3_finalize(select);
-
+		unsentcountafter = filestosend.size();
+		
 		// only do a sleep if there's more to send, we didn't send anything out, and we still want to retry
 		if (unsentcountafter > 0 && unsentcountbefore == unsentcountafter && retry < 10000)
 		{
@@ -249,12 +275,19 @@ void DICOMSenderImpl::DoSend()
 			retry = 0;
 		}
 	}
-	while (!IsCanceled() && unsentcountafter > 0 && retry < 10000);
+	while (!IsCanceled() && unsentcountafter > 0 && retry < 10000);	 
+}
 
 
-	// reset
-	std::string updatesql = "UPDATE images SET sent = 0";
-	sqlite3_exec(db, updatesql.c_str(), NULL, NULL, NULL);    
+int DICOMSenderImpl::addimage(void *param,int columns,char** values, char**names)
+{
+	naturalset *filelist = (naturalset *) param;
+
+	boost::filesystem::path currentFilename(values[0]);
+
+	filelist->insert(currentFilename);
+
+	return 0;
 }
 
 // 
@@ -290,11 +323,8 @@ int DICOMSenderImpl::SendABatch()
 		peerHost << m_destinationHost << ":" << m_destinationPort;
 		ASC_setPresentationAddresses(params, localHost, peerHost.str().c_str());
 
-		// get the list of files to send from the database and save it in fileNameList
-		log.Write("Loading files...\n");
-		addfiles();
+		// add presentation contexts		
 		cond = addStoragePresentationContexts(params, sopClassUIDList);
-
 		if (cond.bad())
 		{
 			log.Write(cond);
@@ -342,23 +372,42 @@ int DICOMSenderImpl::SendABatch()
 		/* command line, transmit the encapsulated DICOM objects to the SCP. */
 		cond = EC_Normal;
 
-		for(naturalset::iterator iter = fileNameList.begin(); iter != fileNameList.end(); iter++)		
+		naturalset::iterator itr = filestosend.begin();
+		while(itr != filestosend.end())
 		{
 			if (IsCanceled())
 				break;
-			cond = storeSCU(assoc, *iter);
+			cond = storeSCU(assoc, *itr);
 
 			if(cond.bad())
 			{
 				// skip this if it's bad data or invalid presentation
-				if(cond != DIMSE_BADDATA && cond != DIMSE_NOVALIDPRESENTATIONCONTEXTID)
+				if(cond == DIMSE_BADDATA || cond == DIMSE_NOVALIDPRESENTATIONCONTEXTID)
+				{
+					log.Write("Skipping file ");
+#ifdef _WIN32
+					// on Windows, boost::filesystem::path is a wstring, so we need to convert to utf8
+					log.Write((*itr).string(std::codecvt_utf8<boost::filesystem::path::value_type>()).c_str());
+#else
+					log.Write((*itr).string().c_str());
+#endif					
+					log.Write(" due to bad data or no valid presentation context id\n");
+					filestosend.erase(itr++);
+				}
+				else
+				{
+					// disconnection or.. ?
 					break;
+				}
+			}
+			else
+			{
+				// delete and go to next
+				filestosend.erase(itr++);
 			}
 		}
-
-		fileNameList.clear();
-
-		/* tear down association, i.e. terminate network connection to SCP */
+		
+		// tear down association, i.e. terminate network connection to SCP 
 		if (cond == EC_Normal)
 		{
 			log.Write("Releasing Association\n");
@@ -679,6 +728,7 @@ OFCondition DICOMSenderImpl::storeSCU(T_ASC_Association * assoc, const boost::fi
 
 	std::stringstream msg;
 #ifdef _WIN32
+	// on Windows, boost::filesystem::path is a wstring, so we need to convert to utf8
 	msg << "Sending file: " << fname.string(std::codecvt_utf8<boost::filesystem::path::value_type>()) << "\n";
 #else
 	msg << "Sending file: " << fname.string() << "\n";
@@ -763,18 +813,8 @@ OFCondition DICOMSenderImpl::storeSCU(T_ASC_Association * assoc, const boost::fi
 		NULL, dcmff.getDataset(), progressCallback, this,
 		DIMSE_NONBLOCKING, 10,
 		&rsp, &statusDetail, NULL, boost::filesystem::file_size(fname));	
-	
-	// update the sent status
-	if (cond.good())
-	{
-		std::string updatesql = "UPDATE images SET sent = 1 WHERE sopuid = ?";
-		sqlite3_stmt *update;
-		sqlite3_prepare_v2(db, updatesql.c_str(), updatesql.length(), &update, NULL);
-		sqlite3_bind_text(update, 1, sopInstance, strlen(sopInstance), SQLITE_STATIC);
-		sqlite3_exec_stmt(update, NULL, NULL, NULL);
-		sqlite3_finalize(update);
-	}
-	else
+		
+	if (cond.bad())
 	{		
 		log.Write("Store Failed\n");
 		log.Write(cond);		
@@ -792,15 +832,8 @@ OFCondition DICOMSenderImpl::storeSCU(T_ASC_Association * assoc, const boost::fi
 	return cond;
 }
 
-int DICOMSenderImpl::addimage(void *param,int columns,char** values, char**names)
-{
-	DICOMSenderImpl *sender = (DICOMSenderImpl *) param;
-
-#ifdef _WIN32
-	boost::filesystem::path currentFilename(values[0], std::codecvt_utf8<boost::filesystem::path::value_type>());
-#else
-    boost::filesystem::path currentFilename(values[0]);
-#endif
+bool DICOMSenderImpl::scanFile(boost::filesystem::path currentFilename)
+{	
 
 	DcmFileFormat dfile;
 	OFCondition cond = dfile.loadFile(currentFilename.c_str());
@@ -808,8 +841,8 @@ int DICOMSenderImpl::addimage(void *param,int columns,char** values, char**names
 	{
 		std::stringstream msg;
 		msg << "cannot access file, ignoring: " << currentFilename << std::endl;
-		sender->log.Write(msg);
-		return 0;
+		log.Write(msg);
+		return true;
 	}
 
 	char sopClassUID[128];
@@ -819,41 +852,27 @@ int DICOMSenderImpl::addimage(void *param,int columns,char** values, char**names
 	{	
 		std::stringstream msg;
 		msg << "missing SOP class (or instance) in file, ignoring: " << currentFilename << std::endl;
-		sender->log.Write(msg);
-		return 0;
+		log.Write(msg);
+		return false;
 	}
 
 	if (!dcmIsaStorageSOPClassUID(sopClassUID))
 	{		
 		std::stringstream msg;
 		msg << "unknown storage sop class in file, ignoring: " << currentFilename << " : " << sopClassUID << std::endl;
-		sender->log.Write(msg);
-		return 0;
+		log.Write(msg);
+		return false;
 	}
 
-	sender->sopClassUIDList.push_back(sopClassUID);
-	sender->fileNameList.insert(currentFilename);
+	sopClassUIDList.push_back(sopClassUID);	
 
-	return 0;
+	return true;
 }
 
-void DICOMSenderImpl::addfiles()
+void DICOMSenderImpl::scanFiles()
 {	
-	std::string selectsql = "SELECT filename FROM images WHERE name = ? AND sent = 0";
-	sqlite3_stmt *select;
-	sqlite3_prepare_v2(db, selectsql.c_str(), selectsql.length(), &select, NULL);
-	sqlite3_bind_text(select, 1, m_PatientName.c_str(), m_PatientName.length(), SQLITE_STATIC);
-	sqlite3_exec_stmt(select, &addimage, this, NULL);
-	sqlite3_finalize(select);
-}
-
-int DICOMSenderImpl::countcallback(void *param,int columns,char** values, char**names)
-{
-	int *count = (int *) param;
-
-	try { *count = boost::lexical_cast<int>(values[0]); }
-	catch(...) { *count = 0; }
-	return 0;
+	for(naturalset::iterator itr = filestosend.begin(); itr != filestosend.end(); itr++)
+		scanFile(*itr);	
 }
 
 void DICOMSenderImpl::Cancel()
@@ -890,12 +909,22 @@ DICOMSender::~DICOMSender(void)
 	delete impl;
 }
 
-void DICOMSender::Initialize(sqlite3 *db, const std::string PatientName, std::string PatientID, std::string BirthDay, 
+void DICOMSender::Initialize(const std::string PatientName, std::string PatientID, std::string BirthDay, 
 							 std::string NewPatientName, std::string NewPatientID, std::string NewBirthDay,
 							 std::string destinationHost, unsigned int destinationPort, std::string destinationAETitle, std::string ourAETitle)
 {
-	impl->Initialize(db, PatientName, PatientID, BirthDay, NewPatientName, NewPatientID, NewBirthDay,
+	impl->Initialize(PatientName, PatientID, BirthDay, NewPatientName, NewPatientID, NewBirthDay,
 		destinationHost, destinationPort, destinationAETitle, ourAETitle);
+}
+
+void DICOMSender::SetFileList(sqlite3 *db)
+{
+	impl->SetFileList(db);
+}
+
+void DICOMSender::SetFileList(const naturalset &files)
+{
+	impl->SetFileList(files);
 }
 
 void DICOMSender::DoSendThread(void *obj)

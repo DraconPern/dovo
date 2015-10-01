@@ -116,6 +116,7 @@ void DICOMFileScannerImpl::ScanFile(boost::filesystem::path path)
 		sqlite3_bind_text(insertImage, 10, sopuid.c_str(), strlen(sopuid.c_str()), SQLITE_STATIC);
 
 #ifdef _WIN32
+		// on Windows, boost::filesystem::path is a wstring, so we need to convert to utf8
 		std::string p = path.string(std::codecvt_utf8<boost::filesystem::path::value_type>());
 		sqlite3_bind_text(insertImage, 11, p.c_str(), p.length(), SQLITE_STATIC);
 #else

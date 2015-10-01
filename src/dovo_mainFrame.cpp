@@ -96,6 +96,7 @@ void dovo_mainFrame::OnUpdate( wxCommandEvent& event )
 	m_series->DeleteAllItems();
 	m_instances->DeleteAllItems();
 #ifdef _WIN32
+	// on Windows, boost::filesystem::path is a wstring already
 	boost::filesystem::path p = m_directory->GetValue();
 #else
 	boost::filesystem::path p = m_directory->GetValue().ToUTF8().data();
@@ -248,6 +249,7 @@ void dovo_mainFrame::OnInstancesSelected( wxListEvent& event )
 		return;
 
 #ifdef _WIN32
+	// on Windows, boost::filesystem::path is a wstring
 	boost::filesystem::path filename = m_instances->GetItemText(item, 1);
 #else
 	boost::filesystem::path filename = m_instances->GetItemText(item, 1).ToUTF8().data();

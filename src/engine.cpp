@@ -30,7 +30,7 @@ engine::engine()
 	sqlite3_exec(db, "CREATE TABLE images (name TEXT, patid TEXT, birthday TEXT, \
 					 studyuid TEXT, modality TEXT, studydesc TEXT, studydate TEXT, \
 					 seriesuid TEXT, seriesdesc TEXT, \
-					 sopuid TEXT UNIQUE, filename TEXT, sent INTEGER)", NULL, NULL, NULL);
+					 sopuid TEXT UNIQUE, filename TEXT)", NULL, NULL, NULL);
 
 }
 
@@ -184,9 +184,11 @@ void engine::StartSend(std::string PatientName, std::string PatientID, std::stri
 		ourAETitle = destinations[destination].ourAETitle;
 	}
 
-	sender.Initialize(db, PatientName, PatientID, BirthDay, 
+	sender.Initialize(PatientName, PatientID, BirthDay, 
 		NewPatientName, NewPatientID, NewBirthDay,
 		destinationHost, destinationPort, destinationAETitle, ourAETitle);
+
+	sender.SetFileList(db);
 
 	// start the thread, let the sender manage (e.g. cancel), so we don't need to track anymore
 	boost::thread t(DICOMSender::DoSendThread, &sender);
@@ -242,20 +244,4 @@ void engine::GetInstances(std::string seriesuid, sqlite3_callback fillinstances,
 
 	sqlite3_exec_stmt(select, fillinstances, obj, NULL);		
 	sqlite3_finalize(select);
-}
-
-void engine::GetImage(std::string sopid, sqlite3_callback fillinstances, void *obj)
-{
-	/*
-	std::string selectsql = "SELECT filename FROM images WHERE (sopuid = ?)";
-	sqlite3_stmt *select;
-	sqlite3_prepare_v2(db, selectsql.c_str(), selectsql.length(), &select, NULL);
-
-	sqlite3_bind_text(select, 1, sopid.c_str(), sopid.length(), SQLITE_STATIC);
-
-	sqlite3_exec_stmt(select, fillinstances, obj, NULL);		
-	sqlite3_finalize(select);*/
-	boost::filesystem::path filename;
-	
-
 }
