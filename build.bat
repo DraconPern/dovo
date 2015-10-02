@@ -1,5 +1,5 @@
 SET TYPE=Release
-SET TYPE=Debug
+rem SET TYPE=Debug
 
 REM a top level directory for all PACS related code
 SET DEVSPACE=%CD%
@@ -30,7 +30,8 @@ set WXWIN=%DEVSPACE%\wxWidgets
 cd %WXWIN%\build\msw
 copy /Y %WXWIN%\include\wx\msw\setup0.h %WXWIN%\include\wx\msw\setup.h
 powershell "gci %WXWIN%\build\msw *.vcxproj -recurse | ForEach { (Get-Content $_ | ForEach {$_ -replace 'MultiThreadedDebugDLL', 'MultiThreadedDebug'}) | Set-Content $_ }"
-msbuild /maxcpucount:5 /P:Configuration=%TYPE% wx_vc11.sln
+powershell "gci %WXWIN%\build\msw *.vcxproj -recurse | ForEach { (Get-Content $_ | ForEach {$_ -replace 'MultiThreadedDLL', 'MultiThreaded'}) | Set-Content $_ }"
+msbuild /maxcpucount:5 /P:Configuration=%TYPE% /p:Platform="Win32" wx_vc11.sln
 
 cd %DEVSPACE%\boost
 call bootstrap
