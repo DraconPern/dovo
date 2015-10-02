@@ -19,7 +19,7 @@ cache:
     - $HOME/wxWidgets
 
 install:
-  - export TYPE=$%CONFIGURATION
+  - export TYPE=$CONFIGURATION
   - export DEVSPACE=$HOME
 
   #zlib preinstalled
