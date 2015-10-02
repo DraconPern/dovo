@@ -144,10 +144,18 @@ void DICOMFileScannerImpl::DoScan(boost::filesystem::path path)
 {	
 	OFLog::configure(OFLogger::OFF_LOG_LEVEL);
 
-	std::string imagesql = "INSERT INTO images VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)";
+	std::string imagesql = "INSERT INTO images VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 	sqlite3_prepare_v2(db, imagesql.c_str(), imagesql.length(), &insertImage, NULL);
 
-	ScanDir(path);
+	// catch any access errors
+	try
+	{
+		ScanDir(path);	
+	}
+	catch(...)
+	{
+
+	}
 
 	sqlite3_finalize(insertImage);
 }
@@ -157,35 +165,27 @@ void DICOMFileScannerImpl::ScanDir(boost::filesystem::path path)
 	boost::filesystem::path someDir(path);
 	boost::filesystem::directory_iterator end_iter;
 
-	// catch any access errors
-	try
+	
+	if ( boost::filesystem::exists(path) && boost::filesystem::is_directory(path))
 	{
-		if ( boost::filesystem::exists(path) && boost::filesystem::is_directory(path))
+		for( boost::filesystem::directory_iterator dir_iter(someDir) ; dir_iter != end_iter ; dir_iter++)
 		{
-			for( boost::filesystem::directory_iterator dir_iter(someDir) ; dir_iter != end_iter ; dir_iter++)
-			{
-				if(IsCanceled())
-				{			
-					break;
-				}
-
-				if (boost::filesystem::is_regular_file(dir_iter->status()) )
-				{
-					ScanFile(*dir_iter);
-				}
-				else if (boost::filesystem::is_directory(dir_iter->status()) )
-				{
-					// descent recursively
-					ScanDir(*dir_iter);
-				}
+			if(IsCanceled())
+			{			
+				break;
 			}
 
+			if (boost::filesystem::is_regular_file(dir_iter->status()) )
+			{
+				ScanFile(*dir_iter);
+			}
+			else if (boost::filesystem::is_directory(dir_iter->status()) )
+			{
+				// descent recursively
+				ScanDir(*dir_iter);
+			}
 		}
-	}
-	catch(...)
-	{
-
-	}
+	}	
 }
 
 

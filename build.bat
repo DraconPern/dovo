@@ -1,5 +1,5 @@
 SET TYPE=Release
-rem SET TYPE=Debug
+SET TYPE=Debug
 
 REM a top level directory for all PACS related code
 SET DEVSPACE=%CD%
