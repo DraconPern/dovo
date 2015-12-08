@@ -205,7 +205,7 @@ void dovo_mainFrame::OnStudiesSelected( wxListEvent& event )
 int dovo_mainFrame::fillseries(void *param,int columns,char** values, char**names)
 {
 	naturalmap *entries = (naturalmap *)param;
-	entries->insert(std::pair<std::string, std::string>(values[1],values[0]));	
+	entries->insert(std::pair<std::string, std::string>(values[0],values[1]));	
 	return 0;
 }
 
@@ -218,7 +218,7 @@ void dovo_mainFrame::OnSeriesSelected( wxListEvent& event )
 	naturalmap entries;
 
 	m_instances->DeleteAllItems();
-	m_engine.GetInstances(m_series->GetItemText(item, 1).ToUTF8().data(), fillinstances, &entries);
+	m_engine.GetInstances(m_series->GetItemText(item, 0).ToUTF8().data(), fillinstances, &entries);
 
 	int j = 0;
 	for(naturalmap::iterator ii = entries.begin(); ii != entries.end(); ++ii)
