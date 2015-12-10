@@ -42,7 +42,7 @@ install:
    #wxWidgets
   - cd $DEVSPACE
   - "[ -d wxWidgets ] || git clone --branch=master https://github.com/wxWidgets/wxWidgets.git"
-  - cd wxWidgets && git pull && mkdir -p build$TYPE && cd build$TYPE
+  - cd wxWidgets && git checkout v3.0.2 && mkdir -p build$TYPE && cd build$TYPE
   - ../configure --disable-shared --with-macosx-version-min=10.9 --with-macosx-sdk=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk
   - make -j8
 

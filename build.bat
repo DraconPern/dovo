@@ -9,6 +9,7 @@ git clone --branch=master https://github.com/madler/zlib.git
 git clone --branch=master git://git.dcmtk.org/dcmtk.git
 git clone --branch=openjpeg-2.1 https://github.com/uclouvain/openjpeg.git
 git clone --branch=master https://github.com/wxWidgets/wxWidgets.git
+cd wxWidgets && git checkout v3.0.2 && cd ..
 git clone --branch=master https://github.com/DraconPern/fmjpeg2koj.git
 
 cd %DEVSPACE%\zlib
@@ -42,8 +43,8 @@ msbuild /maxcpucount:5 /P:Configuration=%TYPE% /p:Platform="Win32" wx_vc11.sln
 
 cd %DEVSPACE%\boost
 call bootstrap
-IF "%TYPE%" == "Release" b2 toolset=msvc-11.0 runtime-link=static define=_BIND_TO_CURRENT_VCLIBS_VERSION=1 -j 4 --with-thread --with-filesystem --with-system stage --with-date_time release
-IF "%TYPE%" == "Debug"   b2 toolset=msvc-11.0 runtime-link=static define=_BIND_TO_CURRENT_VCLIBS_VERSION=1 -j 4 --with-thread --with-filesystem --with-system stage --with-date_time debug
+IF "%TYPE%" == "Release" b2 toolset=msvc-11.0 runtime-link=static define=_BIND_TO_CURRENT_VCLIBS_VERSION=1 -j 4 --with-thread --with-filesystem --with-system stage --with-date_time --with-regex release
+IF "%TYPE%" == "Debug"   b2 toolset=msvc-11.0 runtime-link=static define=_BIND_TO_CURRENT_VCLIBS_VERSION=1 -j 4 --with-thread --with-filesystem --with-system stage --with-date_time --with-regex debug
 cd ..
 
 cd %DEVSPACE%\fmjpeg2koj
