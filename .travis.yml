@@ -26,7 +26,7 @@ install:
 
   #dcmtk
   - cd $DEVSPACE
-  - "[ -d dcmtk ] || git clone git://git.dcmtk.org/dcmtk.git"
+  - "[ -d dcmtk ] || git clone --branch=master git://git.dcmtk.org/dcmtk.git"
   - cd dcmtk && git pull && mkdir -p build-$TYPE && cd build-$TYPE
   - cmake .. -DDCMTK_WIDE_CHAR_FILE_IO_FUNCTIONS=1 -DCMAKE_INSTALL_PREFIX=$DEVSPACE/dcmtk/$TYPE
   - make -j8 install
@@ -41,7 +41,7 @@ install:
 
    #wxWidgets
   - cd $DEVSPACE
-  - "[ -d wxWidgets ] || git clone https://github.com/wxWidgets/wxWidgets.git"
+  - "[ -d wxWidgets ] || git clone --branch=master https://github.com/wxWidgets/wxWidgets.git"
   - cd wxWidgets && git pull && mkdir -p build$TYPE && cd build$TYPE
   - ../configure --disable-shared --with-macosx-version-min=10.9 --with-macosx-sdk=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk
   - make -j8
@@ -50,7 +50,7 @@ install:
 
   #fmjpeg2koj
   - cd $DEVSPACE
-  - "[ -d fmjpeg2koj ] || git clone https://github.com/DraconPern/fmjpeg2koj.git"
+  - "[ -d fmjpeg2koj ] || git clone --branch=master https://github.com/DraconPern/fmjpeg2koj.git"
   - cd fmjpeg2koj && git pull && mkdir -p build-$TYPE && cd build-$TYPE
   - cmake .. -DOPENJPEG=$DEVSPACE/openjpeg/$TYPE -DDCMTK_DIR=$DEVSPACE/dcmtk/$TYPE -DCMAKE_INSTALL_PREFIX=$DEVSPACE/fmjpeg2koj/$TYPE
   - make -j8 install
