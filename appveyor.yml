@@ -23,10 +23,12 @@ install:
 
 # dcmtk
   - cd %DEVSPACE%
-  - git clone git://git.dcmtk.org/dcmtk.git
-  - cd dcmtk && mkdir build-%TYPE% && cd build-%TYPE%
-  - cmake .. -G "Visual Studio 11" -DDCMTK_WIDE_CHAR_FILE_IO_FUNCTIONS=1 -DDCMTK_WITH_ZLIB=1 -DWITH_ZLIBINC=%DEVSPACE%\zlib\%TYPE% -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\dcmtk\%TYPE%
-  - msbuild /maxcpucount:2 /P:Configuration=%TYPE% INSTALL.vcxproj /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+  - mkdir dcmtk
+  - ps: >-
+    $page = Invoke-WebRequest https://api.github.com/repos/DraconPern/dcmtk/releases/latest 
+	$json = $page | ConvertFrom-Json
+	Invoke-WebRequest $json.assets.browser_download_url -Outfile "dcmtk.zip"  
+  - unzip dcmtk.zip
 
 # openjpeg
   - cd %DEVSPACE%
@@ -74,8 +76,7 @@ artifacts:
   - path: dovo.zip
     name: dovo
   
-deploy:
-  release: dovo-v$(appveyor_build_version)
+deploy:  
   description: 'Release'
   provider: GitHub
   auth_token:
