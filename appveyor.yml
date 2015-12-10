@@ -10,20 +10,10 @@ configuration:
 
 install:
   - SET TYPE=%CONFIGURATION%
-  - SET DEVSPACE=%APPVEYOR_BUILD_FOLDER%
+  - SET DEVSPACE=%APPVEYOR_BUILD_FOLDER%\..
 
-#zlib
-  - cd %DEVSPACE%
-  - git clone --branch=master https://github.com/madler/zlib.git
-  - cd zlib && mkdir build-%TYPE% && cd build-%TYPE%
-  - cmake.exe .. -G "Visual Studio 11" -DCMAKE_C_FLAGS_RELEASE="/MT /O2 /D NDEBUG" -DCMAKE_C_FLAGS_DEBUG="/D_DEBUG /MTd /Od" -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\zlib\%TYPE%
-  - msbuild /P:Configuration=%TYPE% INSTALL.vcxproj
-  - IF "%TYPE%" == "Release" copy /Y %DEVSPACE%\zlib\Release\lib\zlibstatic.lib %DEVSPACE%\zlib\Release\lib\zlib_o.lib
-  - IF "%TYPE%" == "Debug"   copy /Y %DEVSPACE%\zlib\Debug\lib\zlibstaticd.lib %DEVSPACE%\zlib\Debug\lib\zlib_d.lib
-
-# dcmtk
-  - cd %DEVSPACE%
-  - mkdir dcmtk && cd dcmtk
+# dcmtk & zlib
+  - cd %DEVSPACE%  
   - ps: |
       $page = Invoke-WebRequest https://api.github.com/repos/DraconPern/dcmtk/releases/latest
       $json = $page | ConvertFrom-Json
@@ -61,16 +51,16 @@ install:
   - msbuild /P:Configuration=%TYPE% INSTALL.vcxproj
 
 before_build:
-  - cd %DEVSPACE% && mkdir build-%TYPE% && cd build-%TYPE%
+  - cd %APPVEYOR_BUILD_FOLDER% && mkdir build-%TYPE% && cd build-%TYPE%
   - cmake .. -G "Visual Studio 11" -DwxWidgets_ROOT_DIR=%WXWIN% -DBOOST_ROOT=C:\Libraries\boost_1_59_0 -DDCMTK_DIR=%DEVSPACE%\dcmtk\%TYPE% -DZLIB_ROOT=%DEVSPACE%\zlib\%TYPE% -DFMJPEG2K=%DEVSPACE%\fmjpeg2koj\%TYPE% -DOPENJPEG=%DEVSPACE%\openjpeg\%TYPE%
 
 build_script:
-  - cd %DEVSPACE%\build-%TYPE%
+  - cd %APPVEYOR_BUILD_FOLDER%\build-%TYPE%
   - msbuild /P:Configuration=%TYPE% ALL_BUILD.vcxproj /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
 after_build:
-  - cd %DEVSPACE%\build-%TYPE%
-  - 7z a dovo.zip %DEVSPACE%\build-%TYPE%\%TYPE%\dovo.exe
+  - cd %APPVEYOR_BUILD_FOLDER%\build-%TYPE%
+  - 7z a dovo.zip %APPVEYOR_BUILD_FOLDER%\build-%TYPE%\%TYPE%\dovo.exe
   
 artifacts:
   - path: dovo.zip
@@ -82,7 +72,7 @@ deploy:
   auth_token:
     secure: 41S3obFejYeK5W2Bcu76OC1PenI9UfIsFg6GSJHQGEzjheBB/pytOefK3FVxrlVq
   artifact: dovo.zip
-  draft: false
+  draft: true
   prerelease: false
   on:
     branch: master
