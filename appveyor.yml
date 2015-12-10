@@ -14,7 +14,7 @@ install:
 
 #zlib
   - cd %DEVSPACE%
-  - git clone https://github.com/madler/zlib.git
+  - git clone --branch=master https://github.com/madler/zlib.git
   - cd zlib && mkdir build-%TYPE% && cd build-%TYPE%
   - cmake.exe .. -G "Visual Studio 11" -DCMAKE_C_FLAGS_RELEASE="/MT /O2 /D NDEBUG" -DCMAKE_C_FLAGS_DEBUG="/D_DEBUG /MTd /Od" -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\zlib\%TYPE%
   - msbuild /P:Configuration=%TYPE% INSTALL.vcxproj
@@ -23,7 +23,7 @@ install:
 
 # dcmtk
   - cd %DEVSPACE%
-  - mkdir dcmtk
+  - mkdir dcmtk && cd dcmtk
   - ps: |
       $page = Invoke-WebRequest https://api.github.com/repos/DraconPern/dcmtk/releases/latest
       $json = $page | ConvertFrom-Json
@@ -32,14 +32,14 @@ install:
 
 # openjpeg
   - cd %DEVSPACE%
-  - git clone https://github.com/uclouvain/openjpeg.git
+  - git clone --branch=master https://github.com/uclouvain/openjpeg.git
   - cd openjpeg && git checkout openjpeg-2.1 && mkdir build-%TYPE% && cd build-%TYPE%
   - cmake .. -G "Visual Studio 11" -DBUILD_THIRDPARTY=1 -DBUILD_SHARED_LIBS=OFF -DCMAKE_C_FLAGS_RELEASE="/MT /O2 /D NDEBUG" -DCMAKE_C_FLAGS_DEBUG="/D_DEBUG /MTd /Od" -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\openjpeg\%TYPE%
   - msbuild /P:Configuration=%TYPE% INSTALL.vcxproj /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
 #wxWidgets
   - cd %DEVSPACE%
-  - git clone https://github.com/wxWidgets/wxWidgets.git
+  - git clone --branch=master https://github.com/wxWidgets/wxWidgets.git
   - set WXWIN=%DEVSPACE%\wxWidgets
   - cd wxWidgets && git checkout v3.0.2 && cd %WXWIN%\build\msw
   - copy /Y %WXWIN%\include\wx\msw\setup0.h %WXWIN%\include\wx\msw\setup.h
@@ -55,7 +55,7 @@ install:
 
 #fmjpeg2koj
   - cd %DEVSPACE%
-  - git clone https://github.com/DraconPern/fmjpeg2koj.git
+  - git clone --branch=master https://github.com/DraconPern/fmjpeg2koj.git
   - cd fmjpeg2koj && mkdir build-%TYPE% && cd build-%TYPE%
   - cmake .. -G "Visual Studio 11" -DBUILD_SHARED_LIBS=OFF -DCMAKE_CXX_FLAGS_RELEASE="/MT /O2 /D NDEBUG" -DCMAKE_CXX_FLAGS_DEBUG="/D_DEBUG /MTd /Od" -DOPENJPEG=%DEVSPACE%\openjpeg\%TYPE% -DDCMTK_DIR=%DEVSPACE%\dcmtk\%TYPE% -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\fmjpeg2koj\%TYPE%
   - msbuild /P:Configuration=%TYPE% INSTALL.vcxproj
