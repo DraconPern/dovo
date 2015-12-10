@@ -25,9 +25,9 @@ install:
   - cd %DEVSPACE%
   - mkdir dcmtk
   - ps: >-
-    $page = Invoke-WebRequest https://api.github.com/repos/DraconPern/dcmtk/releases/latest 
-    $json = $page | ConvertFrom-Json
-    Invoke-WebRequest $json.assets.browser_download_url -Outfile "dcmtk.zip"  
+      $page = Invoke-WebRequest https://api.github.com/repos/DraconPern/dcmtk/releases/latest 
+      $json = $page | ConvertFrom-Json
+      Invoke-WebRequest $json.assets.browser_download_url -Outfile "dcmtk.zip"  
   - unzip dcmtk.zip
 
 # openjpeg
