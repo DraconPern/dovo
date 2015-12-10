@@ -59,20 +59,10 @@ build_script:
   - msbuild /P:Configuration=%TYPE% ALL_BUILD.vcxproj /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
 after_build:
-  - cd %APPVEYOR_BUILD_FOLDER%\build-%TYPE%
+  - cd %APPVEYOR_BUILD_FOLDER%\build-%TYPE%\%TYPE%
   - 7z a dovo.zip %APPVEYOR_BUILD_FOLDER%\build-%TYPE%\%TYPE%\dovo.exe
+  - mv dovo.zip %APPVEYOR_BUILD_FOLDER%
   
 artifacts:
   - path: dovo.zip
     name: dovo
-  
-deploy:  
-  description: 'Release'
-  provider: GitHub
-  auth_token:
-    secure: 41S3obFejYeK5W2Bcu76OC1PenI9UfIsFg6GSJHQGEzjheBB/pytOefK3FVxrlVq
-  artifact: dovo.zip
-  draft: true
-  prerelease: false
-  on:
-    branch: master
