@@ -8,6 +8,8 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
+#include <boost/regex.hpp>
+#include <boost/lexical_cast.hpp>
 using boost::asio::ip::tcp;
 
 #include <wx/wxprec.h>
@@ -21,10 +23,9 @@ boost::gregorian::date convertDATE(char const *time);
 // returns true if the application needs to exit
 bool informUserOfUpdate(std::string json)
 {
-	std::string version = DOVO_VERSION;
-	std::string mustupdate = "false";
-	std::string message = "";
-
+	std::string thisversion = DOVO_VERSION;
+	std::string version, mustupdate, message;
+	
 	try
 	{
 		boost::property_tree::ptree pt;
@@ -37,9 +38,8 @@ bool informUserOfUpdate(std::string json)
 	}
 	catch (std::exception& e)
 	{
-		// std::cout << "Exception: " << e.what() << "\n";
+		return false;
 	}
-
 
 	boost::gregorian::date compiledate(convertDATE(__DATE__));
 	boost::gregorian::date timelimit = compiledate + boost::gregorian::years(1);
@@ -51,14 +51,33 @@ bool informUserOfUpdate(std::string json)
 		return true;
 	}
 
-	if(version != DOVO_VERSION)
+	if(mustupdate == "true")
 	{
-		if(mustupdate == "true")
+		wxMessageBox(wxT("You must update to a new version.  Please see https://github.com/DraconPern/dovo"));
+		return true;
+	}
+	
+	boost::regex expression("(\\d+).(\\d+).(\\d+)"); 
+	boost::cmatch thisversioncmatch, versioncmatch; 
+	if(boost::regex_match(version.c_str(), versioncmatch, expression) && boost::regex_match(thisversion.c_str(), thisversioncmatch, expression))
+	{
+		int thismajor = boost::lexical_cast<int>(thisversioncmatch[1]);
+		int thisminor = boost::lexical_cast<int>(thisversioncmatch[2]);
+		int thisbuild = boost::lexical_cast<int>(thisversioncmatch[3]);
+
+		int major = boost::lexical_cast<int>(versioncmatch[1]);
+		int minor = boost::lexical_cast<int>(versioncmatch[2]);
+		int build = boost::lexical_cast<int>(versioncmatch[3]);
+
+		if(major > thismajor)
 		{
-			wxMessageBox(wxT("You must update to a new version.  Please see https://github.com/DraconPern/dovo"));
-			return true;
+			wxMessageBox( wxT("There is a major update available.  Please see https://github.com/DraconPern/dovo"));
 		}
-		else
+		else if(minor > thisminor)
+		{
+			wxMessageBox( wxT("There is a minor update available.  Please see https://github.com/DraconPern/dovo"));
+		}
+		else if(build > thisbuild)
 		{
 			wxMessageBox( wxT("There is an update available.  Please see https://github.com/DraconPern/dovo"));
 		}
