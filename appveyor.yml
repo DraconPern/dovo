@@ -14,10 +14,8 @@ install:
 
 # dcmtk & zlib
   - cd %DEVSPACE%  
-  - ps: |
-      $page = Invoke-WebRequest https://api.github.com/repos/DraconPern/dcmtk/releases/latest
-      $json = $page | ConvertFrom-Json
-      Invoke-WebRequest $json.assets.browser_download_url -Outfile "dcmtk.zip"
+  - ps: |      
+      Invoke-WebRequest http://draconpern-buildcache.s3.amazonaws.com/dcmtk.zip -Outfile "dcmtk.zip"
   - unzip dcmtk.zip
 
 # openjpeg
