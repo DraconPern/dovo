@@ -17,7 +17,7 @@ endif()
 set(Boost_USE_STATIC_LIBS        ON)
 set(Boost_USE_MULTITHREADED      ON)
 set(Boost_USE_STATIC_RUNTIME     ON)
-find_package(Boost REQUIRED thread filesystem system)
+find_package(Boost REQUIRED thread filesystem system regex date_time)
 
 set(wxWidgets_USE_STATIC   ON)
 #define this so that wxWidgets doesn't define it. Conflicts w/ dcmtk's declaration
