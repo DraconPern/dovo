@@ -190,8 +190,8 @@ void dovo_mainFrame::OnStudiesSelected( wxListEvent& event )
 	int j = 0;
 	for(naturalmap::iterator ii = entries.begin(); ii != entries.end(); ++ii)
 	{
-		m_series->InsertItem(j, wxString::FromUTF8((*ii).first.c_str()));
-		m_series->SetItem(j, 1, wxString::FromUTF8((*ii).second.c_str()));
+		m_series->InsertItem(j, wxString::FromUTF8((*ii).second.c_str()));
+		m_series->SetItem(j, 1, wxString::FromUTF8((*ii).first.c_str()));
 		j++;
 	}
 
@@ -218,7 +218,7 @@ void dovo_mainFrame::OnSeriesSelected( wxListEvent& event )
 	naturalmap entries;
 
 	m_instances->DeleteAllItems();
-	m_engine.GetInstances(m_series->GetItemText(item, 0).ToUTF8().data(), fillinstances, &entries);
+	m_engine.GetInstances(m_series->GetItemText(item, 1).ToUTF8().data(), fillinstances, &entries);
 
 	int j = 0;
 	for(naturalmap::iterator ii = entries.begin(); ii != entries.end(); ++ii)
