@@ -28,14 +28,14 @@ install:
   - cd $DEVSPACE
   - "[ -d wxWidgets ] || git clone --branch=master https://github.com/wxWidgets/wxWidgets.git"
   - cd wxWidgets && git checkout v3.0.2 && mkdir -p build$TYPE && cd build$TYPE
-  - ../configure --disable-shared
+  - ../configure --disable-shared --with-macosx-version-min=10.9
   - make -j8
 
   #boost preinstalled
 
 before_script:
   - cd $TRAVIS_BUILD_DIR && mkdir -p build-$TYPE && cd build-$TYPE
-  - cmake .. -DwxWidgets_CONFIG_EXECUTABLE=$DEVSPACE/wxWidgets/build$TYPE/wx-config -DBOOST_ROOT=$DEVSPACE/boost -DDCMTK_DIR=$DEVSPACE/dcmtk/$TYPE -DFMJPEG2K=$DEVSPACE/fmjpeg2koj/$TYPE -DOPENJPEG=$DEVSPACE/openjpeg/$TYPE
+  - cmake .. -DwxWidgets_CONFIG_EXECUTABLE=$DEVSPACE/wxWidgets/build$TYPE/wx-config -DBOOST_ROOT=$DEVSPACE/boost -DDCMTK_DIR=$DEVSPACE/dcmtk/$TYPE -DFMJPEG2K=$DEVSPACE/fmjpeg2koj/$TYPE -DOPENJPEG=$DEVSPACE/openjpeg/$TYPE -DCMAKE_OSX_DEPLOYMENT_TARGET=10.9
 
 script:
   - cd $TRAVIS_BUILD_DIR/build-$TYPE
