@@ -1,7 +1,3 @@
-branches:
-  only:
-    - master
-
 platform:
   - x86
 
@@ -15,9 +11,15 @@ install:
 # dcmtk & zlib
   - cd %DEVSPACE%  
   - ps: |      
-      Invoke-WebRequest http://draconpern-buildcache.s3.amazonaws.com/dcmtk.zip -Outfile "dcmtk.zip"
-  - unzip dcmtk.zip
+      Invoke-WebRequest http://draconpern-buildcache.s3.amazonaws.com/dcmtk.7z -Outfile "dcmtk.7z"
+  - 7z x -y dcmtk.7z
 
+ #fmjpeg2koj & openjpeg
+  - cd %DEVSPACE%
+  - ps: |
+      Invoke-WebRequest http://draconpern-buildcache.s3.amazonaws.com/fmjpeg2koj.7z -Outfile "fmjpeg2koj.7z"
+  - 7z x -y fmjpeg2koj.7z
+  
 # openjpeg
   - cd %DEVSPACE%
   - git clone --branch=master https://github.com/uclouvain/openjpeg.git

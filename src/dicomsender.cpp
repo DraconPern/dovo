@@ -811,7 +811,7 @@ OFCondition DICOMSenderImpl::storeSCU(T_ASC_Association * assoc, const boost::fi
 	// send it!
 	cond = DIMSE_storeUser(assoc, presId, &req,
 		NULL, dcmff.getDataset(), progressCallback, this,
-		DIMSE_NONBLOCKING, 10,
+		DIMSE_NONBLOCKING, 60,
 		&rsp, &statusDetail, NULL, boost::filesystem::file_size(fname));	
 		
 	if (cond.bad())
