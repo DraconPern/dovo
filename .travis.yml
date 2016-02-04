@@ -3,7 +3,6 @@ compiler:
     - gcc
 
 os:
-#    - linux
     - osx
 
 # use containers
@@ -19,8 +18,8 @@ cache:
     - $HOME/wxWidgets
 
 install:
-  - export TYPE=$CONFIGURATION
-  - export DEVSPACE=$HOME
+ - export TYPE=$CONFIGURATION
+ - export DEVSPACE=$HOME
 
   #zlib preinstalled
 
