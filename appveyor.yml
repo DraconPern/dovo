@@ -20,13 +20,6 @@ install:
       Invoke-WebRequest http://draconpern-buildcache.s3.amazonaws.com/fmjpeg2koj.7z -Outfile "fmjpeg2koj.7z"
   - 7z x -y fmjpeg2koj.7z
   
-# openjpeg
-  - cd %DEVSPACE%
-  - git clone --branch=master https://github.com/uclouvain/openjpeg.git
-  - cd openjpeg && git checkout openjpeg-2.1 && mkdir build-%TYPE% && cd build-%TYPE%
-  - cmake .. -G "Visual Studio 11" -DBUILD_THIRDPARTY=1 -DBUILD_SHARED_LIBS=OFF -DCMAKE_C_FLAGS_RELEASE="/MT /O2 /D NDEBUG" -DCMAKE_C_FLAGS_DEBUG="/D_DEBUG /MTd /Od" -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\openjpeg\%TYPE%
-  - msbuild /P:Configuration=%TYPE% INSTALL.vcxproj /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
-
 #wxWidgets
   - cd %DEVSPACE%
   - git clone --branch=master https://github.com/wxWidgets/wxWidgets.git
@@ -42,13 +35,6 @@ install:
   - call bootstrap
   - IF "%TYPE%" == "Release" b2 toolset=msvc-11.0 runtime-link=static define=_BIND_TO_CURRENT_VCLIBS_VERSION=1 -j 4 --with-thread --with-filesystem --with-system --with-date_time --with-regex stage release
   - IF "%TYPE%" == "Debug"   b2 toolset=msvc-11.0 runtime-link=static define=_BIND_TO_CURRENT_VCLIBS_VERSION=1 -j 4 --with-thread --with-filesystem --with-system --with-date_time --with-regex stage debug
-
-#fmjpeg2koj
-  - cd %DEVSPACE%
-  - git clone --branch=master https://github.com/DraconPern/fmjpeg2koj.git
-  - cd fmjpeg2koj && mkdir build-%TYPE% && cd build-%TYPE%
-  - cmake .. -G "Visual Studio 11" -DBUILD_SHARED_LIBS=OFF -DCMAKE_CXX_FLAGS_RELEASE="/MT /O2 /D NDEBUG" -DCMAKE_CXX_FLAGS_DEBUG="/D_DEBUG /MTd /Od" -DOPENJPEG=%DEVSPACE%\openjpeg\%TYPE% -DDCMTK_DIR=%DEVSPACE%\dcmtk\%TYPE% -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\fmjpeg2koj\%TYPE%
-  - msbuild /P:Configuration=%TYPE% INSTALL.vcxproj
 
 before_build:
   - cd %APPVEYOR_BUILD_FOLDER% && mkdir build-%TYPE% && cd build-%TYPE%
