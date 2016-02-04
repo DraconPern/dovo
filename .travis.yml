@@ -40,10 +40,10 @@ before_script:
 script:
   - cd $TRAVIS_BUILD_DIR/build-$TYPE
   - make -j8
-
-after_script:
-  - hdiutil create -volname dovo -srcfolder $TRAVIS_BUILD_DIR/build-$TYPE/dovo.app -ov -format UDZO dovo.dmg
+ 
 before_deploy:
+  - cd $TRAVIS_BUILD_DIR/build-$TYPE
+  - hdiutil create -volname dovo -srcfolder $TRAVIS_BUILD_DIR/build-$TYPE/dovo.app -ov -format UDZO dovo.dmg
   - cd $TRAVIS_BUILD_DIR/..  
   - mkdir -p dpl_cd_upload
   - mv $TRAVIS_BUILD_DIR/build-$TYPE/dovo.dmg $TRAVIS_BUILD_DIR/../dpl_cd_upload/
