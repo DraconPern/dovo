@@ -58,8 +58,3 @@ script:
 
 after_script:
   - hdiutil create -volname dovo -srcfolder $TRAVIS_BUILD_DIR/build-$TYPE/dovo.app -ov -format UDZO dovo.dmg
-
-addons:
-  artifacts:
-    paths:
-    - $TRAVIS_BUILD_DIR/build-$TYPE/dovo.dmg
