@@ -52,7 +52,7 @@ install:
   - cd $DEVSPACE
   - "[ -d fmjpeg2koj ] || git clone --branch=master https://github.com/DraconPern/fmjpeg2koj.git"
   - cd fmjpeg2koj && git pull && mkdir -p build-$TYPE && cd build-$TYPE
-  - cmake .. -DOPENJPEG=$DEVSPACE/openjpeg/$TYPE -DDCMTK_DIR=$DEVSPACE/dcmtk/$TYPE -DCMAKE_INSTALL_PREFIX=$DEVSPACE/fmjpeg2koj/$TYPE
+  - cmake .. BUILD_SHARED_LIBS=OFF -DOPENJPEG=$DEVSPACE/openjpeg/$TYPE -DDCMTK_DIR=$DEVSPACE/dcmtk/$TYPE -DCMAKE_INSTALL_PREFIX=$DEVSPACE/fmjpeg2koj/$TYPE
   - make -j8 install
 
 before_script:
@@ -64,9 +64,9 @@ script:
   - make -j8
 
 after_script:
-  - zip -r $TRAVIS_BUILD_DIR/dovo-osx.zip $TRAVIS_BUILD_DIR/build-$TYPE
-  
+  - hdiutil create -volname dovo -srcfolder $TRAVIS_BUILD_DIR/build-$TYPE/dovo.app -ov -format UDZO dovo.dmg
+
 addons:
-  artifacts:    
+  artifacts:
     paths:
-    - $TRAVIS_BUILD_DIR/dovo-osx.zip
+    - $TRAVIS_BUILD_DIR/build-$TYPE/dovo.dmg
