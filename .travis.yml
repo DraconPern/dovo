@@ -67,6 +67,6 @@ after_script:
   - zip -r $TRAVIS_BUILD_DIR/dovo-osx.zip $TRAVIS_BUILD_DIR/build-$TYPE
   
 addons:
-  artifacts: true    
+  artifacts:    
     paths:
     - $TRAVIS_BUILD_DIR/dovo-osx.zip
