@@ -54,7 +54,7 @@ git clone --branch=master https://github.com/DraconPern/fmjpeg2koj.git
 cd $DEVSPACE/fmjpeg2koj
 mkdir build-$TYPE
 cd build-$TYPE
-cmake .. BUILD_SHARED_LIBS=OFF -DOPENJPEG=$DEVSPACE/openjpeg/$TYPE -DDCMTK_DIR=$DEVSPACE/dcmtk/$TYPE -DCMAKE_INSTALL_PREFIX=$DEVSPACE/fmjpeg2koj/$TYPE
+cmake .. -DBUILD_SHARED_LIBS=OFF -DOPENJPEG=$DEVSPACE/openjpeg/$TYPE -DDCMTK_DIR=$DEVSPACE/dcmtk/$TYPE -DCMAKE_INSTALL_PREFIX=$DEVSPACE/fmjpeg2koj/$TYPE
 make -j8 install
 
 cd $BUILD_DIR
