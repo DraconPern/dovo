@@ -11,16 +11,10 @@ sudo: false
 configuration:
   - Release
 
-cache:
-  directories:
-    - $HOME/dcmtk
-    - $HOME/openjpeg-version.2.1
-    - $HOME/wxWidgets
+env:
+  - TYPE=Release DEVSPACE=$TRAVIS_BUILD_DIR/..
 
 install:
- - export TYPE=$CONFIGURATION
- - export DEVSPACE=$HOME
-
   #zlib preinstalled
 
   #dcmtk
