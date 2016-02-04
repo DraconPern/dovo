@@ -16,18 +16,13 @@ install:
 
   #dcmtk
   - cd $DEVSPACE
-  - "[ -d dcmtk ] || git clone git@github.com:DraconPern/dcmtk.git --branch ci"
-  - cd dcmtk && git pull && mkdir -p build-$TYPE && cd build-$TYPE
-  - cmake .. -DDCMTK_WIDE_CHAR_FILE_IO_FUNCTIONS=1 -DCMAKE_INSTALL_PREFIX=$DEVSPACE/dcmtk/$TYPE
-  - make -j8 install
+  - wget http://draconpern-buildcache.s3.amazonaws.com/dcmtk-$TRAVIS_OS_NAME.zip
+  - unzip dcmtk-$TRAVIS_OS_NAME.zip
 
-  #openjpeg
+  #openjpeg and fmjpeg2koj
   - cd $DEVSPACE
-  - wget https://github.com/uclouvain/openjpeg/archive/version.2.1.tar.gz
-  - tar -xzf version.2.1.tar.gz
-  - cd openjpeg-version.2.1 && mkdir -p build-$TYPE && cd build-$TYPE
-  - cmake .. -DBUILD_SHARED_LIBS=0 -DCMAKE_INSTALL_PREFIX=$DEVSPACE/openjpeg/$TYPE
-  - make -j8 install
+  - wget http://draconpern-buildcache.s3.amazonaws.com/fmjpeg2koj-$TRAVIS_OS_NAME.zip
+  - unzip fmjpeg2koj-$TRAVIS_OS_NAME.zip
 
    #wxWidgets
   - cd $DEVSPACE
@@ -37,13 +32,6 @@ install:
   - make -j8
 
   #boost preinstalled
-
-  #fmjpeg2koj
-  - cd $DEVSPACE
-  - "[ -d fmjpeg2koj ] || git clone --branch=master https://github.com/DraconPern/fmjpeg2koj.git"
-  - cd fmjpeg2koj && git pull && mkdir -p build-$TYPE && cd build-$TYPE
-  - cmake .. BUILD_SHARED_LIBS=OFF -DOPENJPEG=$DEVSPACE/openjpeg/$TYPE -DDCMTK_DIR=$DEVSPACE/dcmtk/$TYPE -DCMAKE_INSTALL_PREFIX=$DEVSPACE/fmjpeg2koj/$TYPE
-  - make -j8 install
 
 before_script:
   - cd $TRAVIS_BUILD_DIR && mkdir -p build-$TYPE && cd build-$TYPE
