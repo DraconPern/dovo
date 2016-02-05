@@ -20,15 +20,12 @@ install:
       Invoke-WebRequest http://draconpern-buildcache.s3.amazonaws.com/fmjpeg2koj.7z -Outfile "fmjpeg2koj.7z"
   - 7z x -y fmjpeg2koj.7z
   
-#wxWidgets
+#wxWidgets  
   - cd %DEVSPACE%
-  - git clone --branch=master https://github.com/wxWidgets/wxWidgets.git
+  - ps: |
+      Invoke-WebRequest http://draconpern-buildcache.s3.amazonaws.com/wxWidgets.7z -Outfile "wxWidgets.7z"
+  - 7z x -y wxWidgets.7z   
   - set WXWIN=%DEVSPACE%\wxWidgets
-  - cd wxWidgets && git checkout v3.0.2 && cd %WXWIN%\build\msw
-  - copy /Y %WXWIN%\include\wx\msw\setup0.h %WXWIN%\include\wx\msw\setup.h
-  - powershell "gci %WXWIN%\build\msw *.vcxproj -recurse | ForEach { (Get-Content $_ | ForEach {$_ -replace 'MultiThreadedDebugDLL', 'MultiThreadedDebug'}) | Set-Content $_ }"
-  - powershell "gci %WXWIN%\build\msw *.vcxproj -recurse | ForEach { (Get-Content $_ | ForEach {$_ -replace 'MultiThreadedDLL', 'MultiThreaded'}) | Set-Content $_ }"
-  - msbuild /maxcpucount:2 /P:Configuration=%TYPE% /p:Platform="Win32" wx_vc11.sln /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
 #boost
   - cd C:\Libraries\boost_1_59_0
@@ -45,12 +42,12 @@ build_script:
   - msbuild /P:Configuration=%TYPE% ALL_BUILD.vcxproj /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
 after_build:
-  - cd %APPVEYOR_BUILD_FOLDER%\build-%TYPE%\%TYPE%
-  - 7z a dovo.zip %APPVEYOR_BUILD_FOLDER%\build-%TYPE%\%TYPE%\dovo.exe
-  - mv dovo.zip %APPVEYOR_BUILD_FOLDER%
+  - 7z a %APPVEYOR_BUILD_FOLDER%\dovo.7z %APPVEYOR_BUILD_FOLDER%\build-%TYPE%\%TYPE%\dovo.exe
+  - cd %DEVSPACE%
+  - 7z a %APPVEYOR_BUILD_FOLDER%\wxWidgets.7z wxWidgets
   
 artifacts:
-  - path: dovo.zip
+  - path: dovo.7z
     name: dovo
 
 deploy:

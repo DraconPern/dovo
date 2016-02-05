@@ -26,10 +26,8 @@ install:
 
    #wxWidgets
   - cd $DEVSPACE
-  - "[ -d wxWidgets ] || git clone --branch=master https://github.com/wxWidgets/wxWidgets.git"
-  - cd wxWidgets && git checkout v3.0.2 && mkdir -p build$TYPE && cd build$TYPE
-  - ../configure --disable-shared --with-macosx-version-min=10.9
-  - make -j8
+  - wget http://draconpern-buildcache.s3.amazonaws.com/wxWidgets-$TRAVIS_OS_NAME.zip
+  - unzip wxWidgets-$TRAVIS_OS_NAME.zip
 
   #boost preinstalled
 
@@ -44,14 +42,14 @@ script:
 before_deploy:
   - cd $TRAVIS_BUILD_DIR/build-$TYPE
   - hdiutil create -volname dovo -srcfolder $TRAVIS_BUILD_DIR/build-$TYPE/dovo.app -ov -format UDZO dovo.dmg
-  - cd $TRAVIS_BUILD_DIR/..  
+  - cd $TRAVIS_BUILD_DIR/..
   - mkdir -p dpl_cd_upload
   - mv $TRAVIS_BUILD_DIR/build-$TYPE/dovo.dmg $TRAVIS_BUILD_DIR/../dpl_cd_upload/
 deploy:
   provider: s3
   access_key_id: AKIAJLIJS2MGONMUBW4A
   secret_access_key:
-    secure: t04V7/n5MBI+vPYvd1nw/jAS+BMyFhUHWUBzZR62FpDzXI49vfJ7Bs4UJ340j2AWgoDfz2oij2f5rQIKL09Pd1436XeheHzXBuL8DDAMrGlLC33Z3vJgwCxE7dYTtbzoAZHXrIO86mSU9OGoTPl8oGHcsp/mw6gKws4gkwd4HBpMyq61je7rsbYOUePkhyBR9/+KIkDjqnqyKcayYKwKWbpfdMaGDH4sMqpXxI7fd2TAx/ars905QDkYfQ+sdAdIE4dMmPGSKL072m/Y8NGFgtvuz65mABmC62l11eXDSQG4vqmiSpg9Y+YlLWak8+6pcB2lM63zHcN+SpXBwTNc9zcEZCcDEK78wNzWP9NlsZDYz2Yx4KDSlYyUlCasDzPjwUEyfYm5WgL6ZidufInt0tK0ifJLdM7knrPgWfaVbTu0Th+o5BDzUWFw2Ck9wYXF756j6OJbgzv+N8vFY2cw3gXWRoa6jwIJPxqJsd/xW5YTS3DvQFKxzGmPjX5W5zCRsVbagnVpJ49lm8tsgHeNxjcyaHKXqJa5pt82+Ii2qH2HL8ZzxqHc53KeKg9Cj3vSujLjsrcPQ4gVycBkeSht+4eoe9uMAishDLBjRVd5ESs6tihD1VUSx0YGcvE8LYiV9YieFaV7U8BXc+1zI2B1+FUhcnGP2SnYehKIBYHN8ak=
+     secure: hiqUoDtNLKBEqPNFcXGV7pNaUyjCuNY2a22dzS6AGVXoX1IxHhI5Hnawhfevk+P6NaxGUUVgYOpc53vMtk3ng4EOH93JVysa+NwYQ2u56/Knhl7uhxG4ZGcmvMVLuzQOyBXYxz+n2vvpZRGnfGj8EuteQrA+bAKPwI18S0GxeXI=
   bucket: draconpern-buildcache
   acl: public_read
   skip_cleanup: true
