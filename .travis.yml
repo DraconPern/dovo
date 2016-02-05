@@ -17,17 +17,17 @@ install:
   #dcmtk
   - cd $DEVSPACE
   - wget http://draconpern-buildcache.s3.amazonaws.com/dcmtk-$TRAVIS_OS_NAME.zip
-  - unzip dcmtk-$TRAVIS_OS_NAME.zip
+  - unzip -q dcmtk-$TRAVIS_OS_NAME.zip
 
   #openjpeg and fmjpeg2koj
   - cd $DEVSPACE
   - wget http://draconpern-buildcache.s3.amazonaws.com/fmjpeg2koj-$TRAVIS_OS_NAME.zip
-  - unzip fmjpeg2koj-$TRAVIS_OS_NAME.zip
+  - unzip -q fmjpeg2koj-$TRAVIS_OS_NAME.zip
 
    #wxWidgets
   - cd $DEVSPACE
   - wget http://draconpern-buildcache.s3.amazonaws.com/wxWidgets-$TRAVIS_OS_NAME.zip
-  - unzip wxWidgets-$TRAVIS_OS_NAME.zip
+  - unzip -q wxWidgets-$TRAVIS_OS_NAME.zip
 
   #boost preinstalled
 
