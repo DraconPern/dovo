@@ -15,9 +15,8 @@ cmake .. -DDCMTK_WIDE_CHAR_FILE_IO_FUNCTIONS=1 -DCMAKE_INSTALL_PREFIX=$DEVSPACE/
 make -j8 install
 
 cd $DEVSPACE
-git clone --branch=master https://github.com/wxWidgets/wxWidgets.git
+git clone --branch=master https://github.com/DraconPern/wxWidgets.git
 cd $DEVSPACE/wxWidgets
-git checkout v3.0.2
 mkdir build$TYPE
 cd build$TYPE
 COMMONwxWidgetsFlag="--disable-shared"
