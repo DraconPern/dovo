@@ -189,6 +189,7 @@ int getUpdateJSON(std::string &updateinfo)
 		// std::cout << "Exception: " << e.what() << "\n";
 	}
 
+	// process the json info that's embeded in the page
 	if(potentialupdateinfo.length() == 0)
 		return 1;
 
