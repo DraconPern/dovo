@@ -9,29 +9,30 @@ install:
   - SET DEVSPACE=%APPVEYOR_BUILD_FOLDER%\..
 
 # dcmtk & zlib
-  - cd %DEVSPACE%  
-  - ps: |      
+  - cd %DEVSPACE%
+  - ps: |
       Invoke-WebRequest http://draconpern-buildcache.s3.amazonaws.com/dcmtk.7z -Outfile "dcmtk.7z"
   - 7z x -y dcmtk.7z
 
- #fmjpeg2koj & openjpeg
+#fmjpeg2koj & openjpeg
   - cd %DEVSPACE%
   - ps: |
       Invoke-WebRequest http://draconpern-buildcache.s3.amazonaws.com/fmjpeg2koj.7z -Outfile "fmjpeg2koj.7z"
   - 7z x -y fmjpeg2koj.7z
-  
-#wxWidgets  
+
+#wxWidgets
   - cd %DEVSPACE%
   - ps: |
       Invoke-WebRequest http://draconpern-buildcache.s3.amazonaws.com/wxWidgets.7z -Outfile "wxWidgets.7z"
-  - 7z x -y wxWidgets.7z   
+  - 7z x -y wxWidgets.7z
   - set WXWIN=%DEVSPACE%\wxWidgets
 
 #boost
   - cd C:\Libraries\boost_1_59_0
   - call bootstrap
-  - IF "%TYPE%" == "Release" b2 toolset=msvc-11.0 runtime-link=static define=_BIND_TO_CURRENT_VCLIBS_VERSION=1 -j 4 --with-thread --with-filesystem --with-system --with-date_time --with-regex stage release
-  - IF "%TYPE%" == "Debug"   b2 toolset=msvc-11.0 runtime-link=static define=_BIND_TO_CURRENT_VCLIBS_VERSION=1 -j 4 --with-thread --with-filesystem --with-system --with-date_time --with-regex stage debug
+  - SET BOOST_MODULES="--with-thread --with-filesystem --with-system --with-date_time --with-regex"
+  - IF "%TYPE%" == "Release" b2 toolset=msvc-11.0 runtime-link=static define=_BIND_TO_CURRENT_VCLIBS_VERSION=1 -j 4 %BOOST_MODULES% stage release
+  - IF "%TYPE%" == "Debug"   b2 toolset=msvc-11.0 runtime-link=static define=_BIND_TO_CURRENT_VCLIBS_VERSION=1 -j 4 %BOOST_MODULES% stage debug
 
 before_build:
   - cd %APPVEYOR_BUILD_FOLDER% && mkdir build-%TYPE% && cd build-%TYPE%
@@ -43,7 +44,7 @@ build_script:
 
 after_build:
   - 7z a %APPVEYOR_BUILD_FOLDER%\dovo.7z %APPVEYOR_BUILD_FOLDER%\build-%TYPE%\%TYPE%\dovo.exe
-  
+
 artifacts:
   - path: dovo.7z
     name: dovo
@@ -56,5 +57,5 @@ deploy:
     secure: cVrRAHZDL4OZaPmgpH2RAa6yKD1ckjrMvtL/RozVMTTxiMWe5+3BKGrWv7RzNQLK
   bucket: draconpern-buildcache
   set_public: true
-  folder: 
-  artifact: dovo  
+  folder:
+  artifact: dovo
