@@ -46,7 +46,7 @@ git clone --branch=openjpeg-2.1 https://github.com/uclouvain/openjpeg.git
 cd $DEVSPACE/openjpeg
 mkdir build-$TYPE
 cd build-$TYPE
-cmake .. -DBUILD_SHARED_LIBS=0 -DCMAKE_INSTALL_PREFIX=$DEVSPACE/openjpeg/$TYPE
+cmake .. -DBUILD_SHARED_LIBS=OFF -DBUILD_THIRDPARTY=ON -DCMAKE_INSTALL_PREFIX=$DEVSPACE/openjpeg/$TYPE
 make -j8 install
 
 cd $DEVSPACE
