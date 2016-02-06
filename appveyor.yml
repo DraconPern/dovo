@@ -43,8 +43,6 @@ build_script:
 
 after_build:
   - 7z a %APPVEYOR_BUILD_FOLDER%\dovo.7z %APPVEYOR_BUILD_FOLDER%\build-%TYPE%\%TYPE%\dovo.exe
-  - cd %DEVSPACE%
-  - 7z a %APPVEYOR_BUILD_FOLDER%\wxWidgets.7z wxWidgets
   
 artifacts:
   - path: dovo.7z
