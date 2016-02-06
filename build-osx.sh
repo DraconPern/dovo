@@ -20,7 +20,7 @@ cd $DEVSPACE/wxWidgets
 git checkout v3.0.2
 mkdir build$TYPE
 cd build$TYPE
-COMMONwxWidgetsFlag="--disable-shared --with-macosx-version-min=10.9"
+COMMONwxWidgetsFlag="--disable-shared"
 if [ "$TYPE" = "Release" ] ; then
   ../configure $COMMONwxWidgetsFlag
 elif [ "$TYPE" = "Debug" ] ; then
@@ -60,8 +60,7 @@ make -j8 install
 cd $BUILD_DIR
 mkdir build-$TYPE
 cd build-$TYPE
-cmake .. -DwxWidgets_CONFIG_EXECUTABLE=$DEVSPACE/wxWidgets/build$TYPE/wx-config -DBOOST_ROOT=$DEVSPACE/boost_1_60_0 -DDCMTK_DIR=$DEVSPACE/dcmtk/$TYPE -DFMJPEG2K=$DEVSPACE/fmjpeg2koj/$TYPE -DOPENJPEG=$DEVSPACE/openjpeg/$TYPE -DCMAKE_OSX_DEPLOYMENT_TARGET=10.9
-make -j8
+cmake .. -DwxWidgets_CONFIG_EXECUTABLE=$DEVSPACE/wxWidgets/build$TYPE/wx-config -DBOOST_ROOT=$DEVSPACE/boost_1_60_0 -DDCMTK_DIR=$DEVSPACE/dcmtk/$TYPE -DFMJPEG2K=$DEVSPACE/fmjpeg2koj/$TYPE -DOPENJPEG=$DEVSPACE/openjpeg/$TYPE
 
 hdiutil create -volname dovo -srcfolder $BUILD_DIR/build-$TYPE/dovo.app -ov -format UDZO dovo.dmg
 
