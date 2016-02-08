@@ -15,7 +15,7 @@ IF "%TYPE%" == "Release" copy /Y %DEVSPACE%\zlib\Release\lib\zlibstatic.lib %DEV
 IF "%TYPE%" == "Debug"   copy /Y %DEVSPACE%\zlib\Debug\lib\zlibstaticd.lib %DEVSPACE%\zlib\Debug\lib\zlib_d.lib
 
 cd %DEVSPACE%
-git clone --branch=master git://git.dcmtk.org/dcmtk.git
+git clone git@github.com:DraconPern/dcmtk.git --branch ci
 cd dcmtk
 mkdir build-%TYPE%
 cd build-%TYPE%
