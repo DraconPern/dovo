@@ -45,16 +45,13 @@ msbuild /P:Configuration=%TYPE% INSTALL.vcxproj
 if ERRORLEVEL 1 exit %ERRORLEVEL%
 
 cd %DEVSPACE%
-git clone --branch=master https://github.com/wxWidgets/wxWidgets.git
-cd wxWidgets
-git checkout v3.0.2
+git clone --branch=master https://github.com/DraconPern/fmjpeg2koj.git
+cd fmjpeg2koj
 git pull
-set WXWIN=%DEVSPACE%\wxWidgets
-cd %WXWIN%\build\msw
-copy /Y %WXWIN%\include\wx\msw\setup0.h %WXWIN%\include\wx\msw\setup.h
-powershell "gci . *.vcxproj -recurse | ForEach { (Get-Content $_ | ForEach {$_ -replace 'MultiThreadedDebugDLL', 'MultiThreadedDebug'}) | Set-Content $_ }"
-powershell "gci . *.vcxproj -recurse | ForEach { (Get-Content $_ | ForEach {$_ -replace 'MultiThreadedDLL', 'MultiThreaded'}) | Set-Content $_ }"
-msbuild /maxcpucount:5 /P:Configuration=%TYPE% /p:Platform="Win32" wx_vc11.sln
+mkdir build-%TYPE%
+cd build-%TYPE%
+cmake .. -G "Visual Studio 11" -DBUILD_SHARED_LIBS=OFF -DBUILD_THIRDPARTY=ON -DCMAKE_CXX_FLAGS_RELEASE="/MT /O2 /D NDEBUG" -DCMAKE_CXX_FLAGS_DEBUG="/D_DEBUG /MTd /Od" -DOPENJPEG=%DEVSPACE%\openjpeg\%TYPE% -DDCMTK_DIR=%DEVSPACE%\dcmtk\%TYPE% -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\fmjpeg2koj\%TYPE%
+msbuild /P:Configuration=%TYPE% INSTALL.vcxproj
 if ERRORLEVEL 1 exit %ERRORLEVEL%
 
 cd %DEVSPACE%
@@ -66,13 +63,16 @@ IF "%TYPE%" == "Release" b2 toolset=msvc-11.0 runtime-link=static define=_BIND_T
 IF "%TYPE%" == "Debug"   b2 toolset=msvc-11.0 runtime-link=static define=_BIND_TO_CURRENT_VCLIBS_VERSION=1 -j 4 --with-thread --with-filesystem --with-system stage --with-date_time --with-regex debug
 
 cd %DEVSPACE%
-git clone --branch=master https://github.com/DraconPern/fmjpeg2koj.git
-cd fmjpeg2koj
+git clone --branch=master https://github.com/wxWidgets/wxWidgets.git
+cd wxWidgets
+git checkout v3.0.2
 git pull
-mkdir build-%TYPE%
-cd build-%TYPE%
-cmake .. -G "Visual Studio 11" -DBUILD_SHARED_LIBS=OFF -DBUILD_THIRDPARTY=ON -DCMAKE_CXX_FLAGS_RELEASE="/MT /O2 /D NDEBUG" -DCMAKE_CXX_FLAGS_DEBUG="/D_DEBUG /MTd /Od" -DOPENJPEG=%DEVSPACE%\openjpeg\%TYPE% -DDCMTK_DIR=%DEVSPACE%\dcmtk\%TYPE% -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\fmjpeg2koj\%TYPE%
-msbuild /P:Configuration=%TYPE% INSTALL.vcxproj
+set WXWIN=%DEVSPACE%\wxWidgets
+cd %WXWIN%\build\msw
+copy /Y %WXWIN%\include\wx\msw\setup0.h %WXWIN%\include\wx\msw\setup.h
+powershell "gci . *.vcxproj -recurse | ForEach { (Get-Content $_ | ForEach {$_ -replace 'MultiThreadedDebugDLL', 'MultiThreadedDebug'}) | Set-Content $_ }"
+powershell "gci . *.vcxproj -recurse | ForEach { (Get-Content $_ | ForEach {$_ -replace 'MultiThreadedDLL', 'MultiThreaded'}) | Set-Content $_ }"
+msbuild /maxcpucount:5 /P:Configuration=%TYPE% /p:Platform="Win32" wx_vc11.sln
 if ERRORLEVEL 1 exit %ERRORLEVEL%
 
 cd %BUILD_DIR%
