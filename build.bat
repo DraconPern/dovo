@@ -2,7 +2,7 @@ SET TYPE=Release
 SET TYPE=Debug
 
 SET BUILD_DIR=%CD%
-SET DEVSPACE=%CD%\..
+SET DEVSPACE=%CD%
 
 cd %DEVSPACE%
 git clone --branch=master https://github.com/madler/zlib.git
@@ -16,9 +16,10 @@ IF "%TYPE%" == "Release" copy /Y %DEVSPACE%\zlib\Release\lib\zlibstatic.lib %DEV
 IF "%TYPE%" == "Debug"   copy /Y %DEVSPACE%\zlib\Debug\lib\zlibstaticd.lib %DEVSPACE%\zlib\Debug\lib\zlib_d.lib
 
 cd %DEVSPACE%
-git clone https://github.com/DraconPern/dcmtk.git --branch ci
+git clone git://git.dcmtk.org/dcmtk.git
 cd dcmtk
 git pull
+git checkout -f 5371e1d84526e7544ab7e70fb47e3cdb4e9231b2
 mkdir build-%TYPE%
 cd build-%TYPE%
 cmake .. -G "Visual Studio 11" -DDCMTK_WIDE_CHAR_FILE_IO_FUNCTIONS=1 -DDCMTK_WITH_ZLIB=1 -DWITH_ZLIBINC=%DEVSPACE%\zlib\%TYPE% -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\dcmtk\%TYPE%
