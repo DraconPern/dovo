@@ -262,8 +262,6 @@ void dovo_mainFrame::OnInstancesSelected( wxListEvent& event )
 
 	wxClientDC dc(m_preview);
 	renderPreview(dc);
-
-	m_preview->SetClientSize(s);
 }
 
 void dovo_mainFrame::OnPaintPreview( wxPaintEvent& event )
