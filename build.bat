@@ -19,7 +19,7 @@ mkdir build-%TYPE%
 cd build-%TYPE%
 cmake.exe .. -G "Visual Studio 11" -DCMAKE_C_FLAGS_RELEASE="/MT /O2 /D NDEBUG" -DCMAKE_C_FLAGS_DEBUG="/D_DEBUG /MTd /Od" -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\zlib\%TYPE%
 msbuild /P:Configuration=%TYPE% INSTALL.vcxproj
-if ERRORLEVEL 1 exit %ERRORLEVEL%
+if ERRORLEVEL 1 exit /B %ERRORLEVEL%
 IF "%TYPE%" == "Release" copy /Y %DEVSPACE%\zlib\Release\lib\zlibstatic.lib %DEVSPACE%\zlib\Release\lib\zlib_o.lib
 IF "%TYPE%" == "Debug"   copy /Y %DEVSPACE%\zlib\Debug\lib\zlibstaticd.lib %DEVSPACE%\zlib\Debug\lib\zlib_d.lib
 
@@ -32,7 +32,7 @@ mkdir build-%TYPE%
 cd build-%TYPE%
 cmake .. -G "Visual Studio 11" -DDCMTK_WIDE_CHAR_FILE_IO_FUNCTIONS=1 -DDCMTK_WITH_ZLIB=1 -DWITH_ZLIBINC=%DEVSPACE%\zlib\%TYPE% -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\dcmtk\%TYPE%
 msbuild /maxcpucount:8 /P:Configuration=%TYPE% INSTALL.vcxproj
-if ERRORLEVEL 1 exit %ERRORLEVEL%
+if ERRORLEVEL 1 exit /B %ERRORLEVEL%
 
 cd %DEVSPACE%
 git clone --branch=openjpeg-2.1 https://github.com/uclouvain/openjpeg.git
@@ -42,7 +42,7 @@ mkdir build-%TYPE%
 cd build-%TYPE%
 cmake .. -G "Visual Studio 11" -DBUILD_THIRDPARTY=1 -DBUILD_SHARED_LIBS=0 -DCMAKE_C_FLAGS_RELEASE="/MT /O2 /D NDEBUG" -DCMAKE_C_FLAGS_DEBUG="/D_DEBUG /MTd /Od" -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\openjpeg\%TYPE%
 msbuild /P:Configuration=%TYPE% INSTALL.vcxproj
-if ERRORLEVEL 1 exit %ERRORLEVEL%
+if ERRORLEVEL 1 exit /B %ERRORLEVEL%
 
 cd %DEVSPACE%
 git clone --branch=master https://github.com/DraconPern/fmjpeg2koj.git
@@ -52,7 +52,7 @@ mkdir build-%TYPE%
 cd build-%TYPE%
 cmake .. -G "Visual Studio 11" -DBUILD_SHARED_LIBS=OFF -DBUILD_THIRDPARTY=ON -DCMAKE_CXX_FLAGS_RELEASE="/MT /O2 /D NDEBUG" -DCMAKE_CXX_FLAGS_DEBUG="/D_DEBUG /MTd /Od" -DOPENJPEG=%DEVSPACE%\openjpeg\%TYPE% -DDCMTK_DIR=%DEVSPACE%\dcmtk\%TYPE% -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\fmjpeg2koj\%TYPE%
 msbuild /P:Configuration=%TYPE% INSTALL.vcxproj
-if ERRORLEVEL 1 exit %ERRORLEVEL%
+if ERRORLEVEL 1 exit /B %ERRORLEVEL%
 
 cd %DEVSPACE%
 wget -c http://downloads.sourceforge.net/project/boost/boost/1.60.0/boost_1_60_0.zip
@@ -73,7 +73,7 @@ copy /Y %WXWIN%\include\wx\msw\setup0.h %WXWIN%\include\wx\msw\setup.h
 powershell "gci . *.vcxproj -recurse | ForEach { (Get-Content $_ | ForEach {$_ -replace 'MultiThreadedDebugDLL', 'MultiThreadedDebug'}) | Set-Content $_ }"
 powershell "gci . *.vcxproj -recurse | ForEach { (Get-Content $_ | ForEach {$_ -replace 'MultiThreadedDLL', 'MultiThreaded'}) | Set-Content $_ }"
 msbuild /maxcpucount:5 /P:Configuration=%TYPE% /p:Platform="Win32" wx_vc11.sln
-if ERRORLEVEL 1 exit %ERRORLEVEL%
+if ERRORLEVEL 1 exit /B %ERRORLEVEL%
 
 cd %BUILD_DIR%
 git pull
@@ -81,6 +81,6 @@ mkdir build-%TYPE%
 cd build-%TYPE%
 cmake .. -G "Visual Studio 11" -DwxWidgets_ROOT_DIR=%WXWIN% -DBOOST_ROOT=%DEVSPACE%\boost_1_60_0 -DDCMTK_DIR=%DEVSPACE%\dcmtk\%TYPE% -DZLIB_ROOT=%DEVSPACE%\zlib\%TYPE% -DFMJPEG2K=%DEVSPACE%\fmjpeg2koj\%TYPE% -DOPENJPEG=%DEVSPACE%\openjpeg\%TYPE% -DVLD="C:\Program Files (x86)\Visual Leak Detector"
 msbuild /P:Configuration=%TYPE% ALL_BUILD.vcxproj
-if ERRORLEVEL 1 exit %ERRORLEVEL%
+if ERRORLEVEL 1 exit /B %ERRORLEVEL%
 
 cd %BUILD_DIR%
