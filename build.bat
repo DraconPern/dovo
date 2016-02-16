@@ -11,6 +11,8 @@ IF "%1"=="Debug" (
 SET BUILD_DIR=%CD%
 SET DEVSPACE=%CD%
 
+SET CL=/MP
+
 cd %DEVSPACE%
 git clone --branch=master https://github.com/madler/zlib.git
 cd zlib
