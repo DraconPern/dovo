@@ -1,17 +1,18 @@
 CLASS MACHINE
-	CATEGORY "FrontMotion"
-		CATEGORY "dovo"
-		
-		KEYNAME "Software\Policies\FrontMotion\dovo"
+  CATEGORY "FrontMotion"
+    CATEGORY "dovo"
+    
+    KEYNAME "Software\Policies\FrontMotion\dovo"
 #if version >= 5
-		POLICY "Destinations"
-			EXPLAIN !!Destinations_Explain
-			PART Destinations LISTBOX
-				VALUEPREFIX ""
-				KEYNAME "Software\Policies\FrontMotion\dovo\Destinations"
-			END PART
-		END POLICY
-#else
+    POLICY "Destinations"
+      EXPLAIN !!Destinations_Explain
+      PART Destinations LISTBOX
+        VALUEPREFIX ""
+        KEYNAME "Software\Policies\FrontMotion\dovo\Destinations"
+      END PART
+    END POLICY
+#endif
+#if version < 5
     POLICY "Destinations"
       EXPLAIN !!Destinations_Explain
       KEYNAME "Software\Policies\FrontMotion\dovo\Destinations"        
@@ -35,8 +36,8 @@ CLASS MACHINE
       END PART        
     END POLICY
 #endif
-			
-	END CATEGORY
+      
+  END CATEGORY
 END CATEGORY
 
 [strings]
