@@ -1,16 +1,11 @@
 #!/bin/sh 
 set -xe
 
-if [ $1 -eq "Debug" ]
+if [ $1 -eq "Release" ]
 then
-  TYPE=Debug
-else
-  if [ $1 -eq "Release" ]
-  then
-    SET TYPE=Release
-  else
-    SET TYPE=Debug
-  fi
+  TYPE=Release
+else 
+  TYPE=Debug  
 fi
 
 # a top level directory for all PACS related code

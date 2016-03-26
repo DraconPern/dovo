@@ -1,12 +1,9 @@
-IF "%1"=="Debug" (
-  SET TYPE=Debug
+IF "%1"=="Release" (
+SET TYPE=Release
 ) ELSE (
-  IF "%1"=="Release" (
-    SET TYPE=Release
-  ) ELSE (
-    SET TYPE=Debug
-  )
+SET TYPE=Debug
 )
+
 
 SET BUILD_DIR=%CD%
 SET DEVSPACE=%CD%
