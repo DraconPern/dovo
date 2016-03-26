@@ -1,7 +1,7 @@
 #!/bin/bash
 set -xe
 
-if [ $1 -eq "Release" ]
+if [ "$1" == "Release" ]
 then
   TYPE=Release
 else 
