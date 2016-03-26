@@ -1,4 +1,4 @@
-#!/bin/sh
+
 TYPE=Release
 #TYPE=Debug
 
