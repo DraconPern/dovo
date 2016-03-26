@@ -1,23 +1,34 @@
+#!/bin/sh 
+set -xe
 
-TYPE=Release
-#TYPE=Debug
+if [ $1 -eq "Debug" ]
+then
+  TYPE=Debug
+else
+  if [ $1 -eq "Release" ]
+  then
+    SET TYPE=Release
+  else
+    SET TYPE=Debug
+  fi
+fi
 
 # a top level directory for all PACS related code
 BUILD_DIR=`pwd`
 DEVSPACE=`cd .. ; pwd`
 
 cd $DEVSPACE
-git clone git@github.com:DraconPern/dcmtk.git --branch ci
+[[ -d dcmtk ]] || git clone git@github.com:DraconPern/dcmtk.git --branch ci
 cd $DEVSPACE/dcmtk
-mkdir build-$TYPE
+mkdir -p build-$TYPE
 cd build-$TYPE
 cmake .. -DDCMTK_WIDE_CHAR_FILE_IO_FUNCTIONS=1 -DDCMTK_WITH_TIFF=OFF -DDCMTK_WITH_PNG=OFF -DDCMTK_WITH_OPENSSL=OFF -DDCMTK_WITH_XML=OFF -DDCMTK_WITH_ZLIB=ON -DDCMTK_WITH_SNDFILE=OFF -DDCMTK_WITH_ICONV=OFF -DDCMTK_WITH_WRAP=OFF -DCMAKE_INSTALL_PREFIX=$DEVSPACE/dcmtk/$TYPE
 make -j8 install
 
 cd $DEVSPACE
-git clone --branch=master https://github.com/DraconPern/wxWidgets.git
+[[ -d wxWidgets ]] || git clone --branch=master https://github.com/DraconPern/wxWidgets.git
 cd $DEVSPACE/wxWidgets
-mkdir build$TYPE
+mkdir -p build$TYPE
 cd build$TYPE
 COMMONwxWidgetsFlag="--disable-shared"
 if [ "$TYPE" = "Release" ] ; then
@@ -41,23 +52,23 @@ elif [ "$TYPE" = "Debug" ] ; then
 fi
 
 cd $DEVSPACE
-git clone --branch=openjpeg-2.1 https://github.com/uclouvain/openjpeg.git
+[[ -d openjpeg ]] || git clone --branch=openjpeg-2.1 https://github.com/uclouvain/openjpeg.git
 cd $DEVSPACE/openjpeg
-mkdir build-$TYPE
+mkdir -p build-$TYPE
 cd build-$TYPE
 cmake .. -DBUILD_SHARED_LIBS=OFF -DBUILD_THIRDPARTY=ON -DCMAKE_INSTALL_PREFIX=$DEVSPACE/openjpeg/$TYPE
 make -j8 install
 
 cd $DEVSPACE
-git clone --branch=master https://github.com/DraconPern/fmjpeg2koj.git
+[[ -d fmjpeg2koj ]] || git clone --branch=master https://github.com/DraconPern/fmjpeg2koj.git
 cd $DEVSPACE/fmjpeg2koj
-mkdir build-$TYPE
+mkdir -p build-$TYPE
 cd build-$TYPE
 cmake .. -DBUILD_SHARED_LIBS=OFF -DOPENJPEG=$DEVSPACE/openjpeg/$TYPE -DDCMTK_DIR=$DEVSPACE/dcmtk/$TYPE -DCMAKE_INSTALL_PREFIX=$DEVSPACE/fmjpeg2koj/$TYPE
 make -j8 install
 
 cd $BUILD_DIR
-mkdir build-$TYPE
+mkdir -p build-$TYPE
 cd build-$TYPE
 cmake .. -DwxWidgets_CONFIG_EXECUTABLE=$DEVSPACE/wxWidgets/build$TYPE/wx-config -DBOOST_ROOT=$DEVSPACE/boost_1_60_0 -DDCMTK_DIR=$DEVSPACE/dcmtk/$TYPE -DFMJPEG2K=$DEVSPACE/fmjpeg2koj/$TYPE -DOPENJPEG=$DEVSPACE/openjpeg/$TYPE
 
