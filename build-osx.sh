@@ -8,9 +8,8 @@ else
   TYPE=Debug
 fi
 
-# a top level directory for all PACS related code
 BUILD_DIR=`pwd`
-DEVSPACE=`cd .. ; pwd`
+DEVSPACE=`pwd`
 
 cd $DEVSPACE
 [[ -d dcmtk ]] || git clone git://git.dcmtk.org/dcmtk.git
