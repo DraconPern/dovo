@@ -58,8 +58,9 @@ wget -c http://downloads.sourceforge.net/project/boost/boost/1.60.0/boost_1_60_0
 unzip -n boost_1_60_0.zip
 cd boost_1_60_0
 call bootstrap
-IF "%TYPE%" == "Release" b2 toolset=msvc-11.0 runtime-link=static define=_BIND_TO_CURRENT_VCLIBS_VERSION=1 -j 4 --with-thread --with-filesystem --with-system stage --with-date_time --with-regex release
-IF "%TYPE%" == "Debug"   b2 toolset=msvc-11.0 runtime-link=static define=_BIND_TO_CURRENT_VCLIBS_VERSION=1 -j 4 --with-thread --with-filesystem --with-system stage --with-date_time --with-regex debug
+SET BOOSTMODULES=--with-atomic --with-thread --with-filesystem --with-system stage --with-date_time --with-regex
+IF "%TYPE%" == "Release" b2 toolset=msvc-11.0 runtime-link=static define=_BIND_TO_CURRENT_VCLIBS_VERSION=1 -j 4 %BOOSTMODULES% release
+IF "%TYPE%" == "Debug"   b2 toolset=msvc-11.0 runtime-link=static define=_BIND_TO_CURRENT_VCLIBS_VERSION=1 -j 4 %BOOSTMODULES% debug
 
 cd %DEVSPACE%
 git clone --branch=master https://github.com/wxWidgets/wxWidgets.git

@@ -24,7 +24,7 @@ find_package(Boost REQUIRED thread filesystem system regex date_time)
 set(wxWidgets_USE_STATIC   ON)
 #define this so that wxWidgets doesn't define it. Conflicts w/ dcmtk's declaration
 add_definitions(-DHAVE_SSIZE_T)
-find_package(wxWidgets REQUIRED core base adv)
+find_package(wxWidgets COMPONENTS core base adv REQUIRED)
 include(${wxWidgets_USE_FILE})
 
 #enable dcmtk filename to have wide version, only affects WIN32.  http://utf8everywhere.org/
