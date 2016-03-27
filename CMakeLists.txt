@@ -6,6 +6,8 @@ set(VERSION "1.0.5")
 
 add_definitions(-DDOVO_VERSION="${VERSION}")
 
+set (CMAKE_CXX_STANDARD 11)
+
 if(WIN32)
 	#VC++ stuff
 	add_definitions(-D_UNICODE)
