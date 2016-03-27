@@ -28,9 +28,9 @@ mkdir -p build$TYPE
 cd build$TYPE
 COMMONwxWidgetsFlag="--disable-shared"
 if [ "$TYPE" = "Release" ] ; then
-  ../configure $COMMONwxWidgetsFlag
+  ../configure $COMMONwxWidgetsFlag CXXFLAGS="-std=c++11 -stdlib=libc++" CPPFLAGS=-stdlib=libc++ LIBS=-lc++
 elif [ "$TYPE" = "Debug" ] ; then
-  ../configure $COMMONwxWidgetsFlag --enable-debug
+  ../configure $COMMONwxWidgetsFlag CXXFLAGS="-std=c++11 -stdlib=libc++" CPPFLAGS=-stdlib=libc++ LIBS=-lc++ --enable-debug
 fi
 make -j8
 
