@@ -4,8 +4,8 @@ set -xe
 if [ "$1" == "Release" ]
 then
   TYPE=Release
-else 
-  TYPE=Debug  
+else
+  TYPE=Debug
 fi
 
 # a top level directory for all PACS related code
@@ -22,8 +22,9 @@ cmake .. -DDCMTK_WIDE_CHAR_FILE_IO_FUNCTIONS=1 -DDCMTK_WITH_TIFF=OFF -DDCMTK_WIT
 make -j8 install
 
 cd $DEVSPACE
-[[ -d wxWidgets ]] || git clone --branch=master https://github.com/DraconPern/wxWidgets.git
+[[ -d wxWidgets ]] || git clone --branch=master https://github.com/wxWidgets/wxWidgets.git
 cd $DEVSPACE/wxWidgets
+git checkout v3.0.2
 mkdir -p build$TYPE
 cd build$TYPE
 COMMONwxWidgetsFlag="--disable-shared"
