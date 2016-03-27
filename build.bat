@@ -64,7 +64,7 @@ IF "%TYPE%" == "Debug"   b2 toolset=msvc-11.0 runtime-link=static define=_BIND_T
 cd %DEVSPACE%
 git clone --branch=master https://github.com/wxWidgets/wxWidgets.git
 cd wxWidgets
-git checkout v3.0.2
+git checkout v3.1.0
 git pull
 set WXWIN=%DEVSPACE%\wxWidgets
 cd %WXWIN%\build\msw

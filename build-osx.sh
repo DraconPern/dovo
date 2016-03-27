@@ -23,7 +23,7 @@ make -j8 install
 cd $DEVSPACE
 [[ -d wxWidgets ]] || git clone --branch=master https://github.com/wxWidgets/wxWidgets.git
 cd $DEVSPACE/wxWidgets
-git checkout v3.0.2
+git checkout v3.1.0
 mkdir -p build$TYPE
 cd build$TYPE
 COMMONwxWidgetsFlag="--disable-shared"
@@ -67,6 +67,7 @@ cd $BUILD_DIR
 mkdir -p build-$TYPE
 cd build-$TYPE
 cmake .. -DwxWidgets_CONFIG_EXECUTABLE=$DEVSPACE/wxWidgets/build$TYPE/wx-config -DBOOST_ROOT=$DEVSPACE/boost_1_60_0 -DDCMTK_DIR=$DEVSPACE/dcmtk/$TYPE -DFMJPEG2K=$DEVSPACE/fmjpeg2koj/$TYPE -DOPENJPEG=$DEVSPACE/openjpeg/$TYPE
+make -j8
 
 hdiutil create -volname dovo -srcfolder $BUILD_DIR/build-$TYPE/dovo.app -ov -format UDZO dovo.dmg
 
