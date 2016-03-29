@@ -33,11 +33,11 @@ void dovo_changePatientInfo::m_enableEditOnCheckBox( wxCommandEvent& event )
 
 void dovo_changePatientInfo::OnOK( wxCommandEvent& event )
 {
-m_patientName = m_patientNameCtrl->GetValue();
-m_patientID = m_patientIDCtrl->GetValue();
-m_birthday = m_birthdayCtrl->GetValue();
-
-event.Skip();
+	m_patientName = m_patientNameCtrl->GetValue();
+	m_patientID = m_patientIDCtrl->GetValue();
+	m_birthday = m_birthdayCtrl->GetValue();
+	m_changeInfo = m_enableEdit->GetValue();
+	event.Skip();
 }
 
 

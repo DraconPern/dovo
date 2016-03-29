@@ -26,7 +26,7 @@ class dovo_changePatientInfo : public changePatientInfo
 		wxString m_patientID;
 		wxString m_patientName;
 		wxString m_birthday;
-
+		bool m_changeInfo;
 
 
 };

@@ -16,17 +16,17 @@ dovo_mainFrame::dovo_mainFrame( wxWindow* parent )
 	m_about->Hide();
 	m_exit->Hide();
 #endif
-	// Create the UI
-	m_patients->InsertColumn(0, _("Name"));
-	m_patients->InsertColumn(1, "ID");
+	// Create the UI	
+	m_patients->InsertColumn(0, "ID");
+	m_patients->InsertColumn(1, _("Name"));
 	m_patients->InsertColumn(2, _("Birthday"));
 
 	m_studies->InsertColumn(0, _("Date"));
 	m_studies->InsertColumn(1, _("Study"));
-	m_studies->InsertColumn(2, "StudyID");
+	m_studies->InsertColumn(2, "StudyUID");
 
 	m_series->InsertColumn(0, _("Series"));
-	m_series->InsertColumn(1, "SeriesID");
+	m_series->InsertColumn(1, "SeriesUID");
 
 	m_instances->InsertColumn(0, "sop UID");
 	m_instances->InsertColumn(1, _("path"));
@@ -41,6 +41,8 @@ dovo_mainFrame::dovo_mainFrame( wxWindow* parent )
 	FillDestinationList();
 
 	image.Create(1, 1);
+
+	// initlog();
 }
 
 dovo_mainFrame::~dovo_mainFrame()
@@ -87,8 +89,6 @@ void dovo_mainFrame::FillDestinationList()
 		m_destination->Append(wxString::FromUTF8((*itr).name.c_str()));
 }
 
-typedef std::map<std::string, std::string, doj::alphanum_less<std::string> > naturalmap;
-
 void dovo_mainFrame::OnUpdate( wxCommandEvent& event )
 {
 	m_patients->DeleteAllItems();
@@ -108,8 +108,8 @@ void dovo_mainFrame::OnUpdate( wxCommandEvent& event )
 
 	// show and wait for thread to end.
 	dlg.ShowModal();
-
-	m_engine.GetPatients(fillpatients, this);
+	
+	m_engine.patientdata.GetPatients(boost::bind(&dovo_mainFrame::fillpatientscallback, this, _1));
 	m_patients->SetColumnWidth(0, wxLIST_AUTOSIZE);
 	m_patients->SetColumnWidth(1, wxLIST_AUTOSIZE);
 	m_patients->SetColumnWidth(2, wxLIST_AUTOSIZE);
@@ -118,12 +118,11 @@ void dovo_mainFrame::OnUpdate( wxCommandEvent& event )
 	//	m_patients->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
 }
 
-int dovo_mainFrame::fillpatients(void *param,int columns,char** values, char**names)
-{
-	dovo_mainFrame *win = (dovo_mainFrame *) param;
-	win->m_patients->InsertItem(0, values[0]);
-	win->m_patients->SetItem(0, 1, values[1]);
-	win->m_patients->SetItem(0, 2, values[2]);
+int dovo_mainFrame::fillpatientscallback(Patient &patient)
+{	
+	m_patients->InsertItem(0, patient.patid);
+	m_patients->SetItem(0, 1, patient.name);
+	m_patients->SetItem(0, 2, patient.birthday);
 	return 0;
 }
 
@@ -133,8 +132,8 @@ void dovo_mainFrame::OnPatientsSelected( wxListEvent& event )
 	if (item == -1)
 		return;
 
-	m_studies->DeleteAllItems();
-	m_engine.GetStudies(m_patients->GetItemText(item, 1).ToUTF8().data(), fillstudies, this);
+	m_studies->DeleteAllItems();	
+	m_engine.patientdata.GetStudies(m_patients->GetItemText(item, 0).ToUTF8().data(), boost::bind(&dovo_mainFrame::fillstudiescallback, this, _1));
 	m_studies->SetColumnWidth(0, wxLIST_AUTOSIZE);
 	m_studies->SetColumnWidth(1, wxLIST_AUTOSIZE);
 	m_studies->SetColumnWidth(2, wxLIST_AUTOSIZE);
@@ -143,20 +142,15 @@ void dovo_mainFrame::OnPatientsSelected( wxListEvent& event )
 		m_studies->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
 }
 
-int dovo_mainFrame::fillstudies(void *param,int columns,char** values, char**names)
-{
-	dovo_mainFrame *win = (dovo_mainFrame *) param;
-
-	std::string date;
-	date = values[2];
-
+int dovo_mainFrame::fillstudiescallback(Study &study)
+{		
 	struct tm thedate;
 	memset(&thedate, 0, sizeof(struct tm));
 	try
 	{
-		thedate.tm_year = boost::lexical_cast<int>(date.substr(0, 4)) - 1900;
-		thedate.tm_mon = boost::lexical_cast<int>(date.substr(4, 2)) - 1;
-		thedate.tm_mday = boost::lexical_cast<int>(date.substr(6, 2));
+		thedate.tm_year = boost::lexical_cast<int>(study.studydate.substr(0, 4)) - 1900;
+		thedate.tm_mon = boost::lexical_cast<int>(study.studydate.substr(4, 2)) - 1;
+		thedate.tm_mday = boost::lexical_cast<int>(study.studydate.substr(6, 2));
 	}
 	catch(...)
 	{
@@ -170,9 +164,9 @@ int dovo_mainFrame::fillstudies(void *param,int columns,char** values, char**nam
 
 	strftime(buf, 1024, "%x", &thedate);
 
-	win->m_studies->InsertItem(0, buf);
-	win->m_studies->SetItem(0, 1, wxString::FromUTF8(values[1]));
-	win->m_studies->SetItem(0, 2, wxString::FromUTF8(values[0]));
+	m_studies->InsertItem(0, buf);
+	m_studies->SetItem(0, 1, wxString::FromUTF8(study.studydesc.c_str()));
+	m_studies->SetItem(0, 2, wxString::FromUTF8(study.studyuid.c_str()));
 	return 0;
 }
 
@@ -185,7 +179,7 @@ void dovo_mainFrame::OnStudiesSelected( wxListEvent& event )
 	naturalmap entries;
 
 	m_series->DeleteAllItems();
-	m_engine.GetSeries(m_studies->GetItemText(item, 2).ToUTF8().data(), fillseries, &entries);
+	m_engine.patientdata.GetSeries(m_studies->GetItemText(item, 2).ToUTF8().data(), boost::bind(&dovo_mainFrame::fillseriescallback, this, _1, &entries));
 
 	int j = 0;
 	for(naturalmap::iterator ii = entries.begin(); ii != entries.end(); ++ii)
@@ -202,10 +196,9 @@ void dovo_mainFrame::OnStudiesSelected( wxListEvent& event )
 		m_series->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
 }
 
-int dovo_mainFrame::fillseries(void *param,int columns,char** values, char**names)
-{
-	naturalmap *entries = (naturalmap *)param;
-	entries->insert(std::pair<std::string, std::string>(values[0],values[1]));	
+int dovo_mainFrame::fillseriescallback(Series &series, naturalmap *entries)
+{	
+	entries->insert(std::pair<std::string, std::string>(series.seriesuid, series.seriesdesc));	
 	return 0;
 }
 
@@ -218,7 +211,7 @@ void dovo_mainFrame::OnSeriesSelected( wxListEvent& event )
 	naturalmap entries;
 
 	m_instances->DeleteAllItems();
-	m_engine.GetInstances(m_series->GetItemText(item, 1).ToUTF8().data(), fillinstances, &entries);
+	m_engine.patientdata.GetInstances(m_series->GetItemText(item, 1).ToUTF8().data(), boost::bind(&dovo_mainFrame::fillinstancescallback, this, _1, &entries));
 
 	int j = 0;
 	for(naturalmap::iterator ii = entries.begin(); ii != entries.end(); ++ii)
@@ -235,10 +228,9 @@ void dovo_mainFrame::OnSeriesSelected( wxListEvent& event )
 		m_instances->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
 }
 
-int dovo_mainFrame::fillinstances(void *param,int columns,char** values, char**names)
-{
-	naturalmap *entries = (naturalmap *)param;
-	entries->insert(std::pair<std::string, std::string>(values[0],values[1]));
+int dovo_mainFrame::fillinstancescallback(Instance &instance, naturalmap *entries)
+{	
+	entries->insert(std::pair<std::string, std::string>(instance.sopuid, instance.filename));
 	return 0;
 }
 
@@ -289,28 +281,22 @@ void dovo_mainFrame::OnSend( wxCommandEvent& event )
 		wxMessageBox(_("Please select a destination."), _("Error"), wxOK, this);
 		return;
 	}
+	
+	wxString &patientid = m_patients->GetItemText(item);
 
-	wxString patientname = m_patients->GetItemText(item);
-	wxString patientid = m_patients->GetItemText(item, 1);
-	wxString birthday = m_patients->GetItemText(item, 2);
 	dovo_changePatientInfo changepatinfo(this);
-	changepatinfo.m_patientName = m_patients->GetItemText(item);
+	changepatinfo.m_patientName = patientid;
 	changepatinfo.m_patientID = m_patients->GetItemText(item, 1);
 	changepatinfo.m_birthday = m_patients->GetItemText(item, 2);
-
-	wxString new_patientName, new_patientID, new_birthday;
+	
 	if(changepatinfo.ShowModal() == wxID_OK)
-	{
-		if(changepatinfo.m_patientName != m_patients->GetItemText(item))
-			new_patientName = changepatinfo.m_patientName;
-
-		if(changepatinfo.m_patientID != m_patients->GetItemText(item, 1))
-			new_patientID = changepatinfo.m_patientID;
-
-		if(changepatinfo.m_birthday != m_patients->GetItemText(item, 2))
-			new_birthday = changepatinfo.m_birthday;
-
-		m_engine.StartSend(patientname.ToUTF8().data(), patientid.ToUTF8().data(), birthday.ToUTF8().data(), new_patientName.ToUTF8().data(), new_patientID.ToUTF8().data(), new_birthday.ToUTF8().data(), m_destination->GetSelection());
+	{				
+		m_engine.StartSend(patientid.ToUTF8().data(), 
+			changepatinfo.m_changeInfo, 
+			changepatinfo.m_patientID.ToUTF8().data(), 
+			changepatinfo.m_patientName.ToUTF8().data(), 
+			changepatinfo.m_birthday.ToUTF8().data(), 
+			m_destination->GetSelection());
 
 		dovo_sendStatus dlg(this);
 		dlg.m_sender = &m_engine.sender;

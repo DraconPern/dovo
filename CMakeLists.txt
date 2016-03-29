@@ -55,6 +55,7 @@ set(dovo_HEADERS
 	src/dovo_changePatientInfo.h
 	sqlite3/sqlite3.h
 	src/engine.h
+	src/patientdata.h
 	src/destinationentry.h
 	src/dicomscanner.h
 	src/dicomsender.h
@@ -77,6 +78,7 @@ set(dovo_SRCS
 	sqlite3/sqlite3.c
 	sqlite3/sqlite3_exec_stmt.c
 	src/engine.cpp
+	src/patientdata.cpp
 	src/dicomscanner.cpp
 	src/dicomsender.cpp
 	src/dcm2img.cpp

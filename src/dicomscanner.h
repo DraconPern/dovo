@@ -2,24 +2,34 @@
 #define _DICOMSCANNER_
 
 #include <boost/filesystem.hpp>
-#include "sqlite3.h"
+#include <boost/thread/mutex.hpp>
+#include "patientdata.h"
 
-class DICOMFileScannerImpl;
+
 class DICOMFileScanner
 {
 public:
-	DICOMFileScanner();
-	~DICOMFileScanner();
-
-	void Initialize(sqlite3 *db, boost::filesystem::path scanPath);
-	void Clear(void);
-
-	static void DoScanThread(void *obj);
+	DICOMFileScanner(PatientData &patientdata);
+	~DICOMFileScanner(void);
+	
+	void DoScanAsync(boost::filesystem::path path);
+	void DoScan(boost::filesystem::path path);		
 
 	void Cancel();
 	bool IsDone();
-private:
-	DICOMFileScannerImpl *impl;
-};
 
+	PatientData &patientdata;
+protected:
+	static void DoScanThread(void *obj);
+	void ScanFile(boost::filesystem::path path);
+	void ScanDir(boost::filesystem::path path);
+
+	bool IsCanceled();
+	void SetDone(bool state);
+
+	// threading data
+	boost::mutex mutex;
+	bool cancelEvent, doneEvent;	
+	boost::filesystem::path m_scanPath;
+};
 #endif

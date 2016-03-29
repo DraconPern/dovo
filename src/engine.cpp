@@ -14,30 +14,17 @@
 #include <boost/spirit/include/classic_confix.hpp>
 #include <boost/spirit/include/classic_escape_char.hpp>
 #include "sqlite3_exec_stmt.h"
-#include <boost/thread.hpp>
+
 
 engine::engine()	
+	: scanner(patientdata), sender(patientdata)
 {
-	db = NULL;
-
-	if(sqlite3_open_v2(":memory:", &db, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_NOMUTEX, NULL))
-	{
-		std::ostringstream msg;
-		msg << "Can't create database: " << sqlite3_errmsg(db);
-		throw std::runtime_error(msg.str().c_str());				
-	}	
-
-	sqlite3_exec(db, "CREATE TABLE images (name TEXT, patid TEXT, birthday TEXT, \
-					 studyuid TEXT, modality TEXT, studydesc TEXT, studydate TEXT, \
-					 seriesuid TEXT, seriesdesc TEXT, \
-					 sopuid TEXT UNIQUE, filename TEXT)", NULL, NULL, NULL);
-
+	
 }
 
 engine::~engine()
 {
-	if(db)
-		sqlite3_close(db);
+	
 }
 
 void engine::SaveDestinationList()
@@ -149,10 +136,8 @@ void engine::LoadGlobalDestinationList()
 
 void engine::StartScan(boost::filesystem::path path)
 {
-	sqlite3_exec(db, "DELETE FROM images", NULL, NULL, NULL);
-	scanner.Initialize(db, path);
-	boost::thread t(DICOMFileScanner::DoScanThread, &scanner);
-	t.detach();
+	patientdata.Clear();
+	scanner.DoScanAsync(path);
 }
 
 void engine::StopScan()
@@ -161,87 +146,26 @@ void engine::StopScan()
 }
 
 
-void engine::StartSend(std::string PatientName, std::string PatientID, std::string BirthDay, std::string NewPatientName, std::string NewPatientID, std::string NewBirthDay, int destination)
+void engine::StartSend(std::string patientid, bool changePatientInfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, int destination)
 {
 	// find the destination
-	std::string destinationHost;
-	int destinationPort;
-	std::string destinationAETitle, ourAETitle;
+	DestinationEntry dest;
 
 	if(destination < globalDestinations.size())
 	{
-		destinationHost = globalDestinations[destination].destinationHost;
-		destinationPort = globalDestinations[destination].destinationPort;
-		destinationAETitle = globalDestinations[destination].destinationAETitle;
-		ourAETitle = globalDestinations[destination].ourAETitle;
+		dest = globalDestinations[destination];		
 	}
 	else
 	{
 		destination -= globalDestinations.size();
-		destinationHost = destinations[destination].destinationHost;
-		destinationPort = destinations[destination].destinationPort;
-		destinationAETitle = destinations[destination].destinationAETitle;
-		ourAETitle = destinations[destination].ourAETitle;
+		dest = destinations[destination];
 	}
-
-	sender.Initialize(PatientName, PatientID, BirthDay, 
-		NewPatientName, NewPatientID, NewBirthDay,
-		destinationHost, destinationPort, destinationAETitle, ourAETitle);
-
-	sender.SetFileList(db);
-
-	// start the thread, let the sender manage (e.g. cancel), so we don't need to track anymore
-	boost::thread t(DICOMSender::DoSendThread, &sender);
-	t.detach(); 
+	
+	sender.DoSendAsync(patientid, changePatientInfo, NewPatientID, NewPatientName, NewBirthDay, dest);
+	
 }
 
 void engine::StopSend()
 {
 	sender.Cancel();
-}
-
-void engine::GetPatients(sqlite3_callback fillname, void *obj)
-{	
-	std::string selectsql = "SELECT MIN(name), patid, MIN(birthday) FROM images GROUP BY patid ORDER BY name";
-	sqlite3_stmt *select;
-	sqlite3_prepare_v2(db, selectsql.c_str(), selectsql.length(), &select, NULL);
-	sqlite3_exec_stmt(select, fillname, obj, NULL);
-	sqlite3_finalize(select);
-}
-
-void engine::GetStudies(std::string patientid, sqlite3_callback fillstudy, void *obj)
-{
-	std::string selectsql = "SELECT studyuid, MIN(studydesc), MIN(studydate) FROM images WHERE (patid = ?) GROUP BY studyuid ORDER BY studyuid ASC";
-	sqlite3_stmt *select;
-	sqlite3_prepare_v2(db, selectsql.c_str(), selectsql.length(), &select, NULL);
-
-	sqlite3_bind_text(select, 1, patientid.c_str(), patientid.length(), SQLITE_STATIC);
-
-	sqlite3_exec_stmt(select, fillstudy, obj, NULL);		
-	sqlite3_finalize(select);
-}
-
-void engine::GetSeries(std::string studyuid, sqlite3_callback fillseries, void *obj)
-{
-	std::string selectsql = "SELECT seriesuid, MIN(seriesdesc) FROM images WHERE (studyuid = ?) GROUP BY seriesuid ORDER BY seriesuid ASC";
-	sqlite3_stmt *select;
-	sqlite3_prepare_v2(db, selectsql.c_str(), selectsql.length(), &select, NULL);
-
-	sqlite3_bind_text(select, 1, studyuid.c_str(), studyuid.length(), SQLITE_STATIC);
-
-	sqlite3_exec_stmt(select, fillseries, obj, NULL);		
-	sqlite3_finalize(select);
-}
-
-
-void engine::GetInstances(std::string seriesuid, sqlite3_callback fillinstances, void *obj)
-{
-	std::string selectsql = "SELECT sopuid, filename FROM images WHERE (seriesuid = ?) ORDER BY sopuid ASC";
-	sqlite3_stmt *select;
-	sqlite3_prepare_v2(db, selectsql.c_str(), selectsql.length(), &select, NULL);
-
-	sqlite3_bind_text(select, 1, seriesuid.c_str(), seriesuid.length(), SQLITE_STATIC);
-
-	sqlite3_exec_stmt(select, fillinstances, obj, NULL);		
-	sqlite3_finalize(select);
 }

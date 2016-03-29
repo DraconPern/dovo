@@ -15,7 +15,6 @@
 
 #include <boost/thread.hpp>
 
-
 class MyApp: public wxApp
 {
 public:
@@ -60,13 +59,6 @@ BEGIN_EVENT_TABLE(MyApp, wxApp)
 
 	// check for update	for next run
 	updater = boost::thread(&updateChecker);
-
-
-	/*
-	Update notice, message
-	Exit notice, message
-
-	*/
 
 	RegisterCodecs();
 

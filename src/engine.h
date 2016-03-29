@@ -5,6 +5,7 @@
 #include "destinationentry.h"
 #include "dicomscanner.h"
 #include "dicomsender.h"
+#include "patientdata.h"
 
 class engine
 {
@@ -17,19 +18,14 @@ public:
 	void LoadGlobalDestinationList();
 	void SaveDestinationList();
 	void StartScan(boost::filesystem::path path);
-	void StopScan();
-	void StartSend(std::string PatientName, std::string PatientID, std::string BirthDay, std::string NewPatientName, std::string NewPatientID, std::string NewBirthDay, int destination);
+	void StopScan();	
+	void StartSend(std::string patientid, bool changePatientInfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, int destination);
 	void StopSend();
-	void GetPatients(sqlite3_callback fillname, void *obj);
-	void GetStudies(std::string patientid, sqlite3_callback fillstudy, void *obj);
-	void GetSeries(std::string studyuid, sqlite3_callback fillseries, void *obj);
-	void GetInstances(std::string seriesuid, sqlite3_callback fillinstances, void *obj);	
+
 	DICOMFileScanner scanner;
 	DICOMSender sender;
-protected:
+	PatientData patientdata;
 
-	sqlite3 *db;
-	
 };
 
 #endif

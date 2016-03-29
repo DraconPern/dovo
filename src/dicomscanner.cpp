@@ -1,8 +1,8 @@
 
 #include "dicomscanner.h"
-#include <boost/thread/mutex.hpp>
-#include "sqlite3_exec_stmt.h"
+
 #include <codecvt>
+#include <boost/thread.hpp>
 
 // work around the fact that dcmtk doesn't work in unicode mode, so all string operation needs to be converted from/to mbcs
 #ifdef _UNICODE
@@ -26,56 +26,18 @@
 #endif
 
 
-
-class DICOMFileScannerImpl
+DICOMFileScanner::DICOMFileScanner(PatientData &patientdata) 
+	: patientdata(patientdata)
 {
-public:
-	DICOMFileScannerImpl(void);
-	~DICOMFileScannerImpl(void);
-
-	void Initialize(sqlite3 *db, boost::filesystem::path scanPath);
-
-	void DoScan(boost::filesystem::path path);
-
-	static void DoScanThread(void *obj);
-	boost::filesystem::path m_scanPath;
-
-	void Cancel();
-	bool IsDone();
-
-	sqlite3 *db;
-protected:
-	void ScanFile(boost::filesystem::path path);
-	void ScanDir(boost::filesystem::path path);
-
-	bool IsCanceled();
-	void SetDone(bool state);
-
-	boost::mutex mutex;
-	bool cancelEvent, doneEvent;
-
-	sqlite3_stmt *insertImage;
-};
-
-DICOMFileScannerImpl::DICOMFileScannerImpl()
-{
-	cancelEvent = doneEvent = false;
-	db = NULL;
+	cancelEvent = doneEvent = false;	
 	m_scanPath = "";
 }
 
-DICOMFileScannerImpl::~DICOMFileScannerImpl()
+DICOMFileScanner::~DICOMFileScanner()
 {	
 }
 
-void DICOMFileScannerImpl::Initialize(sqlite3 *db, boost::filesystem::path scanPath)
-{
-	cancelEvent = doneEvent = false;
-	this->db = db;
-	this->m_scanPath = scanPath;
-}
-
-void DICOMFileScannerImpl::ScanFile(boost::filesystem::path path)
+void DICOMFileScanner::ScanFile(boost::filesystem::path path)
 {
 	DcmFileFormat dfile;
 	OFCondition cond = dfile.loadFile(path.c_str());
@@ -84,11 +46,11 @@ void DICOMFileScannerImpl::ScanFile(boost::filesystem::path path)
 		OFString patientname, patientid, birthday;
 		OFString studyuid, modality, studydesc, studydate;
 		OFString seriesuid, seriesdesc;
-		OFString sopuid;
+		OFString sopuid, sopclassuid, transfersyntax;
 		dfile.getDataset()->findAndGetOFString(DCM_PatientName, patientname);
 		if(patientname.size() == 0)
 			return;
-
+	
 		dfile.getDataset()->findAndGetOFString(DCM_PatientID, patientid);
 		dfile.getDataset()->findAndGetOFString(DCM_PatientBirthDate, birthday);
 		dfile.getDataset()->findAndGetOFString(DCM_StudyInstanceUID, studyuid);
@@ -100,37 +62,35 @@ void DICOMFileScannerImpl::ScanFile(boost::filesystem::path path)
 		dfile.getDataset()->findAndGetOFString(DCM_SeriesDescription, seriesdesc);
 
 		dfile.getDataset()->findAndGetOFString(DCM_SOPInstanceUID, sopuid);
+		dfile.getDataset()->findAndGetOFString(DCM_SOPClassUID, sopclassuid);
+		DcmXfer filexfer(dfile.getDataset()->getOriginalXfer());
+		transfersyntax = filexfer.getXferID();
+		
+		patientdata.AddPatient(patientid.c_str(), patientname.c_str(), birthday.c_str());
+		patientdata.AddStudy(studyuid.c_str(), patientid.c_str(), studydesc.c_str(), studydate.c_str());
+		patientdata.AddSeries(seriesuid.c_str(), studyuid.c_str(), seriesdesc.c_str());
 
-		sqlite3_bind_text(insertImage, 1, patientname.c_str(), strlen(patientname.c_str()), SQLITE_STATIC);
-		sqlite3_bind_text(insertImage, 2, patientid.c_str(), strlen(patientid.c_str()), SQLITE_STATIC);
-		sqlite3_bind_text(insertImage, 3, birthday.c_str(), strlen(birthday.c_str()), SQLITE_STATIC);
-
-		sqlite3_bind_text(insertImage, 4, studyuid.c_str(), strlen(studyuid.c_str()), SQLITE_STATIC);
-		sqlite3_bind_text(insertImage, 5, modality.c_str(), strlen(modality.c_str()), SQLITE_STATIC);
-		sqlite3_bind_text(insertImage, 6, studydesc.c_str(), strlen(studydesc.c_str()), SQLITE_STATIC);
-		sqlite3_bind_text(insertImage, 7, studydate.c_str(), strlen(studydate.c_str()), SQLITE_STATIC);
-
-		sqlite3_bind_text(insertImage, 8, seriesuid.c_str(), strlen(seriesuid.c_str()), SQLITE_STATIC);
-		sqlite3_bind_text(insertImage, 9, seriesdesc.c_str(), strlen(seriesdesc.c_str()), SQLITE_STATIC);
-
-		sqlite3_bind_text(insertImage, 10, sopuid.c_str(), strlen(sopuid.c_str()), SQLITE_STATIC);
-
-#ifdef _WIN32
-		// on Windows, boost::filesystem::path is a wstring, so we need to convert to utf8
-		std::string p = path.string(std::codecvt_utf8<boost::filesystem::path::value_type>());
-		sqlite3_bind_text(insertImage, 11, p.c_str(), p.length(), SQLITE_STATIC);
+#ifdef _WIN32		
+		std::string filename = path.string(std::codecvt_utf8<boost::filesystem::path::value_type>());				
 #else
-		sqlite3_bind_text(insertImage, 11, path.string().c_str(), path.string().length(), SQLITE_STATIC);
+		std::string filename = path.string();
 #endif
-		sqlite3_exec_stmt(insertImage, NULL, NULL, NULL);
-
+		
+		patientdata.AddInstance(sopuid.c_str(), seriesuid.c_str(), filename, sopclassuid.c_str(), transfersyntax.c_str());		
 	}
 
 }
 
-void DICOMFileScannerImpl::DoScanThread(void *obj)
+void DICOMFileScanner::DoScanAsync(boost::filesystem::path path)
 {
-	DICOMFileScannerImpl *me = (DICOMFileScannerImpl *) obj;
+	m_scanPath = path;
+	boost::thread t(DICOMFileScanner::DoScanThread, this);
+	t.detach();	
+}
+
+void DICOMFileScanner::DoScanThread(void *obj)
+{
+	DICOMFileScanner *me = (DICOMFileScanner *) obj;
 	if(me)
 	{
 		me->SetDone(false);
@@ -140,13 +100,10 @@ void DICOMFileScannerImpl::DoScanThread(void *obj)
 
 }
 
-void DICOMFileScannerImpl::DoScan(boost::filesystem::path path)
+void DICOMFileScanner::DoScan(boost::filesystem::path path)
 {	
 	OFLog::configure(OFLogger::OFF_LOG_LEVEL);
-
-	std::string imagesql = "INSERT INTO images VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-	sqlite3_prepare_v2(db, imagesql.c_str(), imagesql.length(), &insertImage, NULL);
-
+	
 	// catch any access errors
 	try
 	{
@@ -156,11 +113,10 @@ void DICOMFileScannerImpl::DoScan(boost::filesystem::path path)
 	{
 
 	}
-
-	sqlite3_finalize(insertImage);
+	
 }
 
-void DICOMFileScannerImpl::ScanDir(boost::filesystem::path path)
+void DICOMFileScanner::ScanDir(boost::filesystem::path path)
 {
 	boost::filesystem::path someDir(path);
 	boost::filesystem::directory_iterator end_iter;
@@ -189,57 +145,26 @@ void DICOMFileScannerImpl::ScanDir(boost::filesystem::path path)
 }
 
 
-void DICOMFileScannerImpl::Cancel()
+void DICOMFileScanner::Cancel()
 {
 	boost::mutex::scoped_lock lk(mutex);
 	cancelEvent = true;
 }
 
-bool DICOMFileScannerImpl::IsDone()
+bool DICOMFileScanner::IsDone()
 {
 	boost::mutex::scoped_lock lk(mutex);
 	return doneEvent;
 }
 
-bool DICOMFileScannerImpl::IsCanceled()
+bool DICOMFileScanner::IsCanceled()
 {
 	boost::mutex::scoped_lock lk(mutex);
 	return cancelEvent;
 }
 
-void DICOMFileScannerImpl::SetDone(bool state)
+void DICOMFileScanner::SetDone(bool state)
 {
 	boost::mutex::scoped_lock lk(mutex);
 	doneEvent = state;
-}
-
-DICOMFileScanner::DICOMFileScanner(void)
-{
-	impl = new DICOMFileScannerImpl;
-}
-
-DICOMFileScanner::~DICOMFileScanner(void)
-{
-	delete impl;
-}
-
-void DICOMFileScanner::Initialize(sqlite3 *db, boost::filesystem::path scanPath)
-{
-	impl->Initialize(db, scanPath);
-}
-
-void DICOMFileScanner::DoScanThread(void *obj)
-{	
-	DICOMFileScannerImpl::DoScanThread(((DICOMFileScanner *) obj)->impl);
-}
-
-
-void DICOMFileScanner::Cancel()
-{
-	impl->Cancel();
-}
-
-bool DICOMFileScanner::IsDone()
-{
-	return impl->IsDone();
 }

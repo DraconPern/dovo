@@ -5,7 +5,7 @@ dovo_sendStatus::dovo_sendStatus( wxWindow* parent )
 	sendStatus( parent )
 {
 	timer.Connect(wxEVT_TIMER, wxTimerEventHandler( dovo_sendStatus::OnTimer ), NULL, this );
-	timer.Start(500);	
+	timer.Start(200);	
 }
 
 void dovo_sendStatus::OnStop( wxCommandEvent& event )
