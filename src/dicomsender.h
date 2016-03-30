@@ -8,20 +8,7 @@
 #include "patientdata.h"
 #include "destinationentry.h"
 
-// work around the fact that dcmtk doesn't work in unicode mode, so all string operation needs to be converted from/to mbcs
-#ifdef _UNICODE
-#undef _UNICODE
-#undef UNICODE
-#define _UNDEFINEDUNICODE
-#endif
-
 #include "dcmtk/ofstd/ofcond.h"
-
-#ifdef _UNDEFINEDUNICODE
-#define _UNICODE 1
-#define UNICODE 1
-#endif
-
 
 class DICOMSender
 {	
@@ -85,6 +72,9 @@ protected:
 	int fillinstances(Instance &instance, naturalmap *entries);
 	std::vector<std::string> studies, series;
 	naturalmap instances;	// sopid, filename, this ensures we send out instances in sopid order
+
+	// bool updateStringAttributeValue(DcmItem* dataset, const DcmTagKey key, std::string value);
+	// void replacePatientInfoInformation(DcmDataset* dataset);
 };
 
 #endif

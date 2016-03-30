@@ -146,6 +146,10 @@ void DICOMSender::DoSend(std::string PatientID, bool changeinfo, std::string New
 		}
 	}
 		
+	std::stringstream msg;
+	msg << "Sending " << instances.size() << " images\n";
+	log.Write(msg);
+
 	int retry = 0;
 	int unsentcountbefore = 0;
 	int unsentcountafter = 0;
@@ -163,7 +167,9 @@ void DICOMSender::DoSend(std::string PatientID, bool changeinfo, std::string New
 		// only do a sleep if there's more to send, we didn't send anything out, and we still want to retry
 		if (unsentcountafter > 0 && unsentcountbefore == unsentcountafter && retry < 10000)
 		{
-			retry++;
+			retry++;			
+			msg << unsentcountafter << " images left to send\n";
+			log.Write(msg);
 			log.Write("Waiting 1 mins before retry\n");
 
 			// sleep loop with cancel check, 1 minutes
@@ -301,7 +307,7 @@ int DICOMSender::SendABatch()
 }
 /*
 
-bool DICOMSenderImpl::updateStringAttributeValue(DcmItem* dataset, const DcmTagKey& key, OFString value)
+bool DICOMSender::updateStringAttributeValue(DcmItem* dataset, const DcmTagKey& key, std::string value)
 {
 	DcmStack stack;
 	DcmTag tag(key);
@@ -329,7 +335,7 @@ bool DICOMSenderImpl::updateStringAttributeValue(DcmItem* dataset, const DcmTagK
 		return false;
 	}
 
-	cond = elem->putOFStringArray(value);
+	cond = elem->putOFStringArray(value.c_str());
 	if (cond != EC_Normal)
 	{
 		std::stringstream msg;
@@ -344,30 +350,35 @@ bool DICOMSenderImpl::updateStringAttributeValue(DcmItem* dataset, const DcmTagK
 
 void DICOMSender::replacePatientInfoInformation(DcmDataset* dataset)
 {
-	std::stringstream msg;		
+	std::stringstream msg;
 
-	if (m_NewPatientID.length() != 0)
+	if(changeinfo)
 	{
-		msg << "Changing PatientID from " << m_PatientID << " to " << m_NewPatientID << std::endl;
-		log.Write(msg);
-		updateStringAttributeValue(dataset, DCM_PatientID, m_NewPatientID.c_str());
-	}
+		if (NewPatientID.length() != 0)
+		{
+			msg << "Changing PatientID to " << NewPatientID << std::endl;
+			log.Write(msg);
+			updateStringAttributeValue(dataset, DCM_PatientID, NewPatientID);
+		}
 
-	if (m_NewPatientName.length() != 0)
-	{
-		msg << "Changing PatientName from " << m_PatientName << "to " << m_NewPatientName << std::endl;
-		log.Write(msg);
-		updateStringAttributeValue(dataset, DCM_PatientName, m_NewPatientName.c_str());
-	}
+		if (NewPatientName.length() != 0)
+		{
+			msg << "Changing PatientName to " << NewPatientName << std::endl;
+			log.Write(msg);
+			updateStringAttributeValue(dataset, DCM_PatientName, NewPatientName);
+		}
 
-	if (m_NewBirthDay.length() != 0)
-	{
-		msg << "Changing Birthday from " << m_BirthDay << " to " << m_NewBirthDay << std::endl;
-		log.Write(msg);
-		updateStringAttributeValue(dataset, DCM_PatientBirthDate, m_NewBirthDay.c_str());
+		if (NewBirthDay.length() != 0)
+		{
+			msg << "Changing Birthday to " << NewBirthDay << std::endl;
+			log.Write(msg);
+			updateStringAttributeValue(dataset, DCM_PatientBirthDate, NewBirthDay);
+		}
 	}
 }
 
+*/
+/*
 
 void DICOMSender::progressCallback(void * callbackData, T_DIMSE_StoreProgress *progress, T_DIMSE_C_StoreRQ * req)
 {
