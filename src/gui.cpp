@@ -173,7 +173,7 @@ mainFrame::mainFrame( wxWindow* parent, wxWindowID id, const wxString& title, co
 {
 	this->SetSizeHints( wxSize( -1,-1 ), wxDefaultSize );
 	this->SetExtraStyle( wxWS_EX_VALIDATE_RECURSIVELY );
-	this->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_WINDOW ) );
+	this->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_BTNFACE ) );
 	
 	wxBoxSizer* bSizer14;
 	bSizer14 = new wxBoxSizer( wxHORIZONTAL );
@@ -378,7 +378,7 @@ about::about( wxWindow* parent, wxWindowID id, const wxString& title, const wxPo
 	m_sdbSizer1->AddButton( m_sdbSizer1OK );
 	m_sdbSizer1->Realize();
 	
-	bSizer28->Add( m_sdbSizer1, 1, wxALIGN_BOTTOM|wxALL|wxEXPAND, 5 );
+	bSizer28->Add( m_sdbSizer1, 1, wxALL|wxEXPAND, 5 );
 	
 	
 	this->SetSizer( bSizer28 );
