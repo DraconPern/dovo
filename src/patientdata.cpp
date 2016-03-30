@@ -56,12 +56,12 @@ int PatientData::AddPatient(std::string patid, std::string name, std::string bir
 
 int getpatientscallback(void *param,int columns,char** values, char**names)
 {
-	boost::function<int(Patient)> pfn = * static_cast<boost::function<int(Patient)> *>(param);	
+	boost::function<int(Patient &)> pfn = * static_cast<boost::function<int(Patient &)> *>(param);	
 	// patient ID, name, birthday
 	return pfn(Patient(values[0], values[1], values[2]));	
 }
 
-void PatientData::GetPatients(boost::function<int(Patient) > action)
+void PatientData::GetPatients(boost::function<int(Patient &) > action)
 {	
 	std::string selectsql = "SELECT patid, name, birthday FROM patients ORDER BY patid";
 	sqlite3_stmt *select;
@@ -89,13 +89,13 @@ int PatientData::AddStudy(std::string studyuid, std::string patid, std::string s
 
 int getstudiescallback(void *param,int columns,char** values, char**names)
 {
-	boost::function<int(Study)> pfn = * static_cast<boost::function<int(Study)> *>(param);
+	boost::function<int(Study &)> pfn = * static_cast<boost::function<int(Study &)> *>(param);
 	// studyuid, studydesc, studydate
 	return pfn(Study(values[0], values[1], values[2], values[3]));
 }
 
 // void PatientData::GetStudies(std::vector<Study> &studies)
-void PatientData::GetStudies(std::string patientid, boost::function< int(Study) > action)
+void PatientData::GetStudies(std::string patientid, boost::function< int(Study &) > action)
 {
 	std::string selectsql = "SELECT studyuid, patid, studydesc, studydate FROM studies WHERE (patid = ?) ORDER BY studyuid ASC";
 	sqlite3_stmt *select;
@@ -123,12 +123,12 @@ int PatientData::AddSeries(std::string seriesuid, std::string studyuid, std::str
 
 int getseriescallback(void *param,int columns,char** values, char**names)
 {
-	boost::function<int(Series)> pfn = * static_cast<boost::function<int(Series)> *>(param);	
+	boost::function<int(Series &)> pfn = * static_cast<boost::function<int(Series &)> *>(param);	
 	// seriesuid, seriesdesc
 	return pfn(Series(values[0], values[1], values[2]));
 }
 
-void PatientData::GetSeries(std::string studyuid, boost::function< int(Series) > action)
+void PatientData::GetSeries(std::string studyuid, boost::function< int(Series &) > action)
 {
 	std::string selectsql = "SELECT seriesuid, studyuid, seriesdesc FROM series WHERE (studyuid = ?) ORDER BY seriesuid ASC";
 	sqlite3_stmt *select;
@@ -158,13 +158,13 @@ int PatientData::AddInstance(std::string sopuid, std::string seriesuid, std::str
 
 int getinstancescallback(void *param,int columns,char** values, char**names)
 {
-	boost::function<int(Instance)> pfn = * static_cast<boost::function<int(Instance)> *>(param);	
+	boost::function<int(Instance &)> pfn = * static_cast<boost::function<int(Instance &)> *>(param);	
 	// sopuid, filename
 	return pfn(Instance(values[0], values[1], values[2], values[3], values[4]));
 }
 
 //void PatientData::GetInstances(std::vector<Instance> &instances)
-void PatientData::GetInstances(std::string seriesuid, boost::function< int(Instance) > action)
+void PatientData::GetInstances(std::string seriesuid, boost::function< int(Instance &) > action)
 {
 	std::string selectsql = "SELECT sopuid, seriesuid, filename, sopclassuid, transfersyntax FROM instances WHERE (seriesuid = ?) ORDER BY sopuid ASC";
 	sqlite3_stmt *select;

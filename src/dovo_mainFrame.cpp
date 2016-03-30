@@ -282,7 +282,7 @@ void dovo_mainFrame::OnSend( wxCommandEvent& event )
 		return;
 	}
 	
-	wxString &patientid = m_patients->GetItemText(item);
+	wxString patientid = m_patients->GetItemText(item);
 
 	dovo_changePatientInfo changepatinfo(this);
 	changepatinfo.m_patientName = patientid;

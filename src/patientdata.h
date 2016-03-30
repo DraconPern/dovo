@@ -56,16 +56,16 @@ public:
 	PatientData();
 	~PatientData();
 	int AddPatient(std::string patid, std::string name, std::string birthday);
-	void GetPatients(boost::function< int(Patient) > action);
+	void GetPatients(boost::function< int(Patient &) > action);
 	// void GetPatients(std::vector<Patient> &patients);
 	int AddStudy(std::string studyuid, std::string patid, std::string studydesc, std::string studydate);
-	void GetStudies(std::string patientid, boost::function< int(Study) > action);
+	void GetStudies(std::string patientid, boost::function< int(Study &) > action);
 	// void GetStudies(std::vector<Study> &studies);
 	int AddSeries(std::string seriesuid, std::string studyuid, std::string seriesdesc);	
-	void GetSeries(std::string studyuid, boost::function< int(Series) > action);
+	void GetSeries(std::string studyuid, boost::function< int(Series &) > action);
 	// void GetSeries(std::vector<Series> &series);
 	int AddInstance(std::string sopuid, std::string seriesuid, std::string filename, std::string sopclassuid, std::string transfersyntax);
-	void GetInstances(std::string seriesuid, boost::function< int(Instance) > action);
+	void GetInstances(std::string seriesuid, boost::function< int(Instance &) > action);
 	// void GetInstances(std::vector<Instance> &instances);
 	void Clear();
 
