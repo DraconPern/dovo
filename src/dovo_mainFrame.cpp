@@ -285,8 +285,8 @@ void dovo_mainFrame::OnSend( wxCommandEvent& event )
 	wxString patientid = m_patients->GetItemText(item);
 
 	dovo_changePatientInfo changepatinfo(this);
-	changepatinfo.m_patientName = patientid;
-	changepatinfo.m_patientID = m_patients->GetItemText(item, 1);
+	changepatinfo.m_patientID = patientid;
+	changepatinfo.m_patientName = m_patients->GetItemText(item, 1);
 	changepatinfo.m_birthday = m_patients->GetItemText(item, 2);
 	
 	if(changepatinfo.ShowModal() == wxID_OK)
