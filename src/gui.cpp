@@ -298,7 +298,7 @@ mainFrame::mainFrame( wxWindow* parent, wxWindowID id, const wxString& title, co
 	bSizer181->Add( m_exit, 0, wxALL|wxBOTTOM, 5 );
 	
 	
-	bSizer17->Add( bSizer181, 0, wxALIGN_BOTTOM|wxEXPAND, 5 );
+	bSizer17->Add( bSizer181, 0, wxEXPAND, 5 );
 	
 	
 	bSizer14->Add( bSizer17, 0, wxBOTTOM|wxEXPAND|wxRIGHT|wxTOP, 5 );
@@ -533,7 +533,7 @@ searchStatus::searchStatus( wxWindow* parent, wxWindowID id, const wxString& tit
 	
 	m_progress = new wxGauge( this, wxID_ANY, 100, wxDefaultPosition, wxDefaultSize, wxGA_HORIZONTAL|wxGA_SMOOTH );
 	m_progress->SetValue( 0 ); 
-	bSizer28->Add( m_progress, 1, wxALIGN_CENTER_VERTICAL|wxBOTTOM|wxEXPAND|wxLEFT|wxTOP, 15 );
+	bSizer28->Add( m_progress, 1, wxBOTTOM|wxEXPAND|wxLEFT|wxTOP, 15 );
 	
 	m_stop = new wxButton( this, wxID_ANY, _("Stop"), wxDefaultPosition, wxDefaultSize, 0 );
 	bSizer28->Add( m_stop, 0, wxALIGN_CENTER_VERTICAL|wxALL, 15 );
