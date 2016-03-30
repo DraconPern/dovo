@@ -63,10 +63,27 @@ cd build-$TYPE
 cmake .. -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=$TYPE -DOPENJPEG=$DEVSPACE/openjpeg/$TYPE -DDCMTK_DIR=$DEVSPACE/dcmtk/$TYPE -DCMAKE_INSTALL_PREFIX=$DEVSPACE/fmjpeg2koj/$TYPE
 make -j8 install
 
+cd $DEVSPACE
+wget -c https://www.ece.uvic.ca/~frodo/jasper/software/jasper-1.900.1.zip
+unzip -n jasper-1.900.1.zip
+cd $DEVSPACE/jasper-1.900.1
+mkdir -p build-$TYPE
+cd build-$TYPE
+cmake .. -DBUILD_SHARED_LIBS=0 -DCMAKE_BUILD_TYPE=$TYPE -DJASPERDIR=$DEVSPACE/jasper-1.900.1 -DCMAKE_INSTALL_PREFIX=$DEVSPACE/jasper/$TYPE
+make -j8 install
+
+cd $DEVSPACE
+[[ -d fmjpeg2kjasper ]] || git clone --branch=master https://github.com/DraconPern/fmjpeg2kjasper.git
+cd $DEVSPACE/fmjpeg2kjasper
+mkdir -p build-$TYPE
+cd build-$TYPE
+cmake .. -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=$TYPE -DJASPER=$DEVSPACE/jasper/$TYPE -DDCMTK_DIR=$DEVSPACE/dcmtk/$TYPE -DCMAKE_INSTALL_PREFIX=$DEVSPACE/fmjpeg2kjasper/$TYPE
+make -j8 install
+
 cd $BUILD_DIR
 mkdir -p build-$TYPE
 cd build-$TYPE
-cmake .. -DCMAKE_BUILD_TYPE=$TYPE -DwxWidgets_CONFIG_EXECUTABLE=$DEVSPACE/wxWidgets/build$TYPE/wx-config -DBOOST_ROOT=$DEVSPACE/boost_1_60_0 -DDCMTK_DIR=$DEVSPACE/dcmtk/$TYPE -DFMJPEG2K=$DEVSPACE/fmjpeg2koj/$TYPE -DOPENJPEG=$DEVSPACE/openjpeg/$TYPE
+cmake .. -DCMAKE_BUILD_TYPE=$TYPE -DwxWidgets_CONFIG_EXECUTABLE=$DEVSPACE/wxWidgets/build$TYPE/wx-config -DBOOST_ROOT=$DEVSPACE/boost_1_60_0 -DDCMTK_DIR=$DEVSPACE/dcmtk/$TYPE -DFMJPEG2K=$DEVSPACE/fmjpeg2koj/$TYPE -DOPENJPEG=$DEVSPACE/openjpeg/$TYPE -DFMJP2K=$DEVSPACE/fmjpeg2kjasper/$TYPE -DJASPER=$DEVSPACE/jasper/$TYPE
 make -j8
 
 hdiutil create -volname dovo -srcfolder $BUILD_DIR/build-$TYPE/dovo.app -ov -format UDZO dovo.dmg
