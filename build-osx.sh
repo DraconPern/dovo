@@ -66,7 +66,7 @@ make -j8 install
 cd $DEVSPACE
 wget -c https://www.ece.uvic.ca/~frodo/jasper/software/jasper-1.900.1.zip
 unzip -n jasper-1.900.1.zip
-cd $DEVSPACE/jasper-1.900.1
+cd $DEVSPACE/jasper
 mkdir -p build-$TYPE
 cd build-$TYPE
 cmake .. -DBUILD_SHARED_LIBS=0 -DCMAKE_BUILD_TYPE=$TYPE -DJASPERDIR=$DEVSPACE/jasper-1.900.1 -DCMAKE_INSTALL_PREFIX=$DEVSPACE/jasper/$TYPE

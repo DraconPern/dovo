@@ -122,7 +122,7 @@ void RegisterCodecs()
 	DcmRLEEncoderRegistration::registerCodecs();    
 	DcmRLEDecoderRegistration::registerCodecs();			
 	FMJPEG2KEncoderRegistration::registerCodecs();
-	FMJPEG2KDecoderRegistration::registerCodecs();
+	//FMJPEG2KDecoderRegistration::registerCodecs();
 	FMJP2KCodecRegistration::registerCodecs();
 }
 
@@ -136,5 +136,6 @@ void DeregisterCodecs()
 	DcmRLEEncoderRegistration::cleanup();    
 	DcmRLEDecoderRegistration::cleanup();		
 	FMJPEG2KEncoderRegistration::cleanup();
-	FMJPEG2KDecoderRegistration::cleanup();
+	// FMJPEG2KDecoderRegistration::cleanup();
+	FMJP2KCodecRegistration::cleanup();
 }
