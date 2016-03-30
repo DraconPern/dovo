@@ -94,10 +94,11 @@ set(jasper_SRCS
 
 
 #VC++ stuff
+if(WIN32)
 add_definitions(-D_BIND_TO_CURRENT_VCLIBS_VERSION=1)
-
-#JASPER stuff
 add_definitions(-DJAS_WIN_MSVC_BUILD)
+endif()
+
 add_definitions(-DEXCLUDE_MIF_SUPPORT)
 add_definitions(-DEXCLUDE_PNM_SUPPORT)
 add_definitions(-DEXCLUDE_BMP_SUPPORT)
