@@ -57,8 +57,8 @@ int PatientData::AddPatient(std::string patid, std::string name, std::string bir
 int getpatientscallback(void *param,int columns,char** values, char**names)
 {
 	boost::function<int(Patient &)> pfn = * static_cast<boost::function<int(Patient &)> *>(param);	
-	// patient ID, name, birthday
-	return pfn(Patient(values[0], values[1], values[2]));	
+	Patient result(values[0], values[1], values[2]);
+	return pfn(result);	
 }
 
 void PatientData::GetPatients(boost::function<int(Patient &) > action)
@@ -90,8 +90,8 @@ int PatientData::AddStudy(std::string studyuid, std::string patid, std::string s
 int getstudiescallback(void *param,int columns,char** values, char**names)
 {
 	boost::function<int(Study &)> pfn = * static_cast<boost::function<int(Study &)> *>(param);
-	// studyuid, studydesc, studydate
-	return pfn(Study(values[0], values[1], values[2], values[3]));
+	Study result(values[0], values[1], values[2], values[3]);
+	return pfn(result);
 }
 
 // void PatientData::GetStudies(std::vector<Study> &studies)
@@ -124,8 +124,8 @@ int PatientData::AddSeries(std::string seriesuid, std::string studyuid, std::str
 int getseriescallback(void *param,int columns,char** values, char**names)
 {
 	boost::function<int(Series &)> pfn = * static_cast<boost::function<int(Series &)> *>(param);	
-	// seriesuid, seriesdesc
-	return pfn(Series(values[0], values[1], values[2]));
+	Series result(values[0], values[1], values[2]);
+	return pfn(result);
 }
 
 void PatientData::GetSeries(std::string studyuid, boost::function< int(Series &) > action)
@@ -159,8 +159,8 @@ int PatientData::AddInstance(std::string sopuid, std::string seriesuid, std::str
 int getinstancescallback(void *param,int columns,char** values, char**names)
 {
 	boost::function<int(Instance &)> pfn = * static_cast<boost::function<int(Instance &)> *>(param);	
-	// sopuid, filename
-	return pfn(Instance(values[0], values[1], values[2], values[3], values[4]));
+	Instance result(values[0], values[1], values[2], values[3], values[4]);
+	return pfn(result);
 }
 
 //void PatientData::GetInstances(std::vector<Instance> &instances)
