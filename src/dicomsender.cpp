@@ -19,29 +19,84 @@
 #include "dcmtk/dcmnet/diutil.h"
 #include "dcmtk/dcmnet/scu.h"
 
-// check DCMTK functionality
-#if !defined(WIDE_CHAR_FILE_IO_FUNCTIONS) && defined(_WIN32)
-#error "DCMTK and this program must be compiled with DCMTK_WIDE_CHAR_FILE_IO_FUNCTIONS"
-#endif
-
 #ifdef _UNDEFINEDUNICODE
 #define _UNICODE 1
 #define UNICODE 1
 #endif
 
 
+class DICOMSenderImpl
+{	
 
-DICOMSender::DICOMSender(PatientData &patientdata) 
+public:
+	DICOMSenderImpl(PatientData &patientdata);
+	~DICOMSenderImpl(void);
+
+	void DoSendAsync(std::string PatientID, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, DestinationEntry destination);	
+	void DoSend(std::string PatientID, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, DestinationEntry destination);	
+
+	std::string ReadLog();
+	void WriteLog(const char *msg);
+	void WriteLog(std::string &msg);
+
+	void Cancel();
+	bool IsDone();				
+protected:
+	static void DoSendThread(void *obj);
+	PatientData &patientdata;
+	
+	int SendABatch();
+
+	bool IsCanceled();
+	void SetDone(bool state);
+
+	// threading data
+	boost::mutex mutex;
+	bool cancelEvent, doneEvent;
+	std::string PatientID;
+	bool changeinfo;	
+	std::string NewPatientID;
+	std::string NewPatientName;
+	std::string NewBirthDay;
+	DestinationEntry m_destination;	
+	
+	typedef std::map<std::string, std::set<std::string> > mapset;
+	mapset sopclassuidtransfersyntax;
+
+	class GUILog
+	{
+	public:
+		void Write(const char *msg);
+		void Write(const OFCondition &cond);
+		void Write(std::stringstream &stream);
+		std::string Read();
+	protected:
+		std::stringstream mycout;	
+		boost::mutex mycoutmutex;
+	};
+
+	GUILog log;
+
+	typedef std::map<std::string, std::string, doj::alphanum_less<std::string> > naturalmap;	
+	int fillstudies(Study &study);	
+	int fillseries(Series &series);
+	int fillinstances(Instance &instance, naturalmap *entries);
+	std::vector<std::string> studies, series;
+	naturalmap instances;	// sopid, filename, this ensures we send out instances in sopid order	
+};
+
+
+DICOMSenderImpl::DICOMSenderImpl(PatientData &patientdata) 
 	: patientdata(patientdata)
 {			
 	cancelEvent = doneEvent = false;
 }
 
-DICOMSender::~DICOMSender()
+DICOMSenderImpl::~DICOMSenderImpl()
 {
 }
 
-void DICOMSender::DoSendAsync(std::string PatientID, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, DestinationEntry destination)
+void DICOMSenderImpl::DoSendAsync(std::string PatientID, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, DestinationEntry destination)
 {
 	cancelEvent = doneEvent = false;
 	
@@ -53,14 +108,14 @@ void DICOMSender::DoSendAsync(std::string PatientID, bool changeinfo, std::strin
 	this->m_destination = destination;	
 
 	// start the thread, let the sender manage (e.g. cancel), so we don't need to track anymore
-	boost::thread t(DICOMSender::DoSendThread, this);
+	boost::thread t(DICOMSenderImpl::DoSendThread, this);
 	t.detach();
 }
 
 class MyAppender : public dcmtk::log4cplus::Appender 
 {
 public:      
-    MyAppender(DICOMSender &sender) : sender(sender) {}              
+    MyAppender(DICOMSenderImpl &sender) : sender(sender) {}              
 	virtual void close() { closed = true; }
 protected:
 	virtual void append(const dcmtk::log4cplus::spi::InternalLoggingEvent& event)
@@ -68,12 +123,12 @@ protected:
 		sender.WriteLog(formatEvent(event).c_str());
 	}
 
-    DICOMSender &sender;
+    DICOMSenderImpl &sender;
 };
 
-void DICOMSender::DoSendThread(void *obj)
+void DICOMSenderImpl::DoSendThread(void *obj)
 {
-	DICOMSender *me = (DICOMSender *) obj;
+	DICOMSenderImpl *me = (DICOMSenderImpl *) obj;
 	dcmtk::log4cplus::SharedAppenderPtr stringlogger(new MyAppender(*me));
 	dcmtk::log4cplus::Logger rootLogger = dcmtk::log4cplus::Logger::getRoot();
 	rootLogger.removeAllAppenders();
@@ -92,40 +147,40 @@ void DICOMSender::DoSendThread(void *obj)
 	dcmtk::log4cplus::threadCleanup();
 }
 
-std::string DICOMSender::ReadLog()
+std::string DICOMSenderImpl::ReadLog()
 {
 	return log.Read();
 }
 
-void DICOMSender::WriteLog(const char *msg)
+void DICOMSenderImpl::WriteLog(const char *msg)
 {
 	log.Write(msg);
 }
 
-void DICOMSender::WriteLog(std::string &msg)
+void DICOMSenderImpl::WriteLog(std::string &msg)
 {
 	log.Write(msg.c_str());
 }
 
-void DICOMSender::GUILog::Write(const char *msg)
+void DICOMSenderImpl::GUILog::Write(const char *msg)
 {
 	boost::mutex::scoped_lock lk(mycoutmutex);
 	mycout << msg;
 }
 
-void DICOMSender::GUILog::Write(const OFCondition &cond)
+void DICOMSenderImpl::GUILog::Write(const OFCondition &cond)
 {
 	OFString dumpmsg; DimseCondition::dump(dumpmsg, cond); dumpmsg.append("\n");
 	Write(dumpmsg.c_str());
 }
 
-void DICOMSender::GUILog::Write(std::stringstream &stream)
+void DICOMSenderImpl::GUILog::Write(std::stringstream &stream)
 {	
 	Write(stream.str().c_str());
 	stream.str(std::string());
 }
 
-std::string DICOMSender::GUILog::Read()
+std::string DICOMSenderImpl::GUILog::Read()
 {
 	boost::mutex::scoped_lock lk(mycoutmutex);	
 	std::string str = mycout.str();
@@ -133,16 +188,26 @@ std::string DICOMSender::GUILog::Read()
 	return str;
 }
 
-void DICOMSender::DoSend(std::string PatientID, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, DestinationEntry destination)
+class DcmDatasetEditor
+{
+public:
+	DcmDatasetEditor(DcmDataset* dataset) : dataset(dataset) {};
+	bool updateStringAttributeValue(DcmItem* dataset, const DcmTagKey& key, std::string value);
+	void replacePatientInfoInformation(std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay);
+protected:
+	DcmDataset* dataset;
+};
+
+void DICOMSenderImpl::DoSend(std::string PatientID, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, DestinationEntry destination)
 {	
 	// get a list of files
-	patientdata.GetStudies(PatientID, boost::bind(&DICOMSender::fillstudies, this, _1));
+	patientdata.GetStudies(PatientID, boost::bind(&DICOMSenderImpl::fillstudies, this, _1));
 	for (std::vector<std::string>::iterator it = studies.begin() ; it != studies.end(); ++it)
 	{
-		patientdata.GetSeries(*it, boost::bind(&DICOMSender::fillseries, this, _1));
+		patientdata.GetSeries(*it, boost::bind(&DICOMSenderImpl::fillseries, this, _1));
 		for (std::vector<std::string>::iterator it2 = series.begin() ; it2 != series.end(); ++it2)
 		{
-			patientdata.GetInstances(*it2, boost::bind(&DICOMSender::fillinstances, this, _1, &instances));
+			patientdata.GetInstances(*it2, boost::bind(&DICOMSenderImpl::fillinstances, this, _1, &instances));
 		}
 	}
 		
@@ -194,19 +259,19 @@ void DICOMSender::DoSend(std::string PatientID, bool changeinfo, std::string New
 	while (!IsCanceled() && unsentcountafter > 0 && retry < 10000);	 
 }
 
-int DICOMSender::fillstudies(Study &study)
+int DICOMSenderImpl::fillstudies(Study &study)
 {
 	studies.push_back(study.studyuid);
 	return 0;
 }
 
-int DICOMSender::fillseries(Series &series)
+int DICOMSenderImpl::fillseries(Series &series)
 {
 	this->series.push_back(series.seriesuid);
 	return 0;
 }
 
-int DICOMSender::fillinstances(Instance &instance, naturalmap *entries)
+int DICOMSenderImpl::fillinstances(Instance &instance, naturalmap *entries)
 {
 	// add file to send
 	entries->insert(std::pair<std::string, std::string>(instance.sopuid, instance.filename));
@@ -219,7 +284,7 @@ int DICOMSender::fillinstances(Instance &instance, naturalmap *entries)
 class MyDcmSCU: public DcmSCU
 {
 public:
-	MyDcmSCU(DICOMSender &sender) : sender(sender) {}
+	MyDcmSCU(DICOMSenderImpl &sender) : sender(sender) {}
 	bool newtransfer;
 protected:
 	virtual void notifySENDProgress(const unsigned long byteCount)
@@ -233,10 +298,10 @@ protected:
 			sender.WriteLog(".");*/
 	}
 
-	DICOMSender &sender;	
+	DICOMSenderImpl &sender;	
 };
 
-int DICOMSender::SendABatch()
+int DICOMSenderImpl::SendABatch()
 {		
 	MyDcmSCU scu(*this);
 
@@ -287,7 +352,28 @@ int DICOMSender::SendABatch()
 		msg << "Sending file: " << itr->second << "\n";
 		log.Write(msg);
 		scu.newtransfer = true;
-		cond = scu.sendSTORERequest(0, itr->second.c_str(), NULL, status);
+
+		// load file
+		DcmFileFormat dcmff;
+		dcmff.loadFile(itr->second.c_str());
+
+		if(changeinfo)
+		{
+			dcmff.getDataset()->putAndInsertString(DCM_PatientID, NewPatientID.c_str());
+			dcmff.getDataset()->putAndInsertString(DCM_PatientName, NewPatientName.c_str());
+			dcmff.getDataset()->putAndInsertString(DCM_PatientBirthDate, NewBirthDay.c_str());
+		}
+
+		// do some precheck of the transfer syntax
+		DcmXfer fileTransfer(dcmff.getDataset()->getOriginalXfer());
+		OFString sopclassuid;
+		dcmff.getDataset()->findAndGetOFString(DCM_SOPClassUID, sopclassuid);
+
+		log.Write(fileTransfer.getXferName());
+		// out found.. change to 
+		T_ASC_PresentationContextID pid = scu.findAnyPresentationContextID(sopclassuid, fileTransfer.getXferID());
+		
+		cond = scu.sendSTORERequest(pid, "", dcmff.getDataset(), status);
 		if(cond.good())
 			itr = instances.erase(itr);
 		else if(cond == DUL_PEERABORTEDASSOCIATION)
@@ -305,9 +391,9 @@ int DICOMSender::SendABatch()
 	scu.releaseAssociation();	
 	return 0;
 }
-/*
 
-bool DICOMSender::updateStringAttributeValue(DcmItem* dataset, const DcmTagKey& key, std::string value)
+
+bool DcmDatasetEditor::updateStringAttributeValue(DcmItem* dataset, const DcmTagKey& key, std::string value)
 {
 	DcmStack stack;
 	DcmTag tag(key);
@@ -315,10 +401,7 @@ bool DICOMSender::updateStringAttributeValue(DcmItem* dataset, const DcmTagKey& 
 	OFCondition cond = EC_Normal;
 	cond = dataset->search(key, stack, ESM_fromHere, false);
 	if (cond != EC_Normal)
-	{
-		std::stringstream msg;
-		msg << "Error: updateStringAttributeValue: cannot find: " << tag.getTagName() << " " << key << ": " << cond.text() << std::endl;
-		log.Write(msg);
+	{		
 		return false;
 	}
 
@@ -326,79 +409,33 @@ bool DICOMSender::updateStringAttributeValue(DcmItem* dataset, const DcmTagKey& 
 
 	DcmVR vr(elem->ident());
 	if (elem->getLength() > vr.getMaxValueLength())
-	{
-		std::stringstream msg;
-		msg << "error: updateStringAttributeValue: " << tag.getTagName()
-			<< " " << key << ": value too large (max "
-			<< vr.getMaxValueLength() << ") for " << vr.getVRName() << " value: " << value << std::endl;
-		log.Write(msg);
+	{	
 		return false;
 	}
 
 	cond = elem->putOFStringArray(value.c_str());
 	if (cond != EC_Normal)
-	{
-		std::stringstream msg;
-		msg << "error: updateStringAttributeValue: cannot put string in attribute: " << tag.getTagName()
-			<< " " << key << ": " << cond.text() << std::endl;
-		log.Write(msg);
+	{	
 		return false;
 	}
 
 	return true;
 }
 
-void DICOMSender::replacePatientInfoInformation(DcmDataset* dataset)
+void DcmDatasetEditor::replacePatientInfoInformation(std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay)
 {
-	std::stringstream msg;
+	if (NewPatientID.length() != 0)
+		updateStringAttributeValue(dataset, DCM_PatientID, NewPatientID);
 
-	if(changeinfo)
-	{
-		if (NewPatientID.length() != 0)
-		{
-			msg << "Changing PatientID to " << NewPatientID << std::endl;
-			log.Write(msg);
-			updateStringAttributeValue(dataset, DCM_PatientID, NewPatientID);
-		}
+	if (NewPatientName.length() != 0)
+		updateStringAttributeValue(dataset, DCM_PatientName, NewPatientName);
 
-		if (NewPatientName.length() != 0)
-		{
-			msg << "Changing PatientName to " << NewPatientName << std::endl;
-			log.Write(msg);
-			updateStringAttributeValue(dataset, DCM_PatientName, NewPatientName);
-		}
-
-		if (NewBirthDay.length() != 0)
-		{
-			msg << "Changing Birthday to " << NewBirthDay << std::endl;
-			log.Write(msg);
-			updateStringAttributeValue(dataset, DCM_PatientBirthDate, NewBirthDay);
-		}
-	}
+	if (NewBirthDay.length() != 0)
+		updateStringAttributeValue(dataset, DCM_PatientBirthDate, NewBirthDay);
 }
 
-*/
 /*
-
-void DICOMSender::progressCallback(void * callbackData, T_DIMSE_StoreProgress *progress, T_DIMSE_C_StoreRQ * req)
-{
-	DICOMSender *sender = (DICOMSender *)callbackData;
-
-	switch (progress->state)
-	{
-	case DIMSE_StoreBegin:
-		sender->log.Write("XMIT:");
-		break;
-	case DIMSE_StoreEnd:
-		sender->log.Write("|\n");
-		break;
-	default:
-		sender->log.Write(".");
-		break;
-	}
-}
-
-OFCondition DICOMSender::storeSCU(T_ASC_Association * assoc, const boost::filesystem::path &fname)
+OFCondition DICOMSenderImpl::storeSCU(T_ASC_Association * assoc, const boost::filesystem::path &fname)
 {
 	DIC_US msgId = assoc->nextMsgID++;
 	T_DIMSE_C_StoreRQ req;
@@ -512,7 +549,7 @@ OFCondition DICOMSender::storeSCU(T_ASC_Association * assoc, const boost::filesy
 	return cond;
 }
 
-bool DICOMSender::scanFile(boost::filesystem::path currentFilename)
+bool DICOMSenderImpl::scanFile(boost::filesystem::path currentFilename)
 {	
 
 	DcmFileFormat dfile;
@@ -549,26 +586,62 @@ bool DICOMSender::scanFile(boost::filesystem::path currentFilename)
 	return true;
 }
 */
-void DICOMSender::Cancel()
+void DICOMSenderImpl::Cancel()
 {
 	boost::mutex::scoped_lock lk(mutex);
 	cancelEvent = true;
 }
 
-bool DICOMSender::IsDone()
+bool DICOMSenderImpl::IsDone()
 {
 	boost::mutex::scoped_lock lk(mutex);
 	return doneEvent;
 }
 
-bool DICOMSender::IsCanceled()
+bool DICOMSenderImpl::IsCanceled()
 {
 	boost::mutex::scoped_lock lk(mutex);
 	return cancelEvent;
 }
 
-void DICOMSender::SetDone(bool state)
+void DICOMSenderImpl::SetDone(bool state)
 {
 	boost::mutex::scoped_lock lk(mutex);
 	doneEvent = state;
+}
+
+
+DICOMSender::DICOMSender(PatientData &patientdata)
+{
+	impl = new DICOMSenderImpl(patientdata);
+}
+
+DICOMSender::~DICOMSender(void)
+{
+	delete impl;
+}
+
+void DICOMSender::DoSendAsync(std::string PatientID, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, DestinationEntry destination)
+{
+	impl->DoSendAsync(PatientID, changeinfo, NewPatientID, NewPatientName, NewBirthDay, destination);
+}
+
+void DICOMSender::DoSend(std::string PatientID, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, DestinationEntry destination)
+{
+	impl->DoSend(PatientID, changeinfo, NewPatientID, NewPatientName, NewBirthDay, destination);
+}
+
+std::string DICOMSender::ReadLog()
+{
+	return impl->ReadLog();
+}
+
+void DICOMSender::Cancel()
+{
+	impl->Cancel();
+}
+
+bool DICOMSender::IsDone()
+{
+	return impl->IsDone();
 }
