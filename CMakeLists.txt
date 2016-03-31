@@ -27,9 +27,11 @@ add_definitions(-DHAVE_SSIZE_T)
 find_package(wxWidgets COMPONENTS core base adv REQUIRED)
 include(${wxWidgets_USE_FILE})
 
-#enable dcmtk filename to have wide version, only affects WIN32.  http://utf8everywhere.org/
-add_definitions(-DDCMTK_WIDE_CHAR_FILE_IO_FUNCTIONS=1)
-find_package(dcmtk REQUIRED CONFIG HINTS ${DCMTK_DIR})
+if(WIN32)
+	#enable dcmtk filename to have wide version, only affects WIN32.  http://utf8everywhere.org/
+	add_definitions(-DDCMTK_WIDE_CHAR_FILE_IO_FUNCTIONS=1)
+endif(WIN32)
+find_package(DCMTK REQUIRED CONFIG HINTS ${DCMTK_DIR})
 
 #include zlib
 find_package(zlib REQUIRED ${ZLIB_ROOT})
@@ -94,7 +96,7 @@ if(WIN32)
 endif(WIN32)
 
 if(APPLE)
-  set(dovo_SRCS ${dovo_SRCS} src/osx/dovo.icns src/osx/Info.plist)
+  set(dovo_SRCS ${dovo_SRCS} src/osx/dovo.icns src/osx/Info.plist.in)
 endif(APPLE)
 
 ADD_EXECUTABLE(dovo WIN32 MACOSX_BUNDLE ${dovo_SRCS})
