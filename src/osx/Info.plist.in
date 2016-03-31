@@ -41,7 +41,7 @@
 	<key>LSMinimumSystemVersion</key>
 	<string>10.10</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2015-2016 DraconPern. All rights reserved.</string>
+	<string>Copyright © 2015-2016 Ing-Long Eric Kuo. All rights reserved.</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
