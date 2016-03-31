@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 
 project(dovo)
 
-set(VERSION "1.0.5")
+set(VERSION 1.0.6)
 
 add_definitions(-DDOVO_VERSION="${VERSION}")
 
@@ -94,7 +94,7 @@ if(WIN32)
 endif(WIN32)
 
 if(APPLE)
-  set(dovo_SRCS ${dovo_SRCS} src/osx/dovo.icns)
+  set(dovo_SRCS ${dovo_SRCS} src/osx/dovo.icns src/osx/Info.plist)
 endif(APPLE)
 
 ADD_EXECUTABLE(dovo WIN32 MACOSX_BUNDLE ${dovo_SRCS})
@@ -106,8 +106,8 @@ ELSE(WIN32)
 ENDIF(WIN32)
 
 if(APPLE)
-  set_target_properties(dovo PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/src/osx/Info.plist)
-  set_target_properties(dovo PROPERTIES MACOSX_BUNDLE_ICON_FILE dovo)
+  set_target_properties(dovo PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/src/osx/Info.plist.in)
+  set_target_properties(dovo PROPERTIES MACOSX_BUNDLE_SHORT_VERSION_STRING ${VERSION})
 	SET_SOURCE_FILES_PROPERTIES(${CMAKE_SOURCE_DIR}/src/osx/dovo.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
 ENDIF()
 
