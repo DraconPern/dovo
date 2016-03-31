@@ -75,11 +75,18 @@ cd wxWidgets
 git checkout v3.1.0
 mkdir -p build$TYPE
 cd build$TYPE
-COMMONwxWidgetsFlag="--disable-shared"
+
+unamestr=`uname`
+if [[ "$unamestr" == 'Linux' ]]; then
+COMMONwxWidgetsFlag=--disable-shared
+else
+COMMONwxWidgetsFlag=--disable-shared CXXFLAGS="-std=c++11 -stdlib=libc++" CPPFLAGS=-stdlib=libc++ LIBS=-lc++
+fi
+
 if [ "$TYPE" = "Release" ] ; then
-  ../configure $COMMONwxWidgetsFlag CXXFLAGS="-std=c++11 -stdlib=libc++" CPPFLAGS=-stdlib=libc++ LIBS=-lc++
-elif [ "$TYPE" = "Debug" ] ; then
-  ../configure $COMMONwxWidgetsFlag CXXFLAGS="-std=c++11 -stdlib=libc++" CPPFLAGS=-stdlib=libc++ LIBS=-lc++ --enable-debug
+  ../configure $COMMONwxWidgetsFlag 
+  elif [ "$TYPE" = "Debug" ] ; then
+  ../configure $COMMONwxWidgetsFlag --enable-debug
 fi
 make -j8
 
