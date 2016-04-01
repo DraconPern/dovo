@@ -76,16 +76,16 @@ git checkout v3.1.0
 mkdir -p build$TYPE
 cd build$TYPE
 unamestr=`uname`
-if [ "$unamestr" == 'Darwin' ] ; then
-  COMMONwxWidgetsFlag=--disable-shared CXXFLAGS='-std=c++11 -stdlib=libc++' CPPFLAGS=-stdlib=libc++ LIBS=-lc++
+if [ "$unamestr" == 'Darwin' ] ; then  
+  COMMONwxWidgetsFlag=(--disable-shared CXXFLAGS='-std=c++11 -stdlib=libc++' CPPFLAGS=-stdlib=libc++ LIBS=-lc++)
 elif [ "$unamestr" = 'Linux'] ; then
-  COMMONwxWidgetsFlag=--disable-shared
+  COMMONwxWidgetsFlag=(--disable-shared CXXFLAGS='-std=c++11')
 fi
 
 if [ "$TYPE" = "Release" ] ; then
-  ../configure $COMMONwxWidgetsFlag
+  ../configure ${COMMONwxWidgetsFlag[@]}
 elif [ "$TYPE" = "Debug" ] ; then
-  ../configure $COMMONwxWidgetsFlag --enable-debug
+  ../configure ${COMMONwxWidgetsFlag[@]} --enable-debug
 fi
 make -j8
 
