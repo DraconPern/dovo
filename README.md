@@ -1,5 +1,5 @@
 # dovo
-Windows [![Build Status](http://home.draconpern.com:8080/buildStatus/icon?job=dovo.win32.release)](http://home.draconpern.com:8080/job/dovo.win32.release/) OS X [![Build Status](http://home.draconpern.com:8080/buildStatus/icon?job=dovo.osx.release)](http://home.draconpern.com:8080/job/dovo.osx.release/) Linux [![Build Status](http://home.draconpern.com:8080/buildStatus/icon?job=dovo.ubuntu.release)](http://home.draconpern.com:8080/job/dovo.ubuntu.release/)
+Windows [![Build Status](http://home.draconpern.com:8080/buildStatus/icon?job=dovo.win32.release)](http://home.draconpern.com:8080/job/dovo.win32.release/) OS X [![Build Status](http://home.draconpern.com:8080/buildStatus/icon?job=dovo.osx.release)](http://home.draconpern.com:8080/job/dovo.osx.release/) Linux [![Build Status](http://home.draconpern.com:8080/buildStatus/icon?job=dovo.linux.debug)](http://home.draconpern.com:8080/job/dovo.linux.debug/)
 
 Point of care, cross-platform software for importing DICOM CD and files then sending it to PACS. Usage scenario is front desk staff getting handed a CD with patient's images.  This tool allows the front desk to preview the images, and send to PACS.  Tested on Windows and OS X.
 
