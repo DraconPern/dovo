@@ -77,9 +77,9 @@ mkdir -p build$TYPE
 cd build$TYPE
 unamestr=`uname`
 if [ "$unamestr" == 'Darwin' ] ; then  
-  COMMONwxWidgetsFlag=(--disable-shared CXXFLAGS='-std=c++11 -stdlib=libc++' CPPFLAGS=-stdlib=libc++ LIBS=-lc++)
+  COMMONwxWidgetsFlag=(--disable-shared CXXFLAGS="-std=c++11 -stdlib=libc++" CPPFLAGS=-stdlib=libc++ LIBS=-lc++)
 elif [ "$unamestr" = 'Linux'] ; then
-  COMMONwxWidgetsFlag=(--disable-shared CXXFLAGS='-std=c++11')
+  COMMONwxWidgetsFlag=(--disable-shared CXXFLAGS="-std=c++11")
 fi
 
 if [ "$TYPE" = "Release" ] ; then
