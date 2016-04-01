@@ -79,7 +79,7 @@ unzip -n boost_1_60_0.zip
 cd boost_1_60_0
 call bootstrap
 SET COMMONb2Flag=toolset=msvc-11.0 runtime-link=static define=_BIND_TO_CURRENT_VCLIBS_VERSION=1 -j 4 stage
-SET BOOSTmodules=--with-atomic --with-thread --with-filesystem --with-system --with-date_time --with-regex
+SET BOOSTmodules=--with-locale --with-atomic --with-thread --with-filesystem --with-system --with-date_time --with-regex
 IF "%TYPE%" == "Release" b2 %COMMONb2Flag% %BOOSTmodules% release
 IF "%TYPE%" == "Debug"   b2 %COMMONb2Flag% %BOOSTmodules% debug
 

@@ -62,7 +62,7 @@ unzip -n boost_1_60_0.zip
 cd boost_1_60_0
 ./bootstrap.sh
 COMMONb2Flag="-j 4 link=static runtime-link=static stage"
-BOOSTModule="--with-thread --with-filesystem --with-system --with-date_time --with-regex"
+BOOSTModule="--with-locale --with-thread --with-filesystem --with-system --with-date_time --with-regex"
 if [ "$TYPE" = "Release" ] ; then
   ./b2 $COMMONb2Flag $BOOSTModule variant=release
 elif [ "$TYPE" = "Debug" ] ; then
