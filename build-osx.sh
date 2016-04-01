@@ -76,12 +76,7 @@ git checkout v3.1.0
 mkdir -p build$TYPE
 cd build$TYPE
 
-unamestr=`uname`
-if [[ "$unamestr" == 'Linux' ]]; then
-COMMONwxWidgetsFlag=--disable-shared
-else
-COMMONwxWidgetsFlag=--disable-shared CXXFLAGS="-std=c++11 -stdlib=libc++" CPPFLAGS=-stdlib=libc++ LIBS=-lc++
-fi
+COMMONwxWidgetsFlag=--disable-shared CXXFLAGS=\"-std=c++11 -stdlib=libc++\" CPPFLAGS=-stdlib=libc++ LIBS=-lc++
 
 if [ "$TYPE" = "Release" ] ; then
   ../configure $COMMONwxWidgetsFlag 
