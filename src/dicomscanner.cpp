@@ -1,7 +1,6 @@
 
 #include "dicomscanner.h"
 
-#include <codecvt>
 #include <boost/thread.hpp>
 
 // work around the fact that dcmtk doesn't work in unicode mode, so all string operation needs to be converted from/to mbcs
@@ -69,14 +68,8 @@ void DICOMFileScanner::ScanFile(boost::filesystem::path path)
 		patientdata.AddPatient(patientid.c_str(), patientname.c_str(), birthday.c_str());
 		patientdata.AddStudy(studyuid.c_str(), patientid.c_str(), studydesc.c_str(), studydate.c_str());
 		patientdata.AddSeries(seriesuid.c_str(), studyuid.c_str(), seriesdesc.c_str());
-
-#ifdef _WIN32		
-		std::string filename = path.string(std::codecvt_utf8<boost::filesystem::path::value_type>());				
-#else
-		std::string filename = path.string();
-#endif
-		
-		patientdata.AddInstance(sopuid.c_str(), seriesuid.c_str(), filename, sopclassuid.c_str(), transfersyntax.c_str());		
+	
+		patientdata.AddInstance(sopuid.c_str(), seriesuid.c_str(), path, sopclassuid.c_str(), transfersyntax.c_str());		
 	}
 
 }

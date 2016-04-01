@@ -5,15 +5,16 @@
 #include <vector>
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
+#include <boost/filesystem.hpp>
 
 class Instance
 {
 public:
-	Instance(std::string sopuid, std::string seriesuid, std::string filename, std::string sopclassuid, std::string transfersyntax)
+	Instance(std::string sopuid, std::string seriesuid, boost::filesystem::path filename, std::string sopclassuid, std::string transfersyntax)
 		: sopuid(sopuid), seriesuid(seriesuid), filename(filename), sopclassuid(sopclassuid), transfersyntax(transfersyntax) {}
 	std::string sopuid;
 	std::string seriesuid;
-	std::string filename;
+	boost::filesystem::path filename;
 	std::string sopclassuid;
 	std::string transfersyntax;
 };
@@ -64,7 +65,7 @@ public:
 	int AddSeries(std::string seriesuid, std::string studyuid, std::string seriesdesc);	
 	void GetSeries(std::string studyuid, boost::function< int(Series &) > action);
 	// void GetSeries(std::vector<Series> &series);
-	int AddInstance(std::string sopuid, std::string seriesuid, std::string filename, std::string sopclassuid, std::string transfersyntax);
+	int AddInstance(std::string sopuid, std::string seriesuid, boost::filesystem::path filename, std::string sopclassuid, std::string transfersyntax);
 	void GetInstances(std::string seriesuid, boost::function< int(Instance &) > action);
 	// void GetInstances(std::vector<Instance> &instances);
 	void Clear();

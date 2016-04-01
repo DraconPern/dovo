@@ -1,7 +1,9 @@
 
 #include "patientdata.h"
 #include "sqlite3_exec_stmt.h"
-
+#ifdef _WIN32
+#include <codecvt>
+#endif
 #include <sstream>
 
 PatientData::PatientData()
@@ -138,14 +140,19 @@ void PatientData::GetSeries(std::string studyuid, boost::function< int(Series &)
 	sqlite3_finalize(select);
 }
 
-int PatientData::AddInstance(std::string sopuid, std::string seriesuid, std::string filename, std::string sopclassuid, std::string transfersyntax)
+int PatientData::AddInstance(std::string sopuid, std::string seriesuid, boost::filesystem::path filename, std::string sopclassuid, std::string transfersyntax)
 {
 	sqlite3_stmt *insert;
 	std::string sql = "INSERT INTO instances VALUES(?, ?, ?, ?, ?)";
 	sqlite3_prepare_v2(db, sql.c_str(), sql.length(), &insert, NULL);
 	sqlite3_bind_text(insert, 1, sopuid.c_str(), sopuid.length(), SQLITE_STATIC);
 	sqlite3_bind_text(insert, 2, seriesuid.c_str(), seriesuid.length(), SQLITE_STATIC);
-	sqlite3_bind_text(insert, 3, filename.c_str(), filename.length(), SQLITE_STATIC);	
+#ifdef _WIN32
+	std::string p = filename.string(std::codecvt_utf8<boost::filesystem::path::value_type>());
+#else
+	std::string p = filename.string();
+#endif
+	sqlite3_bind_text(insert, 3, p.c_str(), p.length(), SQLITE_STATIC);	
 	sqlite3_bind_text(insert, 4, sopclassuid.c_str(), sopclassuid.length(), SQLITE_STATIC);	
 	sqlite3_bind_text(insert, 5, transfersyntax.c_str(), transfersyntax.length(), SQLITE_STATIC);	
 	int res = sqlite3_exec_stmt(insert, NULL, NULL, NULL);

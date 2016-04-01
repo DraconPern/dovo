@@ -1,7 +1,6 @@
 
 #include "dicomsender.h"
 #include <boost/lexical_cast.hpp>
-#include <codecvt>
 #include <boost/thread.hpp>
 #include "destinationentry.h"
 
@@ -77,12 +76,12 @@ protected:
 
 	GUILog log;
 
-	typedef std::map<std::string, std::string, doj::alphanum_less<std::string> > naturalmap;	
+	typedef std::map<std::string, boost::filesystem::path, doj::alphanum_less<std::string> > naturalpathmap;	
 	int fillstudies(Study &study);	
 	int fillseries(Series &series);
-	int fillinstances(Instance &instance, naturalmap *entries);
+	int fillinstances(Instance &instance, naturalpathmap *entries);
 	std::vector<std::string> studies, series;
-	naturalmap instances;	// sopid, filename, this ensures we send out instances in sopid order	
+	naturalpathmap instances;	// sopid, filename, this ensures we send out instances in sopid order	
 };
 
 
@@ -271,10 +270,10 @@ int DICOMSenderImpl::fillseries(Series &series)
 	return 0;
 }
 
-int DICOMSenderImpl::fillinstances(Instance &instance, naturalmap *entries)
+int DICOMSenderImpl::fillinstances(Instance &instance, naturalpathmap *entries)
 {
 	// add file to send
-	entries->insert(std::pair<std::string, std::string>(instance.sopuid, instance.filename));
+	entries->insert(std::pair<std::string, boost::filesystem::path>(instance.sopuid, instance.filename));
 
 	// remember the class and transfersyntax
 	sopclassuidtransfersyntax[instance.sopclassuid].insert(instance.transfersyntax);
@@ -343,7 +342,7 @@ int DICOMSenderImpl::SendABatch()
 	if(scu.negotiateAssociation().bad())
 		return 1;
 
-	naturalmap::iterator itr = instances.begin();
+	naturalpathmap::iterator itr = instances.begin();
 	while(itr != instances.end())
 	{
 		Uint16 status;

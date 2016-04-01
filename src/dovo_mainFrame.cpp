@@ -176,13 +176,13 @@ void dovo_mainFrame::OnStudiesSelected( wxListEvent& event )
 	if (item == -1)
 		return;
 
-	naturalmap entries;
+	naturalstringmap entries;
 
 	m_series->DeleteAllItems();
 	m_engine.patientdata.GetSeries(m_studies->GetItemText(item, 2).ToUTF8().data(), boost::bind(&dovo_mainFrame::fillseriescallback, this, _1, &entries));
 
 	int j = 0;
-	for(naturalmap::iterator ii = entries.begin(); ii != entries.end(); ++ii)
+	for(naturalstringmap::iterator ii = entries.begin(); ii != entries.end(); ++ii)
 	{
 		m_series->InsertItem(j, wxString::FromUTF8((*ii).second.c_str()));
 		m_series->SetItem(j, 1, wxString::FromUTF8((*ii).first.c_str()));
@@ -196,7 +196,7 @@ void dovo_mainFrame::OnStudiesSelected( wxListEvent& event )
 		m_series->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
 }
 
-int dovo_mainFrame::fillseriescallback(Series &series, naturalmap *entries)
+int dovo_mainFrame::fillseriescallback(Series &series, naturalstringmap *entries)
 {	
 	entries->insert(std::pair<std::string, std::string>(series.seriesuid, series.seriesdesc));	
 	return 0;
@@ -208,16 +208,16 @@ void dovo_mainFrame::OnSeriesSelected( wxListEvent& event )
 	if (item == -1)
 		return;
 
-	naturalmap entries;
+	naturalpathmap entries;
 
 	m_instances->DeleteAllItems();
 	m_engine.patientdata.GetInstances(m_series->GetItemText(item, 1).ToUTF8().data(), boost::bind(&dovo_mainFrame::fillinstancescallback, this, _1, &entries));
 
 	int j = 0;
-	for(naturalmap::iterator ii = entries.begin(); ii != entries.end(); ++ii)
+	for(naturalpathmap::iterator ii = entries.begin(); ii != entries.end(); ++ii)
 	{
 		m_instances->InsertItem(j, wxString::FromUTF8((*ii).first.c_str()));
-		m_instances->SetItem(j, 1, wxString::FromUTF8((*ii).second.c_str()));
+		m_instances->SetItem(j, 1, (*ii).second.c_str());
 		j++;
 	}
 
@@ -228,9 +228,9 @@ void dovo_mainFrame::OnSeriesSelected( wxListEvent& event )
 		m_instances->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
 }
 
-int dovo_mainFrame::fillinstancescallback(Instance &instance, naturalmap *entries)
+int dovo_mainFrame::fillinstancescallback(Instance &instance, naturalpathmap *entries)
 {	
-	entries->insert(std::pair<std::string, std::string>(instance.sopuid, instance.filename));
+	entries->insert(std::pair<std::string, boost::filesystem::path>(instance.sopuid, instance.filename));
 	return 0;
 }
 

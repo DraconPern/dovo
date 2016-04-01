@@ -47,10 +47,11 @@ class dovo_mainFrame : public mainFrame
 		void FillDestinationList();		
 		int fillpatientscallback(Patient &patient);
 		int fillstudiescallback(Study &study);
-		typedef std::map<std::string, std::string, doj::alphanum_less<std::string> > naturalmap;
+		typedef std::map<std::string, std::string, doj::alphanum_less<std::string> > naturalstringmap;
+		typedef std::map<std::string, boost::filesystem::path, doj::alphanum_less<std::string> > naturalpathmap;
 
-		int fillseriescallback(Series &series, naturalmap *entries);
-		int fillinstancescallback(Instance &instance, naturalmap *entries);
+		int fillseriescallback(Series &series, naturalstringmap *entries);
+		int fillinstancescallback(Instance &instance, naturalpathmap *entries);
 		void renderPreview(wxDC& dc);
 
 		engine m_engine;
