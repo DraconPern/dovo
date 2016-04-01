@@ -93,19 +93,19 @@ set(dovo_SRCS
 
 if(WIN32)
   set(dovo_SRCS ${dovo_SRCS} src/win/dovo.rc)
-endif(WIN32)
+endif()
 
 if(APPLE)
   set(dovo_SRCS ${dovo_SRCS} src/osx/dovo.icns src/osx/Info.plist.in)
-endif(APPLE)
+endif()
 
 ADD_EXECUTABLE(dovo WIN32 MACOSX_BUNDLE ${dovo_SRCS})
 
 IF(WIN32)
   SET(OS_SPECIFIC_LIBS netapi32 wsock32 odbc32 Rpcrt4)
-ELSE(WIN32)
-  SET(OS_SPECIFIC_LIBS )
-ENDIF(WIN32)
+ELSEIF(!WIN32 && !APPLE)
+  SET(OS_SPECIFIC_LIBS ld)
+ENDIF()
 
 if(APPLE)
   set_target_properties(dovo PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/src/osx/Info.plist.in)
