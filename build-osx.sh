@@ -83,9 +83,9 @@ elif [ "$unamestr" = 'Linux'] ; then
 fi
 
 if [ "$TYPE" = "Release" ] ; then
-  ../configure ${COMMONwxWidgetsFlag[@]}
+  ../configure "${COMMONwxWidgetsFlag[@]}"
 elif [ "$TYPE" = "Debug" ] ; then
-  ../configure ${COMMONwxWidgetsFlag[@]} --enable-debug
+  ../configure "${COMMONwxWidgetsFlag[@]}" --enable-debug
 fi
 make -j8
 
