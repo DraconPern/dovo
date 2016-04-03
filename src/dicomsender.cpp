@@ -374,7 +374,7 @@ int DICOMSenderImpl::SendABatch()
 		
 		cond = scu.sendSTORERequest(pid, "", dcmff.getDataset(), status);
 		if(cond.good())
-			itr = instances.erase(itr);
+			instances.erase(itr++);
 		else if(cond == DUL_PEERABORTEDASSOCIATION)
 			return 1;
 		else			// some error? keep going
