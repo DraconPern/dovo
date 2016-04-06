@@ -39,6 +39,7 @@ cmake .. -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=$TYPE -DOPENJPEG=$DEVSPACE/o
 make -j8 install
 
 cd $DEVSPACE
+[[ -d fmjpeg2kjasper ]] || git clone --branch=master https://github.com/DraconPern/fmjpeg2kjasper.git
 wget -c https://www.ece.uvic.ca/~frodo/jasper/software/jasper-1.900.1.zip
 unzip -n jasper-1.900.1.zip
 cd jasper
@@ -46,9 +47,7 @@ mkdir -p build-$TYPE
 cd build-$TYPE
 cmake .. -DBUILD_SHARED_LIBS=0 -DCMAKE_BUILD_TYPE=$TYPE -DJASPERDIR=$DEVSPACE/jasper-1.900.1 -DCMAKE_INSTALL_PREFIX=$DEVSPACE/jasper/$TYPE
 make -j8 install
-
 cd $DEVSPACE
-[[ -d fmjpeg2kjasper ]] || git clone --branch=master https://github.com/DraconPern/fmjpeg2kjasper.git
 cd fmjpeg2kjasper
 git pull
 mkdir -p build-$TYPE
