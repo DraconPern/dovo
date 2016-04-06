@@ -60,7 +60,7 @@ unzip -n jasper-1.900.1.zip
 cd jasper
 mkdir build-%TYPE%
 cd build-%TYPE%
-cmake .. -G "Visual Studio 11" -DBUILD_SHARED_LIBS=0 -DCMAKE_C_FLAGS_RELEASE="/MT /O2 /D NDEBUG" -DCMAKE_C_FLAGS_DEBUG="/D_DEBUG /MTd /Od" -DJASPERDIR=%DEVSPACE%\jasper-1.900.1 -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\jasper\%TYPE%
+cmake .. -G "Visual Studio 11" -DBUILD_SHARED_LIBS=0 -DCMAKE_C_FLAGS_RELEASE="/MT /O2 /D NDEBUG" -DCMAKE_C_FLAGS_DEBUG="/D_DEBUG /MTd /Od" -DJASPERDIR=%DEVSPACE%\fmjpeg2kjasper\jasper-1.900.1 -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\jasper\%TYPE%
 msbuild /P:Configuration=%TYPE% INSTALL.vcxproj
 if ERRORLEVEL 1 exit /B %ERRORLEVEL%
 cd %DEVSPACE%

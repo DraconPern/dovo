@@ -47,7 +47,7 @@ unzip -n jasper-1.900.1.zip
 cd jasper
 mkdir -p build-$TYPE
 cd build-$TYPE
-cmake .. -DBUILD_SHARED_LIBS=0 -DCMAKE_BUILD_TYPE=$TYPE -DJASPERDIR=$DEVSPACE/jasper-1.900.1 -DCMAKE_INSTALL_PREFIX=$DEVSPACE/jasper/$TYPE
+cmake .. -DBUILD_SHARED_LIBS=0 -DCMAKE_BUILD_TYPE=$TYPE -DJASPERDIR=$DEVSPACE/fmjpeg2kjasper/jasper-1.900.1 -DCMAKE_INSTALL_PREFIX=$DEVSPACE/jasper/$TYPE
 make -j8 install
 cd $DEVSPACE
 cd fmjpeg2kjasper
