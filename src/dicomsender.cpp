@@ -345,6 +345,12 @@ int DICOMSenderImpl::SendABatch()
 	naturalpathmap::iterator itr = instances.begin();
 	while(itr != instances.end())
 	{
+		if(IsCanceled())
+		{
+			log.Write("Send canceled\n");
+			break;
+		}
+
 		Uint16 status;
 
 		std::stringstream msg;
@@ -368,7 +374,9 @@ int DICOMSenderImpl::SendABatch()
 		OFString sopclassuid;
 		dcmff.getDataset()->findAndGetOFString(DCM_SOPClassUID, sopclassuid);
 
-		log.Write(fileTransfer.getXferName());
+		msg << "File encoding: " << fileTransfer.getXferName() << "\n";
+		log.Write(msg);
+
 		// out found.. change to 
 		T_ASC_PresentationContextID pid = scu.findAnyPresentationContextID(sopclassuid, fileTransfer.getXferID());
 		
