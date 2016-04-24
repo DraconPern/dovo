@@ -18,6 +18,8 @@ using boost::asio::ip::tcp;
 #endif
 #include <wx/config.h>
 
+#include "dovo_updateCheck.h"
+
 boost::gregorian::date convertDATE(char const *time);
 
 // returns true if the application needs to exit
@@ -25,7 +27,8 @@ bool informUserOfUpdate(std::string json)
 {
 	std::string thisversion = DOVO_VERSION;
 	std::string version, mustupdate, message;
-	
+	dovo_updateCheck updatecheckdlg(NULL);
+
 	try
 	{
 		boost::property_tree::ptree pt;
@@ -35,6 +38,8 @@ bool informUserOfUpdate(std::string json)
 		version = pt.get_child("dovo.version").data();
 		mustupdate = pt.get_child("dovo.mustupdate").data();
 		message = pt.get_child("dovo.message").data();
+		updatecheckdlg.m_message = message;
+		updatecheckdlg.m_version = version;
 	}
 	catch (std::exception& e)
 	{
@@ -46,17 +51,20 @@ bool informUserOfUpdate(std::string json)
 	boost::gregorian::date today = boost::gregorian::day_clock::local_day();
 
 	if(today > timelimit)
-	{
-		wxMessageBox(wxT("This software is outdated, please upgrade! Please see https://github.com/DraconPern/dovo"));
+	{				
+
+		updatecheckdlg.m_updatetext = wxT("This software is outdated, please upgrade!");		
+		updatecheckdlg.ShowModal();
 		return true;
 	}
 
 	if(mustupdate == "true")
-	{
-		wxMessageBox(wxT("You must update to a new version.  Please see https://github.com/DraconPern/dovo"));
+	{		
+		updatecheckdlg.m_updatetext = wxT("You must upgrade to a new version:");
+		updatecheckdlg.ShowModal();
 		return true;
 	}
-	
+
 	boost::regex expression("(\\d+).(\\d+).(\\d+)"); 
 	boost::cmatch thisversioncmatch, versioncmatch; 
 	if(boost::regex_match(version.c_str(), versioncmatch, expression) && boost::regex_match(thisversion.c_str(), thisversioncmatch, expression))
@@ -71,15 +79,18 @@ bool informUserOfUpdate(std::string json)
 
 		if(major > thismajor)
 		{
-			wxMessageBox( wxT("There is a major update available.  Please see https://github.com/DraconPern/dovo"));
+			updatecheckdlg.m_updatetext = wxT("A new version of dovo is available:");
+			updatecheckdlg.ShowModal();
 		}
 		else if(minor > thisminor)
 		{
-			wxMessageBox( wxT("There is a minor update available.  Please see https://github.com/DraconPern/dovo"));
+			updatecheckdlg.m_updatetext = wxT("A new update of dovo is available:");
+			updatecheckdlg.ShowModal();
 		}
 		else if(build > thisbuild)
 		{
-			wxMessageBox( wxT("There is an update available.  Please see https://github.com/DraconPern/dovo"));
+			updatecheckdlg.m_updatetext = wxT("An update available:");
+			updatecheckdlg.ShowModal();
 		}
 	}
 

@@ -378,7 +378,7 @@ about::about( wxWindow* parent, wxWindowID id, const wxString& title, const wxPo
 	m_sdbSizer1->AddButton( m_sdbSizer1OK );
 	m_sdbSizer1->Realize();
 	
-	bSizer28->Add( m_sdbSizer1, 1, wxALL|wxEXPAND, 5 );
+	bSizer28->Add( m_sdbSizer1, 0, wxALL|wxEXPAND, 5 );
 	
 	
 	this->SetSizer( bSizer28 );
@@ -460,7 +460,7 @@ changePatientInfo::changePatientInfo( wxWindow* parent, wxWindowID id, const wxS
 	m_sdbSizer3->AddButton( m_sdbSizer3Cancel );
 	m_sdbSizer3->Realize();
 	
-	bSizer23->Add( m_sdbSizer3, 1, wxEXPAND, 5 );
+	bSizer23->Add( m_sdbSizer3, 0, wxALL|wxEXPAND, 5 );
 	
 	
 	this->SetSizer( bSizer23 );
@@ -553,5 +553,53 @@ searchStatus::~searchStatus()
 {
 	// Disconnect Events
 	m_stop->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( searchStatus::OnStop ), NULL, this );
+	
+}
+
+updateCheck::updateCheck( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	wxBoxSizer* bSizer28;
+	bSizer28 = new wxBoxSizer( wxVERTICAL );
+	
+	wxBoxSizer* bSizer29;
+	bSizer29 = new wxBoxSizer( wxVERTICAL );
+	
+	m_needtoupgrade = new wxStaticText( this, wxID_ANY, _("A new version of dovo is available:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_needtoupgrade->Wrap( -1 );
+	bSizer29->Add( m_needtoupgrade, 0, wxALL, 5 );
+	
+	m_remoteversion = new wxStaticText( this, wxID_ANY, _("x.x.x.x"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_remoteversion->Wrap( -1 );
+	bSizer29->Add( m_remoteversion, 0, wxALL, 5 );
+	
+	m_remotemessage = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY );
+	bSizer29->Add( m_remotemessage, 1, wxALL|wxEXPAND, 5 );
+	
+	
+	bSizer28->Add( bSizer29, 1, wxEXPAND, 5 );
+	
+	m_sdbSizer4 = new wxStdDialogButtonSizer();
+	m_sdbSizer4OK = new wxButton( this, wxID_OK );
+	m_sdbSizer4->AddButton( m_sdbSizer4OK );
+	m_sdbSizer4->Realize();
+	
+	bSizer28->Add( m_sdbSizer4, 0, wxALL|wxEXPAND, 5 );
+	
+	
+	this->SetSizer( bSizer28 );
+	this->Layout();
+	
+	this->Centre( wxBOTH );
+	
+	// Connect Events
+	this->Connect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( updateCheck::updateCheckOnInitDialog ) );
+}
+
+updateCheck::~updateCheck()
+{
+	// Disconnect Events
+	this->Disconnect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( updateCheck::updateCheckOnInitDialog ) );
 	
 }

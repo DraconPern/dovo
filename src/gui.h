@@ -230,4 +230,29 @@ class searchStatus : public wxDialog
 	
 };
 
+///////////////////////////////////////////////////////////////////////////////
+/// Class updateCheck
+///////////////////////////////////////////////////////////////////////////////
+class updateCheck : public wxDialog 
+{
+	private:
+	
+	protected:
+		wxStaticText* m_needtoupgrade;
+		wxStaticText* m_remoteversion;
+		wxTextCtrl* m_remotemessage;
+		wxStdDialogButtonSizer* m_sdbSizer4;
+		wxButton* m_sdbSizer4OK;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void updateCheckOnInitDialog( wxInitDialogEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		updateCheck( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Update Check"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 480,300 ), long style = wxDEFAULT_DIALOG_STYLE ); 
+		~updateCheck();
+	
+};
+
 #endif //__GUI_H__

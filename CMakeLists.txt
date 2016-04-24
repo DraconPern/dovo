@@ -59,6 +59,7 @@ set(dovo_HEADERS
 	src/dovo_searchStatus.h
 	src/dovo_sendStatus.h
 	src/dovo_changePatientInfo.h
+	src/dovo_updateCheck.h
 	sqlite3/sqlite3.h
 	src/engine.h
 	src/patientdata.h
@@ -81,6 +82,7 @@ set(dovo_SRCS
 	src/dovo_searchStatus.cpp
 	src/dovo_sendStatus.cpp
 	src/dovo_changePatientInfo.cpp
+	src/dovo_updateCheck.cpp
 	sqlite3/sqlite3.c
 	sqlite3/sqlite3_exec_stmt.c
 	src/engine.cpp
