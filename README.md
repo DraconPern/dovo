@@ -4,7 +4,7 @@ Windows [![Build Status](http://home.draconpern.com:8080/buildStatus/icon?job=do
 Point of care, cross-platform software for importing DICOM CD and files then sending it to PACS. Usage scenario is front desk staff getting handed a CD with patient's images.  This tool allows the front desk to preview the images, and send to PACS.  Tested on Windows and OS X.
 
 - Supports Group Policy for PACS destinations on Windows.
-- Supports Windows XP, Windows Vista, Windows 7, Windows 8, and Windows 10
+- Supports Windows 7, Windows 8, and Windows 10
 - Supported on OS X
 - Works on Linux
 - Supports Unicode file and path.
