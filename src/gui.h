@@ -241,6 +241,8 @@ class updateCheck : public wxDialog
 		wxStaticText* m_needtoupgrade;
 		wxStaticText* m_remoteversion;
 		wxTextCtrl* m_remotemessage;
+		wxStaticText* m_staticText13;
+		wxHyperlinkCtrl* m_hyperlink11;
 		wxStdDialogButtonSizer* m_sdbSizer4;
 		wxButton* m_sdbSizer4OK;
 		

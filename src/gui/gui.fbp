@@ -3383,7 +3383,7 @@
                         <property name="gripper">0</property>
                         <property name="hidden">0</property>
                         <property name="id">wxID_ANY</property>
-                        <property name="label">Copyright (C) 2007-2015 Ing-Long Eric Kuo</property>
+                        <property name="label">Copyright (C) 2007-2016 Ing-Long Eric Kuo</property>
                         <property name="max_size"></property>
                         <property name="maximize_button">0</property>
                         <property name="maximum_size"></property>
