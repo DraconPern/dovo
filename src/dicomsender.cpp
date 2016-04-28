@@ -34,6 +34,8 @@ public:
 	void DoSendAsync(std::string PatientID, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, DestinationEntry destination);	
 	void DoSend(std::string PatientID, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, DestinationEntry destination);	
 
+	static bool Echo(DestinationEntry destination);
+
 	std::string ReadLog();
 	void WriteLog(const char *msg);
 	void WriteLog(std::string &msg);
@@ -399,6 +401,44 @@ int DICOMSenderImpl::SendABatch()
 	return 0;
 }
 
+bool DICOMSenderImpl::Echo(DestinationEntry destination)
+{
+	DcmSCU scu;
+
+	scu.setVerbosePCMode(true);
+	scu.setAETitle(destination.ourAETitle.c_str());
+	scu.setPeerHostName(destination.destinationHost.c_str());
+	scu.setPeerPort(destination.destinationPort);
+	scu.setPeerAETitle(destination.destinationAETitle.c_str());
+	scu.setACSETimeout(30);
+	scu.setDIMSETimeout(60);
+	scu.setDatasetConversionMode(true);
+	
+	OFList<OFString> transfersyntax;
+	transfersyntax.push_back(UID_LittleEndianExplicitTransferSyntax);
+	transfersyntax.push_back(UID_LittleEndianImplicitTransferSyntax);
+	scu.addPresentationContext(UID_VerificationSOPClass, transfersyntax);
+
+	OFCondition cond;
+	cond = scu.initNetwork();	
+	if(cond.bad())	
+		return false;
+	
+	cond = scu.negotiateAssociation();
+	if(cond.bad())
+		return false;
+
+	cond = scu.sendECHORequest(0);
+
+	scu.releaseAssociation();
+
+	if(cond == EC_Normal)
+	{
+		return true;
+	}
+
+	return false;
+}
 
 bool DcmDatasetEditor::updateStringAttributeValue(DcmItem* dataset, const DcmTagKey& key, std::string value)
 {
@@ -441,158 +481,6 @@ void DcmDatasetEditor::replacePatientInfoInformation(std::string NewPatientID, s
 		updateStringAttributeValue(dataset, DCM_PatientBirthDate, NewBirthDay);
 }
 
-/*
-OFCondition DICOMSenderImpl::storeSCU(T_ASC_Association * assoc, const boost::filesystem::path &fname)
-{
-	DIC_US msgId = assoc->nextMsgID++;
-	T_DIMSE_C_StoreRQ req;
-	T_DIMSE_C_StoreRSP rsp;
-	DIC_UI sopClass;
-	DIC_UI sopInstance;
-	DcmDataset *statusDetail = NULL;	
-
-	std::stringstream msg;
-#ifdef _WIN32
-	// on Windows, boost::filesystem::path is a wstring, so we need to convert to utf8
-	msg << "Sending file: " << fname.string(std::codecvt_utf8<boost::filesystem::path::value_type>()) << "\n";
-#else
-	msg << "Sending file: " << fname.string() << "\n";
-#endif
-	log.Write(msg);
-
-	DcmFileFormat dcmff;
-	OFCondition cond = dcmff.loadFile(fname.c_str());
-
-	if (cond.bad())
-	{		
-		log.Write(cond);
-		return cond;
-	}
-
-	replacePatientInfoInformation(dcmff.getDataset());
-
-	if (!DU_findSOPClassAndInstanceInDataSet(dcmff.getDataset(), sopClass, sopInstance, false))
-	{		
-		log.Write("No SOP Class & Instance UIDs\n");
-		return DIMSE_BADDATA;
-	}
-
-	DcmXfer filexfer(dcmff.getDataset()->getOriginalXfer());
-
-	// special case: if the file uses an unencapsulated transfer syntax (uncompressed
-    // or deflated explicit VR) and we prefer deflated explicit VR, then try
-	 // to find a presentation context for deflated explicit VR first.
-	
-	if (filexfer.isNotEncapsulated() && opt_networkTransferSyntax == EXS_DeflatedLittleEndianExplicit)
-	{
-		filexfer = EXS_DeflatedLittleEndianExplicit;
-	}
-
-	T_ASC_PresentationContextID presId;
-	if (filexfer.getXfer() != EXS_Unknown)
-		presId = ASC_findAcceptedPresentationContextID(assoc, sopClass, filexfer.getXferID());
-	else 
-		presId = ASC_findAcceptedPresentationContextID(assoc, sopClass);
-
-	if (presId == 0)
-	{
-		const char *modalityName = dcmSOPClassUIDToModality(sopClass);
-		if (!modalityName)
-			modalityName = dcmFindNameOfUID(sopClass);
-		if (!modalityName)
-			modalityName = "unknown SOP class";
-
-		std::stringstream msg;
-		msg << "No presentation context for: " << sopClass << " = " << modalityName << std::endl;
-		log.Write(msg);
-		return DIMSE_NOVALIDPRESENTATIONCONTEXTID;
-	}
-
-	DcmXfer fileTransfer(dcmff.getDataset()->getOriginalXfer());
-	T_ASC_PresentationContext pc;
-	ASC_findAcceptedPresentationContext(assoc->params, presId, &pc);
-	DcmXfer netTransfer(pc.acceptedTransferSyntax);
-
-	msg << "Transfer: " << dcmFindNameOfUID(fileTransfer.getXferID()) << " -> " << dcmFindNameOfUID(netTransfer.getXferID()) << "\n";
-	log.Write(msg);
-
-	if(fileTransfer.getXferID() != netTransfer.getXferID())
-	{
-		if(dcmff.getDataset()->chooseRepresentation(netTransfer.getXfer(), NULL) != EC_Normal)
-		{
-			log.Write("Unable to choose Representation\n");
-		}
-	}
-
-	
-	bzero((char*)&req, sizeof(req));
-	req.MessageID = msgId;
-	strcpy(req.AffectedSOPClassUID, sopClass);
-	strcpy(req.AffectedSOPInstanceUID, sopInstance);
-	req.DataSetType = DIMSE_DATASET_PRESENT;
-	req.Priority = DIMSE_PRIORITY_LOW;	
-
-	// send it!
-	cond = DIMSE_storeUser(assoc, presId, &req,
-		NULL, dcmff.getDataset(), progressCallback, this,
-		DIMSE_NONBLOCKING, 60,
-		&rsp, &statusDetail, NULL, boost::filesystem::file_size(fname));	
-		
-	if (cond.bad())
-	{		
-		log.Write("Store Failed\n");
-		log.Write(cond);		
-	}
-
-	if (statusDetail != NULL)
-	{
-		msg << "Status Detail:\n";
-		statusDetail->print(msg);
-		delete statusDetail;
-		log.Write(msg);
-	}
-
-	
-	return cond;
-}
-
-bool DICOMSenderImpl::scanFile(boost::filesystem::path currentFilename)
-{	
-
-	DcmFileFormat dfile;
-	OFCondition cond = dfile.loadFile(currentFilename.c_str());
-	if (cond.bad())
-	{
-		std::stringstream msg;
-		msg << "cannot access file, ignoring: " << currentFilename << std::endl;
-		log.Write(msg);
-		return true;
-	}
-
-	char sopClassUID[128];
-	char sopInstanceUID[128];
-
-	if (!DU_findSOPClassAndInstanceInDataSet(dfile.getDataset(), sopClassUID, sopInstanceUID))
-	{	
-		std::stringstream msg;
-		msg << "missing SOP class (or instance) in file, ignoring: " << currentFilename << std::endl;
-		log.Write(msg);
-		return false;
-	}
-
-	if (!dcmIsaStorageSOPClassUID(sopClassUID))
-	{		
-		std::stringstream msg;
-		msg << "unknown storage sop class in file, ignoring: " << currentFilename << " : " << sopClassUID << std::endl;
-		log.Write(msg);
-		return false;
-	}
-
-	sopClassUIDList.push_back(sopClassUID);	
-
-	return true;
-}
-*/
 void DICOMSenderImpl::Cancel()
 {
 	boost::mutex::scoped_lock lk(mutex);
@@ -636,6 +524,11 @@ void DICOMSender::DoSendAsync(std::string PatientID, bool changeinfo, std::strin
 void DICOMSender::DoSend(std::string PatientID, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, DestinationEntry destination)
 {
 	impl->DoSend(PatientID, changeinfo, NewPatientID, NewPatientName, NewBirthDay, destination);
+}
+
+bool DICOMSender::Echo(DestinationEntry destination)
+{
+	return DICOMSenderImpl::Echo(destination);
 }
 
 std::string DICOMSender::ReadLog()

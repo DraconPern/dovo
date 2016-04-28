@@ -68,6 +68,7 @@ class destination : public wxDialog
 		virtual void OnSelect( wxListEvent& event ) { event.Skip(); }
 		virtual void OnAdd( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnDelete( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnEcho( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnNameText( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnDestinationHostText( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnDestinationPortText( wxCommandEvent& event ) { event.Skip(); }

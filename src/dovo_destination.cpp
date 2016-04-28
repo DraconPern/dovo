@@ -1,14 +1,9 @@
 #include "dovo_destination.h"
-#include <wx/valtext.h>
-#include <wx/valnum.h>
-#include <boost/lexical_cast.hpp>
 
 dovo_destination::dovo_destination( wxWindow* parent )
 	:
 	destination( parent )
 {
-	m_echo->Hide();
-
 	invalidInput = ",";
 	wxTextValidator textval(wxFILTER_EMPTY | wxFILTER_EXCLUDE_CHAR_LIST);
 	// seems like putting it in the ctor doesn't work
@@ -77,6 +72,24 @@ void dovo_destination::OnDelete( wxCommandEvent& event )
 	SetCtrlState();
 }
 
+void dovo_destination::OnEcho( wxCommandEvent& event )
+{	
+	int sel = GetSelectedDestinationItem();
+	if ( sel == -1 )
+		return;
+	
+	wxBusyCursor wait;
+	if(DICOMSender::Echo(m_destinations[sel]))
+	{
+		wxMessageBox(_("Success"), _("Echo"), wxOK, this);		
+	}
+	else
+	{
+		wxMessageBox(_("Failed"), _("Echo"), wxOK, this);
+	}
+
+}
+
 void dovo_destination::OnNameText( wxCommandEvent& event )
 {
 	UpdateItem();
@@ -85,7 +98,7 @@ void dovo_destination::OnNameText( wxCommandEvent& event )
 	int sel = GetSelectedDestinationItem();
 	if(sel != -1)
 	{
-		m_destinationList->SetItemText(sel, m_destinations[sel].name);		
+		m_destinationList->SetItemText(sel, m_destinations[sel].name);
 	}
 }
 
@@ -110,9 +123,11 @@ void dovo_destination::OnOurAETitleText( wxCommandEvent& event )
 }
 
 void dovo_destination::OnOK( wxCommandEvent& event )
-{	
+{
+
 	event.Skip();
 }
+
 
 void dovo_destination::UpdateItem(int sel)
 {
@@ -124,7 +139,7 @@ void dovo_destination::UpdateItem(int sel)
 		if ( sel == -1 )
 			return;
 	}
-	
+
 	m_destinations[sel].name = m_name->GetValue().ToUTF8();
 	m_destinations[sel].destinationHost = m_destinationHost->GetValue().ToUTF8();
 	try { m_destinations[sel].destinationPort = boost::lexical_cast<int>(m_destinationPort->GetValue()); }
