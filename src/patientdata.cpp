@@ -95,6 +95,15 @@ int getstudiescallback(void *param,int columns,char** values, char**names)
 }
 
 // void PatientData::GetStudies(std::vector<Study> &studies)
+void PatientData::GetStudies(boost::function< int(Study &) > action)
+{
+	std::string selectsql = "SELECT studyuid, patid, studydesc, studydate FROM studies ORDER BY studyuid ASC";
+	sqlite3_stmt *select;
+	sqlite3_prepare_v2(db, selectsql.c_str(), selectsql.length(), &select, NULL);	
+	sqlite3_exec_stmt(select, getstudiescallback, &action, NULL);		
+	sqlite3_finalize(select);
+}
+
 void PatientData::GetStudies(std::string patientid, boost::function< int(Study &) > action)
 {
 	std::string selectsql = "SELECT studyuid, patid, studydesc, studydate FROM studies WHERE (patid = ?) ORDER BY studyuid ASC";

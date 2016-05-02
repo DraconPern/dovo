@@ -60,6 +60,7 @@ public:
 	void GetPatients(boost::function< int(Patient &) > action);
 	// void GetPatients(std::vector<Patient> &patients);
 	int AddStudy(std::string studyuid, std::string patid, std::string studydesc, std::string studydate);
+	void GetStudies(boost::function< int(Study &) > action);
 	void GetStudies(std::string patientid, boost::function< int(Study &) > action);
 	// void GetStudies(std::vector<Study> &studies);
 	int AddSeries(std::string seriesuid, std::string studyuid, std::string seriesdesc);	
