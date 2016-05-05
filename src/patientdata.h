@@ -32,10 +32,11 @@ public:
 class Study
 {
 public:
-	Study(std::string studyuid, std::string patid, std::string studydesc, std::string studydate)
-		: studyuid(studyuid), patid(patid), studydesc(studydesc), studydate(studydate) {}
+	Study(std::string studyuid, std::string patid, std::string patname, std::string studydesc, std::string studydate)
+		: studyuid(studyuid), patid(patid), patname(patname), studydesc(studydesc), studydate(studydate) {}
 	std::string studyuid;
 	std::string patid;
+	std::string patname;
 	std::string studydesc;
 	std::string studydate;
 };
@@ -56,12 +57,12 @@ public:
 
 	PatientData();
 	~PatientData();
-	int AddPatient(std::string patid, std::string name, std::string birthday);
+	int AddPatient(std::string patid, std::string patname, std::string birthday);
 	void GetPatients(boost::function< int(Patient &) > action);
 	// void GetPatients(std::vector<Patient> &patients);
-	int AddStudy(std::string studyuid, std::string patid, std::string studydesc, std::string studydate);
+	int AddStudy(std::string studyuid, std::string patid, std::string patname, std::string studydesc, std::string studydate);
 	void GetStudies(boost::function< int(Study &) > action);
-	void GetStudies(std::string patientid, boost::function< int(Study &) > action);
+	void GetStudies(std::string patientid, std::string patientname, boost::function< int(Study &) > action);
 	// void GetStudies(std::vector<Study> &studies);
 	int AddSeries(std::string seriesuid, std::string studyuid, std::string seriesdesc);	
 	void GetSeries(std::string studyuid, boost::function< int(Series &) > action);

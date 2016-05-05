@@ -66,7 +66,7 @@ void DICOMFileScanner::ScanFile(boost::filesystem::path path)
 		transfersyntax = filexfer.getXferID();
 		
 		patientdata.AddPatient(patientid.c_str(), patientname.c_str(), birthday.c_str());
-		patientdata.AddStudy(studyuid.c_str(), patientid.c_str(), studydesc.c_str(), studydate.c_str());
+		patientdata.AddStudy(studyuid.c_str(), patientid.c_str(), patientname.c_str(), studydesc.c_str(), studydate.c_str());
 		patientdata.AddSeries(seriesuid.c_str(), studyuid.c_str(), seriesdesc.c_str());
 	
 		patientdata.AddInstance(sopuid.c_str(), seriesuid.c_str(), path, sopclassuid.c_str(), transfersyntax.c_str());		

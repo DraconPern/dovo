@@ -133,7 +133,7 @@ void dovo_mainFrame::OnPatientsSelected( wxListEvent& event )
 		return;
 
 	m_studies->DeleteAllItems();	
-	m_engine.patientdata.GetStudies(m_patients->GetItemText(item, 0).ToUTF8().data(), boost::bind(&dovo_mainFrame::fillstudiescallback, this, _1));
+	m_engine.patientdata.GetStudies(m_patients->GetItemText(item, 0).ToUTF8().data(), m_patients->GetItemText(item, 1).ToUTF8().data(), boost::bind(&dovo_mainFrame::fillstudiescallback, this, _1));
 	m_studies->SetColumnWidth(0, wxLIST_AUTOSIZE);
 	m_studies->SetColumnWidth(1, wxLIST_AUTOSIZE);
 	m_studies->SetColumnWidth(2, wxLIST_AUTOSIZE);
@@ -283,15 +283,17 @@ void dovo_mainFrame::OnSend( wxCommandEvent& event )
 	}
 	
 	wxString patientid = m_patients->GetItemText(item);
+	wxString patientname = m_patients->GetItemText(item, 1);
 
 	dovo_changePatientInfo changepatinfo(this);
 	changepatinfo.m_patientID = patientid;
-	changepatinfo.m_patientName = m_patients->GetItemText(item, 1);
+	changepatinfo.m_patientName = patientname;
 	changepatinfo.m_birthday = m_patients->GetItemText(item, 2);
 	
 	if(changepatinfo.ShowModal() == wxID_OK)
 	{				
 		m_engine.StartSend(patientid.ToUTF8().data(), 
+			patientname.ToUTF8().data(),
 			changepatinfo.m_changeInfo, 
 			changepatinfo.m_patientID.ToUTF8().data(), 
 			changepatinfo.m_patientName.ToUTF8().data(), 

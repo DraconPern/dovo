@@ -31,8 +31,8 @@ public:
 	DICOMSenderImpl(PatientData &patientdata);
 	~DICOMSenderImpl(void);
 
-	void DoSendAsync(std::string PatientID, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, DestinationEntry destination);	
-	void DoSend(std::string PatientID, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, DestinationEntry destination);	
+	void DoSendAsync(std::string PatientID, std::string PatientName, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, DestinationEntry destination);	
+	void DoSend(std::string PatientID, std::string PatientName, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, DestinationEntry destination);	
 
 	static bool Echo(DestinationEntry destination);
 
@@ -55,6 +55,7 @@ protected:
 	boost::mutex mutex;
 	bool cancelEvent, doneEvent;
 	std::string PatientID;
+	std::string PatientName;
 	bool changeinfo;	
 	std::string NewPatientID;
 	std::string NewPatientName;
@@ -97,11 +98,12 @@ DICOMSenderImpl::~DICOMSenderImpl()
 {
 }
 
-void DICOMSenderImpl::DoSendAsync(std::string PatientID, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, DestinationEntry destination)
+void DICOMSenderImpl::DoSendAsync(std::string PatientID, std::string PatientName, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, DestinationEntry destination)
 {
 	cancelEvent = doneEvent = false;
 	
 	this->PatientID = PatientID;
+	this->PatientName = PatientName;
 	this->changeinfo = changeinfo;
 	this->NewPatientID = NewPatientID;
 	this->NewPatientName = NewPatientName;	
@@ -140,7 +142,7 @@ void DICOMSenderImpl::DoSendThread(void *obj)
 	if (me)
 	{
 		me->SetDone(false);
-		me->DoSend(me->PatientID, me->changeinfo, me->NewPatientID, me->NewPatientName, me->NewBirthDay, me->m_destination);
+		me->DoSend(me->PatientID, me->PatientName, me->changeinfo, me->NewPatientID, me->NewPatientName, me->NewBirthDay, me->m_destination);
 		me->SetDone(true);
 	}
 
@@ -199,10 +201,10 @@ protected:
 	DcmDataset* dataset;
 };
 
-void DICOMSenderImpl::DoSend(std::string PatientID, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, DestinationEntry destination)
+void DICOMSenderImpl::DoSend(std::string PatientID, std::string PatientName, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, DestinationEntry destination)
 {	
 	// get a list of files
-	patientdata.GetStudies(PatientID, boost::bind(&DICOMSenderImpl::fillstudies, this, _1));
+	patientdata.GetStudies(PatientID, PatientName, boost::bind(&DICOMSenderImpl::fillstudies, this, _1));
 	for (std::vector<std::string>::iterator it = studies.begin() ; it != studies.end(); ++it)
 	{
 		patientdata.GetSeries(*it, boost::bind(&DICOMSenderImpl::fillseries, this, _1));
@@ -516,14 +518,14 @@ DICOMSender::~DICOMSender(void)
 	delete impl;
 }
 
-void DICOMSender::DoSendAsync(std::string PatientID, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, DestinationEntry destination)
+void DICOMSender::DoSendAsync(std::string PatientID, std::string PatientName, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, DestinationEntry destination)
 {
-	impl->DoSendAsync(PatientID, changeinfo, NewPatientID, NewPatientName, NewBirthDay, destination);
+	impl->DoSendAsync(PatientID, PatientName, changeinfo, NewPatientID, NewPatientName, NewBirthDay, destination);
 }
 
-void DICOMSender::DoSend(std::string PatientID, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, DestinationEntry destination)
+void DICOMSender::DoSend(std::string PatientID, std::string PatientName, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, DestinationEntry destination)
 {
-	impl->DoSend(PatientID, changeinfo, NewPatientID, NewPatientName, NewBirthDay, destination);
+	impl->DoSend(PatientID, PatientName, changeinfo, NewPatientID, NewPatientName, NewBirthDay, destination);
 }
 
 bool DICOMSender::Echo(DestinationEntry destination)

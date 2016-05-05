@@ -146,7 +146,7 @@ void engine::StopScan()
 }
 
 
-void engine::StartSend(std::string patientid, bool changePatientInfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, int destination)
+void engine::StartSend(std::string PatientID, std::string PatientName, bool changePatientInfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, int destination)
 {
 	// find the destination
 	DestinationEntry dest;
@@ -161,7 +161,7 @@ void engine::StartSend(std::string patientid, bool changePatientInfo, std::strin
 		dest = destinations[destination];
 	}
 	
-	sender.DoSendAsync(patientid, changePatientInfo, NewPatientID, NewPatientName, NewBirthDay, dest);
+	sender.DoSendAsync(PatientID, PatientName, changePatientInfo, NewPatientID, NewPatientName, NewBirthDay, dest);
 	
 }
 

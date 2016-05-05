@@ -19,7 +19,7 @@ public:
 	void SaveDestinationList();
 	void StartScan(boost::filesystem::path path);
 	void StopScan();	
-	void StartSend(std::string patientid, bool changePatientInfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, int destination);
+	void StartSend(std::string PatientID, std::string PatientName, bool changePatientInfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, int destination);
 	void StopSend();
 
 	DICOMFileScanner scanner;
