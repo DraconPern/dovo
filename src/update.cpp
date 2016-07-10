@@ -133,6 +133,7 @@ int getUpdateJSON(std::string &updateinfo)
 		std::ostream request_stream(&request);
 		request_stream << "GET " << checkurl << " HTTP/1.0\r\n";
 		request_stream << "Host: " << host << "\r\n";
+		request_stream << "User-Agent: dovo/" << DOVO_VERSION << "\r\n";
 		request_stream << "Accept: */*\r\n";
 		request_stream << "Connection: close\r\n\r\n";
 
