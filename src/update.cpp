@@ -17,6 +17,7 @@ using boost::asio::ip::tcp;
 #include <wx/wx.h>
 #endif
 #include <wx/config.h>
+#include <wx/platinfo.h>
 
 #include "dovo_updateCheck.h"
 
@@ -133,7 +134,12 @@ int getUpdateJSON(std::string &updateinfo)
 		std::ostream request_stream(&request);
 		request_stream << "GET " << checkurl << " HTTP/1.0\r\n";
 		request_stream << "Host: " << host << "\r\n";
-		request_stream << "User-Agent: dovo/" << DOVO_VERSION << "\r\n";
+		request_stream << "User-Agent: dovo/" << DOVO_VERSION;
+
+		const wxPlatformInfo &pinfo = wxPlatformInfo::Get();
+		request_stream << " (";
+		request_stream << pinfo.GetOperatingSystemIdName() << " " << pinfo.GetOSMajorVersion() << "." << pinfo.GetOSMinorVersion();
+		request_stream << ")\r\n";
 		request_stream << "Accept: */*\r\n";
 		request_stream << "Connection: close\r\n\r\n";
 
