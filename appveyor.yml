@@ -11,8 +11,8 @@ install:
 # dcmtk & zlib
   - cd %DEVSPACE%
   - ps: |
-      Invoke-WebRequest http://draconpern-buildcache.s3.amazonaws.com/dcmtk.7z -Outfile "dcmtk.7z"
-  - 7z x -y dcmtk.7z
+      Invoke-WebRequest http://draconpern-buildcache.s3.amazonaws.com/dcmtk-win.7z -Outfile "dcmtk.7z"
+  - 7z x -y dcmtk-win.7z
 
 #fmjpeg2koj & openjpeg
   - cd %DEVSPACE%
