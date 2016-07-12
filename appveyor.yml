@@ -16,14 +16,14 @@ install:
 #fmjpeg2koj & openjpeg
   - cd %DEVSPACE%
   - ps: |
-      Invoke-WebRequest http://draconpern-buildcache.s3.amazonaws.com/fmjpeg2koj.7z -Outfile "fmjpeg2koj.7z"
-  - 7z x -y fmjpeg2koj.7z
+      Invoke-WebRequest http://draconpern-buildcache.s3.amazonaws.com/fmjpeg2koj-win.7z -Outfile "fmjpeg2koj-win.7z"
+  - 7z x -y fmjpeg2koj-win.7z
 
 #wxWidgets
   - cd %DEVSPACE%
   - ps: |
-      Invoke-WebRequest http://draconpern-buildcache.s3.amazonaws.com/wxWidgets.7z -Outfile "wxWidgets.7z"
-  - 7z x -y wxWidgets.7z
+      Invoke-WebRequest http://draconpern-buildcache.s3.amazonaws.com/wxWidgets-win.7z -Outfile "wxWidgets-win.7z"
+  - 7z x -y wxWidgets-win.7z
   - set WXWIN=%DEVSPACE%\wxWidgets
 
 #boost
