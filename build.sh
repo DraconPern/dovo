@@ -39,25 +39,6 @@ cmake .. -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=$TYPE -DOPENJPEG=$DEVSPACE/o
 make -j8 install
 
 cd $DEVSPACE
-[[ -d fmjpeg2kjasper ]] || git clone --branch=master https://github.com/DraconPern/fmjpeg2kjasper.git
-cd fmjpeg2kjasper
-git pull
-wget -c https://www.ece.uvic.ca/~frodo/jasper/software/jasper-1.900.1.zip
-unzip -n jasper-1.900.1.zip
-cd jasper
-mkdir -p build-$TYPE
-cd build-$TYPE
-cmake .. -DBUILD_SHARED_LIBS=0 -DCMAKE_BUILD_TYPE=$TYPE -DJASPERDIR=$DEVSPACE/fmjpeg2kjasper/jasper-1.900.1 -DCMAKE_INSTALL_PREFIX=$DEVSPACE/jasper/$TYPE
-make -j8 install
-cd $DEVSPACE
-cd fmjpeg2kjasper
-git pull
-mkdir -p build-$TYPE
-cd build-$TYPE
-cmake .. -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=$TYPE -DJASPER=$DEVSPACE/jasper/$TYPE -DDCMTK_DIR=$DEVSPACE/dcmtk/$TYPE -DCMAKE_INSTALL_PREFIX=$DEVSPACE/fmjpeg2kjasper/$TYPE
-make -j8 install
-
-cd $DEVSPACE
 wget -c http://downloads.sourceforge.net/project/boost/boost/1.60.0/boost_1_60_0.zip
 unzip -n boost_1_60_0.zip
 cd boost_1_60_0

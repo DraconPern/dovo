@@ -22,7 +22,6 @@
 #include "dcmtk/dcmdata/dcrleerg.h" 
 #include "fmjpeg2k/djencode.h"
 #include "fmjpeg2k/djdecode.h"
-#include "fmjp2k/fmjp2kcrg.h"
 #include "dcmtk/dcmjpls/djrparam.h"   /* for class DJLSRepresentationParameter */
 
 #ifdef _UNDEFINEDUNICODE
@@ -123,7 +122,6 @@ void RegisterCodecs()
 	DcmRLEDecoderRegistration::registerCodecs();			
 	FMJPEG2KEncoderRegistration::registerCodecs();
 	FMJPEG2KDecoderRegistration::registerCodecs();
-	// FMJP2KCodecRegistration::registerCodecs();
 }
 
 
@@ -137,5 +135,4 @@ void DeregisterCodecs()
 	DcmRLEDecoderRegistration::cleanup();		
 	FMJPEG2KEncoderRegistration::cleanup();
 	FMJPEG2KDecoderRegistration::cleanup();
-	// FMJP2KCodecRegistration::cleanup();
 }
