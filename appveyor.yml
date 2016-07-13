@@ -29,7 +29,7 @@ install:
 #boost
   - cd C:\Libraries\boost_1_59_0
   - call bootstrap
-  - SET BOOST_MODULES=--with-atomic --with-thread --with-filesystem --with-system stage --with-date_time --with-regex
+  - SET BOOST_MODULES=--with-atomic --with-thread --with-filesystem --with-system stage --with-date_time --with-regex --with-locale
   - IF "%TYPE%" == "Release" b2 toolset=msvc-11.0 runtime-link=static define=_BIND_TO_CURRENT_VCLIBS_VERSION=1 -j 4 %BOOST_MODULES% stage release
   - IF "%TYPE%" == "Debug"   b2 toolset=msvc-11.0 runtime-link=static define=_BIND_TO_CURRENT_VCLIBS_VERSION=1 -j 4 %BOOST_MODULES% stage debug
 
