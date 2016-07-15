@@ -58,7 +58,7 @@ git checkout v3.1.0
 mkdir -p build$TYPE
 cd build$TYPE
 unamestr=`uname`
-if [ "$unamestr" == 'Darwin' ] ; then  
+if [ "$unamestr" == 'Darwin' ] ; then
   COMMONwxWidgetsFlag=(--disable-shared CXXFLAGS="-std=c++11 -stdlib=libc++" CPPFLAGS=-stdlib=libc++ LIBS=-lc++ -with-macosx-version-min=10.9)
 elif [ "$unamestr" = 'Linux'] ; then
   COMMONwxWidgetsFlag=(--disable-shared CXXFLAGS="-std=c++11")
@@ -74,5 +74,5 @@ make -j8
 cd $BUILD_DIR
 mkdir -p build-$TYPE
 cd build-$TYPE
-cmake .. -DCMAKE_BUILD_TYPE=$TYPE -DwxWidgets_CONFIG_EXECUTABLE=$DEVSPACE/wxWidgets/build$TYPE/wx-config -DBOOST_ROOT=$DEVSPACE/boost_1_60_0 -DDCMTK_DIR=$DEVSPACE/dcmtk/$TYPE -DFMJPEG2K=$DEVSPACE/fmjpeg2koj/$TYPE -DOPENJPEG=$DEVSPACE/openjpeg/$TYPE -DFMJP2K=$DEVSPACE/fmjpeg2kjasper/$TYPE -DJASPER=$DEVSPACE/jasper/$TYPE
+cmake .. -DCMAKE_BUILD_TYPE=$TYPE -DwxWidgets_CONFIG_EXECUTABLE=$DEVSPACE/wxWidgets/build$TYPE/wx-config -DBOOST_ROOT=$DEVSPACE/boost_1_60_0 -DDCMTK_DIR=$DEVSPACE/dcmtk/$TYPE -DFMJPEG2K=$DEVSPACE/fmjpeg2koj/$TYPE -DOPENJPEG=$DEVSPACE/openjpeg/$TYPE
 make -j8
