@@ -25,6 +25,7 @@ protected:
 	void ScanDir(boost::filesystem::path path);
 
 	bool IsCanceled();
+	void ClearCancel();
 	void SetDone(bool state);
 
 	// threading data

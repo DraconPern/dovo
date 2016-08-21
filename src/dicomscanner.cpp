@@ -89,6 +89,7 @@ void DICOMFileScanner::DoScanThread(void *obj)
 		me->SetDone(false);
 		me->DoScan(me->m_scanPath);
 		me->SetDone(true);
+		me->ClearCancel();
 	}
 
 }
@@ -142,6 +143,12 @@ void DICOMFileScanner::Cancel()
 {
 	boost::mutex::scoped_lock lk(mutex);
 	cancelEvent = true;
+}
+
+void DICOMFileScanner::ClearCancel()
+{
+	boost::mutex::scoped_lock lk(mutex);
+	cancelEvent = false;
 }
 
 bool DICOMFileScanner::IsDone()
