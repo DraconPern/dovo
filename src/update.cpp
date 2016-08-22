@@ -66,33 +66,10 @@ bool informUserOfUpdate(std::string json)
 		return true;
 	}
 
-	boost::regex expression("(\\d+).(\\d+).(\\d+)"); 
-	boost::cmatch thisversioncmatch, versioncmatch; 
-	if(boost::regex_match(version.c_str(), versioncmatch, expression) && boost::regex_match(thisversion.c_str(), thisversioncmatch, expression))
+	if (version != thisversion)
 	{
-		int thismajor = boost::lexical_cast<int>(thisversioncmatch[1]);
-		int thisminor = boost::lexical_cast<int>(thisversioncmatch[2]);
-		int thisbuild = boost::lexical_cast<int>(thisversioncmatch[3]);
-
-		int major = boost::lexical_cast<int>(versioncmatch[1]);
-		int minor = boost::lexical_cast<int>(versioncmatch[2]);
-		int build = boost::lexical_cast<int>(versioncmatch[3]);
-
-		if(major > thismajor)
-		{
-			updatecheckdlg.m_updatetext = wxT("A new version of dovo is available:");
-			updatecheckdlg.ShowModal();
-		}
-		else if(minor > thisminor)
-		{
-			updatecheckdlg.m_updatetext = wxT("A new update of dovo is available:");
-			updatecheckdlg.ShowModal();
-		}
-		else if(build > thisbuild)
-		{
-			updatecheckdlg.m_updatetext = wxT("An update available:");
-			updatecheckdlg.ShowModal();
-		}
+		updatecheckdlg.m_updatetext = wxT("A new version of dovo is available:");
+		updatecheckdlg.ShowModal();
 	}
 
 	return false;
