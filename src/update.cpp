@@ -59,15 +59,15 @@ bool informUserOfUpdate(std::string json)
 		return true;
 	}
 
-	if(mustupdate == "true")
-	{		
-		updatecheckdlg.m_updatetext = wxT("You must upgrade to a new version:");
-		updatecheckdlg.ShowModal();
-		return true;
-	}
-
 	if (version != thisversion)
 	{
+		if (mustupdate == "true")
+		{
+			updatecheckdlg.m_updatetext = wxT("You must upgrade to a new version:");
+			updatecheckdlg.ShowModal();
+			return true;
+		}
+
 		updatecheckdlg.m_updatetext = wxT("A new version of dovo is available:");
 		updatecheckdlg.ShowModal();
 	}
