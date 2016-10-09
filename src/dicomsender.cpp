@@ -203,6 +203,11 @@ protected:
 
 void DICOMSenderImpl::DoSend(std::string PatientID, std::string PatientName, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, DestinationEntry destination)
 {	
+	std::stringstream msg;
+	msg << "gathering images\n";
+	log.Write(msg);
+	msg.str("");
+
 	// get a list of files
 	patientdata.GetStudies(PatientID, PatientName, boost::bind(&DICOMSenderImpl::fillstudies, this, _1));
 	for (std::vector<std::string>::iterator it = studies.begin() ; it != studies.end(); ++it)
@@ -213,8 +218,7 @@ void DICOMSenderImpl::DoSend(std::string PatientID, std::string PatientName, boo
 			patientdata.GetInstances(*it2, boost::bind(&DICOMSenderImpl::fillinstances, this, _1, &instances));
 		}
 	}
-		
-	std::stringstream msg;
+			
 	msg << "Sending " << instances.size() << " images\n";
 	log.Write(msg);
 
@@ -259,7 +263,13 @@ void DICOMSenderImpl::DoSend(std::string PatientID, std::string PatientName, boo
 			retry = 0;
 		}
 	}
-	while (!IsCanceled() && unsentcountafter > 0 && retry < 10000);	 
+	while (!IsCanceled() && unsentcountafter > 0 && retry < 10000);
+
+	// clear 
+	instances.clear();
+	series.clear();
+	studies.clear();
+	sopclassuidtransfersyntax.clear();
 }
 
 int DICOMSenderImpl::fillstudies(Study &study)
