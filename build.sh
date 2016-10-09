@@ -39,9 +39,9 @@ cmake .. -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=$TYPE -DOPENJPEG=$DEVSPACE/o
 make -j8 install
 
 cd $DEVSPACE
-wget -c http://downloads.sourceforge.net/project/boost/boost/1.60.0/boost_1_60_0.zip
-unzip -n boost_1_60_0.zip
-cd boost_1_60_0
+wget -c http://downloads.sourceforge.net/project/boost/boost/1.61.0/boost_1_61_0.zip
+unzip -n boost_1_61_0.zip
+cd boost_1_61_0
 ./bootstrap.sh
 COMMONb2Flag="-j 4 link=static runtime-link=static stage"
 BOOSTModule="--with-locale --with-thread --with-filesystem --with-system --with-date_time --with-regex"
@@ -59,7 +59,7 @@ mkdir -p build$TYPE
 cd build$TYPE
 unamestr=`uname`
 if [ "$unamestr" == 'Darwin' ] ; then
-  COMMONwxWidgetsFlag=(--disable-shared CXXFLAGS="-std=c++11 -stdlib=libc++" CPPFLAGS=-stdlib=libc++ LIBS=-lc++ -with-macosx-version-min=10.9)
+  COMMONwxWidgetsFlag=(--disable-shared --disable-mediactrl CXXFLAGS="-std=c++11 -stdlib=libc++" CPPFLAGS=-stdlib=libc++ LIBS=-lc++ -with-macosx-version-min=10.9)
 elif [ "$unamestr" = 'Linux'] ; then
   COMMONwxWidgetsFlag=(--disable-shared CXXFLAGS="-std=c++11")
 fi
@@ -74,5 +74,5 @@ make -j8
 cd $BUILD_DIR
 mkdir -p build-$TYPE
 cd build-$TYPE
-cmake .. -DCMAKE_BUILD_TYPE=$TYPE -DwxWidgets_CONFIG_EXECUTABLE=$DEVSPACE/wxWidgets/build$TYPE/wx-config -DBOOST_ROOT=$DEVSPACE/boost_1_60_0 -DDCMTK_DIR=$DEVSPACE/dcmtk/$TYPE -DFMJPEG2K=$DEVSPACE/fmjpeg2koj/$TYPE -DOPENJPEG=$DEVSPACE/openjpeg/$TYPE
+cmake .. -DCMAKE_BUILD_TYPE=$TYPE -DwxWidgets_CONFIG_EXECUTABLE=$DEVSPACE/wxWidgets/build$TYPE/wx-config -DBOOST_ROOT=$DEVSPACE/boost_1_61_0 -DDCMTK_DIR=$DEVSPACE/dcmtk/$TYPE -DFMJPEG2K=$DEVSPACE/fmjpeg2koj/$TYPE -DOPENJPEG=$DEVSPACE/openjpeg/$TYPE
 make -j8
