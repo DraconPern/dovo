@@ -12,6 +12,7 @@ searchStatus( parent )
 	SetMinSize(wxSize(400, 100));
 	SetSize(wxSize(400, 100));
 #endif
+	Center();
 	timer.Connect(wxEVT_TIMER, wxTimerEventHandler( dovo_searchStatus::OnTimer ), NULL, this );
 	timer.Start(500);
 }
@@ -30,7 +31,7 @@ dovo_searchStatus::~dovo_searchStatus()
 void dovo_searchStatus::OnTimer( wxTimerEvent& event )
 {
 	if(m_scanner->IsDone())
-	{						
+	{
 		timer.Disconnect(wxEVT_TIMER, wxTimerEventHandler( dovo_searchStatus::OnTimer ), NULL, this );
 		EndModal(0);
 	}

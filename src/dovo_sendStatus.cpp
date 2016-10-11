@@ -5,11 +5,11 @@ dovo_sendStatus::dovo_sendStatus( wxWindow* parent )
 	sendStatus( parent )
 {
 	timer.Connect(wxEVT_TIMER, wxTimerEventHandler( dovo_sendStatus::OnTimer ), NULL, this );
-	timer.Start(200);	
+	timer.Start(200);
 }
 
 void dovo_sendStatus::OnStop( wxCommandEvent& event )
-{	
+{
 	m_sender->Cancel();
 
 	if(m_sender->IsDone())
@@ -24,7 +24,7 @@ dovo_sendStatus::~dovo_sendStatus()
 
 void dovo_sendStatus::OnTimer( wxTimerEvent& event )
 {
-	// update cout => log window		
+	// update cout => log window
 	std::string str = m_sender->ReadLog();
 
 	if(str.length() != 0)
@@ -33,7 +33,7 @@ void dovo_sendStatus::OnTimer( wxTimerEvent& event )
 	}
 
 	if(m_sender->IsDone())
-	{				
+	{
 		timer.Disconnect(wxEVT_TIMER, wxTimerEventHandler( dovo_sendStatus::OnTimer ), NULL, this );
 		m_stop->SetLabel(_("Close"));
 		m_log->AppendText("\nDone\n");
