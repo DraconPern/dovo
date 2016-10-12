@@ -53,7 +53,7 @@ msbuild /P:Configuration=%TYPE% INSTALL.vcxproj
 if ERRORLEVEL 1 exit /B %ERRORLEVEL%
 
 cd %DEVSPACE%
-wget -c http://downloads.sourceforge.net/project/boost/boost/1.61.0/boost_1_61_0.zip
+if NOT EXIST boost_1_61_0.zip wget -c http://downloads.sourceforge.net/project/boost/boost/1.61.0/boost_1_61_0.zip
 if NOT EXIST boost_1_61_0 unzip -n boost_1_61_0.zip
 cd boost_1_61_0
 call bootstrap
