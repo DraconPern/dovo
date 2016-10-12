@@ -38,4 +38,4 @@ The program is http://utf8everywhere.org/
 Ing-Long Eric Kuo <draconpern@hotmail.com>
 
 ## License
-This software is licensed under the GPL.  For use under another license, please contact Ing-Long Eric Kuo <eric@frontmotion.com>
+This software is licensed under the GPL.
