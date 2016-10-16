@@ -76,7 +76,8 @@ void DICOMFileScanner::ScanFile(boost::filesystem::path path)
 
 void DICOMFileScanner::DoScanAsync(boost::filesystem::path path)
 {
-	cancelEvent = doneEvent = false;
+	SetDone(false);
+	ClearCancel();
 
 	m_scanPath = path;
 	boost::thread t(DICOMFileScanner::DoScanThread, this);

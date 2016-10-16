@@ -49,6 +49,7 @@ protected:
 	int SendABatch();
 
 	bool IsCanceled();
+	void ClearCancel();
 	void SetDone(bool state);
 
 	// threading data
@@ -100,7 +101,8 @@ DICOMSenderImpl::~DICOMSenderImpl()
 
 void DICOMSenderImpl::DoSendAsync(std::string PatientID, std::string PatientName, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, DestinationEntry destination)
 {
-	cancelEvent = doneEvent = false;
+	SetDone(false);
+	ClearCancel();
 	
 	this->PatientID = PatientID;
 	this->PatientName = PatientName;
@@ -496,6 +498,12 @@ void DICOMSenderImpl::Cancel()
 {
 	boost::mutex::scoped_lock lk(mutex);
 	cancelEvent = true;
+}
+
+void DICOMSenderImpl::ClearCancel()
+{
+	boost::mutex::scoped_lock lk(mutex);
+	cancelEvent = false;
 }
 
 bool DICOMSenderImpl::IsDone()
