@@ -141,7 +141,6 @@ void DICOMSenderImpl::DoSendThread(void *obj)
 
 	if (me)
 	{
-		me->SetDone(false);
 		me->DoSend(me->PatientID, me->PatientName, me->changeinfo, me->NewPatientID, me->NewPatientName, me->NewBirthDay, me->m_destination);
 		me->SetDone(true);
 	}
