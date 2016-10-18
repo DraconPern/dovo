@@ -57,6 +57,8 @@ BEGIN_EVENT_TABLE(MyApp, wxApp)
 		return true;
 	}
 
+	boost::filesystem::path::codecvt();  // ensure VC++ does not race during initialization.
+
 	// check for update	in background and save result for next run
 	updater = boost::thread(&updateChecker);
 
