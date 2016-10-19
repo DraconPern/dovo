@@ -114,10 +114,10 @@ void dcm2img(boost::filesystem::path filename, int clientWidth, int clientHeight
 
 void RegisterCodecs()
 {
-	DJDecoderRegistration::registerCodecs();
-	DJEncoderRegistration::registerCodecs();    
+	DJEncoderRegistration::registerCodecs();
+	DJDecoderRegistration::registerCodecs();    
 	DJLSEncoderRegistration::registerCodecs();    
-	DJLSEncoderRegistration::registerCodecs();    
+	DJLSDecoderRegistration::registerCodecs();    
 	DcmRLEEncoderRegistration::registerCodecs();    
 	DcmRLEDecoderRegistration::registerCodecs();			
 	FMJPEG2KEncoderRegistration::registerCodecs();
@@ -127,10 +127,10 @@ void RegisterCodecs()
 
 void DeregisterCodecs()
 {
-	DJDecoderRegistration::cleanup();
-	DJEncoderRegistration::cleanup();    
-	DJLSDecoderRegistration::cleanup();
-	DJLSEncoderRegistration::cleanup();   
+	DJEncoderRegistration::cleanup();
+	DJDecoderRegistration::cleanup();    
+	DJLSEncoderRegistration::cleanup();
+	DJLSDecoderRegistration::cleanup();   
 	DcmRLEEncoderRegistration::cleanup();    
 	DcmRLEDecoderRegistration::cleanup();		
 	FMJPEG2KEncoderRegistration::cleanup();
