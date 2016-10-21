@@ -22,7 +22,7 @@ IF "%TYPE%" == "Release" copy /Y %DEVSPACE%\zlib\Release\lib\zlibstatic.lib %DEV
 IF "%TYPE%" == "Debug"   copy /Y %DEVSPACE%\zlib\Debug\lib\zlibstaticd.lib %DEVSPACE%\zlib\Debug\lib\zlib_d.lib
 
 cd %DEVSPACE%
-git clone https://github.com/vovythevov/libiconv-cmake.git
+git clone https://github.com/DraconPern/libiconv-cmake.git
 cd libiconv-cmake
 REM powershell "gci . CMakeLists.txt -recurse | ForEach { (Get-Content $_.FullName | ForEach {$_ -replace 'set\(BUILD_SHARED_LIBS ON', '#'}) | Set-Content $_.FullName }"
 REM powershell "gci . iconv.h.build.in -recurse | ForEach { (Get-Content $_.FullName | ForEach {$_ -replace '\@HAVE_VISIBILITY\@', 'TRUE'}) | Set-Content $_.FullName }"
