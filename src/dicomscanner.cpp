@@ -46,6 +46,9 @@ void DICOMFileScanner::ScanFile(boost::filesystem::path path)
 		OFString studyuid, modality, studydesc, studydate;
 		OFString seriesuid, seriesdesc;
 		OFString sopuid, sopclassuid, transfersyntax;
+				
+		dfile.getDataset()->convertToUTF8();
+
 		dfile.getDataset()->findAndGetOFString(DCM_PatientName, patientname);
 		if(patientname.size() == 0)
 			return;
@@ -62,6 +65,7 @@ void DICOMFileScanner::ScanFile(boost::filesystem::path path)
 
 		dfile.getDataset()->findAndGetOFString(DCM_SOPInstanceUID, sopuid);
 		dfile.getDataset()->findAndGetOFString(DCM_SOPClassUID, sopclassuid);
+	
 		DcmXfer filexfer(dfile.getDataset()->getOriginalXfer());
 		transfersyntax = filexfer.getXferID();
 		

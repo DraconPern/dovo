@@ -121,7 +121,7 @@ void dovo_mainFrame::OnUpdate( wxCommandEvent& event )
 int dovo_mainFrame::fillpatientscallback(Patient &patient)
 {	
 	m_patients->InsertItem(0, patient.patid);
-	m_patients->SetItem(0, 1, patient.name);
+	m_patients->SetItem(0, 1, wxString::FromUTF8(patient.name.c_str()));
 	m_patients->SetItem(0, 2, patient.birthday);
 	return 0;
 }

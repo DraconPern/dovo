@@ -22,13 +22,28 @@ IF "%TYPE%" == "Release" copy /Y %DEVSPACE%\zlib\Release\lib\zlibstatic.lib %DEV
 IF "%TYPE%" == "Debug"   copy /Y %DEVSPACE%\zlib\Debug\lib\zlibstaticd.lib %DEVSPACE%\zlib\Debug\lib\zlib_d.lib
 
 cd %DEVSPACE%
+git clone https://github.com/vovythevov/libiconv-cmake.git
+cd libiconv-cmake
+REM powershell "gci . CMakeLists.txt -recurse | ForEach { (Get-Content $_.FullName | ForEach {$_ -replace 'set\(BUILD_SHARED_LIBS ON', '#'}) | Set-Content $_.FullName }"
+REM powershell "gci . iconv.h.build.in -recurse | ForEach { (Get-Content $_.FullName | ForEach {$_ -replace '\@HAVE_VISIBILITY\@', 'TRUE'}) | Set-Content $_.FullName }"
+REM powershell "gci . iconv.h.build.in -recurse | ForEach { (Get-Content $_.FullName | ForEach {$_ -replace 'extern LIBICONV_DLL_EXPORTED \@DLL_VARIABLE\@ int _libiconv_version;', '#ifdef`r`n//'}) | Set-Content $_.FullName }"
+REM powershell "gci . localcharset.h.build.in -recurse | ForEach { (Get-Content $_.FullName | ForEach {$_ -replace '\@HAVE_VISIBILITY\@', 'TRUE'}) | Set-Content $_.FullName }"
+mkdir build-%TYPE%
+cd build-%TYPE%
+cmake.exe .. -G %GENERATOR% -DBUILD_SHARED_LIBS=0 -DCMAKE_C_FLAGS_RELEASE="/MT /O2 /D NDEBUG" -DCMAKE_C_FLAGS_DEBUG="/D_DEBUG /MTd /Od" -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\libiconv\%TYPE%
+msbuild /P:Configuration=%TYPE% INSTALL.vcxproj
+if ERRORLEVEL 1 exit /B %ERRORLEVEL%
+IF "%TYPE%" == "Debug"   copy /Y %DEVSPACE%\libiconv\Debug\lib\libiconv.lib %DEVSPACE%\libiconv\Debug\lib\libiconv_d.lib
+
+
+cd %DEVSPACE%
 git clone git://git.dcmtk.org/dcmtk.git
 cd dcmtk
 git pull
 git checkout -f 5371e1d84526e7544ab7e70fb47e3cdb4e9231b2
 mkdir build-%TYPE%
 cd build-%TYPE%
-cmake .. -G %GENERATOR% -DDCMTK_WIDE_CHAR_FILE_IO_FUNCTIONS=1 -DDCMTK_WITH_ZLIB=1 -DCMAKE_CXX_FLAGS_RELEASE="/Zi" -DWITH_ZLIBINC=%DEVSPACE%\zlib\%TYPE% -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\dcmtk\%TYPE%
+cmake .. -G %GENERATOR% -DDCMTK_WIDE_CHAR_FILE_IO_FUNCTIONS=1 -DCMAKE_CXX_FLAGS_RELEASE="/Zi" -DDCMTK_WITH_ZLIB=1 -DWITH_ZLIBINC=%DEVSPACE%\zlib\%TYPE% -DDCMTK_WITH_ICONV=1 -DWITH_LIBICONVINC=%DEVSPACE%\libiconv\%TYPE% -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\dcmtk\%TYPE%
 msbuild /maxcpucount:8 /P:Configuration=%TYPE% INSTALL.vcxproj
 if ERRORLEVEL 1 exit /B %ERRORLEVEL%
 
