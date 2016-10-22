@@ -24,10 +24,6 @@ IF "%TYPE%" == "Debug"   copy /Y %DEVSPACE%\zlib\Debug\lib\zlibstaticd.lib %DEVS
 cd %DEVSPACE%
 git clone https://github.com/DraconPern/libiconv-cmake.git
 cd libiconv-cmake
-REM powershell "gci . CMakeLists.txt -recurse | ForEach { (Get-Content $_.FullName | ForEach {$_ -replace 'set\(BUILD_SHARED_LIBS ON', '#'}) | Set-Content $_.FullName }"
-REM powershell "gci . iconv.h.build.in -recurse | ForEach { (Get-Content $_.FullName | ForEach {$_ -replace '\@HAVE_VISIBILITY\@', 'TRUE'}) | Set-Content $_.FullName }"
-REM powershell "gci . iconv.h.build.in -recurse | ForEach { (Get-Content $_.FullName | ForEach {$_ -replace 'extern LIBICONV_DLL_EXPORTED \@DLL_VARIABLE\@ int _libiconv_version;', '#ifdef`r`n//'}) | Set-Content $_.FullName }"
-REM powershell "gci . localcharset.h.build.in -recurse | ForEach { (Get-Content $_.FullName | ForEach {$_ -replace '\@HAVE_VISIBILITY\@', 'TRUE'}) | Set-Content $_.FullName }"
 mkdir build-%TYPE%
 cd build-%TYPE%
 cmake.exe .. -G %GENERATOR% -DBUILD_SHARED_LIBS=0 -DCMAKE_C_FLAGS_RELEASE="/MT /O2 /D NDEBUG" -DCMAKE_C_FLAGS_DEBUG="/D_DEBUG /MTd /Od" -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\libiconv\%TYPE%
