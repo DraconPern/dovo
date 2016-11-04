@@ -156,11 +156,8 @@ int PatientData::AddInstance(std::string sopuid, std::string seriesuid, boost::f
 	sqlite3_prepare_v2(db, sql.c_str(), sql.length(), &insert, NULL);
 	sqlite3_bind_text(insert, 1, sopuid.c_str(), sopuid.length(), SQLITE_STATIC);
 	sqlite3_bind_text(insert, 2, seriesuid.c_str(), seriesuid.length(), SQLITE_STATIC);
-#ifdef _WIN32
+
 	std::string p = boost::locale::conv::utf_to_utf<char>(filename.c_str());
-#else
-	std::string p = filename.string();
-#endif
 	sqlite3_bind_text(insert, 3, p.c_str(), p.length(), SQLITE_STATIC);	
 	sqlite3_bind_text(insert, 4, sopclassuid.c_str(), sopclassuid.length(), SQLITE_STATIC);	
 	sqlite3_bind_text(insert, 5, transfersyntax.c_str(), transfersyntax.length(), SQLITE_STATIC);	
@@ -175,11 +172,7 @@ int PatientData::AddInstance(std::string sopuid, std::string seriesuid, boost::f
 int getinstancescallback(void *param,int columns,char** values, char**names)
 {
 	boost::function<int(Instance &)> pfn = * static_cast<boost::function<int(Instance &)> *>(param);
-#ifdef _WIN32	
 	Instance result(values[0], values[1], boost::locale::conv::utf_to_utf<boost::filesystem::path::value_type>(values[2]), values[3], values[4]);
-#else
-	Instance result(values[0], values[1], values[2], values[3], values[4]);
-#endif
 	return pfn(result);
 }
 
