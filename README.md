@@ -18,6 +18,8 @@ Source https://github.com/DraconPern/dovo
 
 ## Development notes
 The program is http://utf8everywhere.org/
+The data in sqlite is always utf8.
+wxWidgets is utf32 on Windows and utf8 everywhere else.
 
 ## Requirements
 - CMake http://www.cmake.org/download/
