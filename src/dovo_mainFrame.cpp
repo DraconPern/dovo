@@ -128,7 +128,10 @@ void dovo_mainFrame::OnPatientsSelected( wxListEvent& event )
 	if (item == -1)
 		return;
 
-	m_studies->DeleteAllItems();	
+	m_studies->DeleteAllItems();
+	m_series->DeleteAllItems();
+	m_instances->DeleteAllItems();
+
 	m_engine.patientdata.GetStudies(m_patients->GetItemText(item, 0).ToUTF8().data(), m_patients->GetItemText(item, 1).ToUTF8().data(), boost::bind(&dovo_mainFrame::fillstudiescallback, this, _1));
 	m_studies->SetColumnWidth(0, wxLIST_AUTOSIZE);
 	m_studies->SetColumnWidth(1, wxLIST_AUTOSIZE);
@@ -175,6 +178,8 @@ void dovo_mainFrame::OnStudiesSelected( wxListEvent& event )
 	naturalstringmap entries;
 
 	m_series->DeleteAllItems();
+	m_instances->DeleteAllItems();
+
 	m_engine.patientdata.GetSeries(m_studies->GetItemText(item, 2).ToUTF8().data(), boost::bind(&dovo_mainFrame::fillseriescallback, this, _1, &entries));
 
 	int j = 0;
