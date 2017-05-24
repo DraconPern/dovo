@@ -396,7 +396,7 @@ int DICOMSenderImpl::SendABatch()
 		T_ASC_PresentationContextID pid = scu.findAnyPresentationContextID(sopclassuid, fileTransfer.getXferID());
 		
 		cond = scu.sendSTORERequest(pid, "", dcmff.getDataset(), status);
-		if(cond.good() && status == 0)
+		if (cond.good() && (status == 0 || (status & 0xf000) == 0xb000))
 			instances.erase(itr++);
 		else if(cond == DUL_PEERABORTEDASSOCIATION)
 			return 1;
