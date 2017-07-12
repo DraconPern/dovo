@@ -252,7 +252,7 @@ void DICOMSenderImpl::DoSend(std::string PatientID, std::string PatientName, boo
 #ifdef _WIN32
 				Sleep(200);
 #else
-                usleep(200);
+                usleep(200 * 1000);
 #endif
                 sleeploop--;
 				if (IsCanceled())
