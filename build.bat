@@ -35,8 +35,8 @@ IF "%TYPE%" == "Release" copy /Y %DEVSPACE%\libiconv\Release\lib\libiconv.lib %D
 cd %DEVSPACE%
 git clone git://git.dcmtk.org/dcmtk.git
 cd dcmtk
-git pull
-git checkout -f 5371e1d84526e7544ab7e70fb47e3cdb4e9231b2
+git fetch
+git checkout -f DCMTK-3.6.2
 mkdir build-%TYPE%
 cd build-%TYPE%
 cmake .. -G %GENERATOR% -DDCMTK_WIDE_CHAR_FILE_IO_FUNCTIONS=1 -DCMAKE_CXX_FLAGS_RELEASE="/Zi" -DDCMTK_WITH_ZLIB=1 -DWITH_ZLIBINC=%DEVSPACE%\zlib\%TYPE% -DDCMTK_WITH_ICONV=1 -DWITH_LIBICONVINC=%DEVSPACE%\libiconv\%TYPE% -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\dcmtk\%TYPE%

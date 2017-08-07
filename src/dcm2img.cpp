@@ -1,5 +1,9 @@
 #include <boost/filesystem.hpp>
 
+// include wxwidgets first because it'll define ssize_t
+#include <wx/image.h>
+#include <wx/rawbmp.h>
+
 // work around the fact that dcmtk doesn't work in unicode mode, so all string operation needs to be converted from/to mbcs
 #ifdef _UNICODE
 #undef _UNICODE
@@ -28,9 +32,6 @@
 #define _UNICODE 1
 #define UNICODE 1
 #endif
-
-#include <wx/image.h>
-#include <wx/rawbmp.h>
 
 void dcm2img(boost::filesystem::path filename, int clientWidth, int clientHeight, wxImage &image)
 {

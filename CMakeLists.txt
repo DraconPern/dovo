@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 
 project(dovo)
 
-set(VERSION 1.0.13)
+set(VERSION 1.0.14)
 
 add_definitions(-DDOVO_VERSION="${VERSION}")
 
@@ -41,7 +41,7 @@ find_package(fmjpeg2k REQUIRED HINTS ${FMJPEG2K})
 
 set(wxWidgets_USE_STATIC   ON)
 #define this so that wxWidgets doesn't define it. Conflicts w/ dcmtk's declaration
-add_definitions(-DHAVE_SSIZE_T)
+#add_definitions(-DHAVE_SSIZE_T)
 find_package(wxWidgets COMPONENTS core base adv REQUIRED)
 include(${wxWidgets_USE_FILE})
 
