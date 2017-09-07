@@ -35,8 +35,6 @@
 
 void dcm2img(boost::filesystem::path filename, int clientWidth, int clientHeight, wxImage &image)
 {
-	OFLog::configure(OFLogger::OFF_LOG_LEVEL);	
-		
 	unsigned char *source = NULL;
 
 	try
@@ -46,6 +44,8 @@ void dcm2img(boost::filesystem::path filename, int clientWidth, int clientHeight
 			throw std::runtime_error("");
 		if(dfile.loadAllDataIntoMemory().bad())
 			throw std::runtime_error("");
+
+		OFLog::configure(OFLogger::OFF_LOG_LEVEL);	// needed to avoid memory leak in DicomImage constructor
 
 		// uncompress
 		DicomImage di(&dfile, EXS_Unknown);
