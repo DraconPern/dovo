@@ -60,7 +60,7 @@ mkdir -p build$TYPE
 cd build$TYPE
 unamestr=`uname`
 if [ "$unamestr" = "Darwin" ] ; then
-  COMMONwxWidgetsFlag=(--disable-shared --enable-utf8 --disable-mediactrl CXXFLAGS="-std=c++11 -stdlib=libc++" CPPFLAGS=-stdlib=libc++ LIBS=-lc++)
+  COMMONwxWidgetsFlag=(--disable-shared --enable-utf8 --disable-mediactrl CXXFLAGS="-std=c++11 -stdlib=libc++ -D__ASSERT_MACROS_DEFINE_VERSIONS_WITHOUT_UNDERSCORES=1" CPPFLAGS=-stdlib=libc++ LIBS=-lc++)
 elif [ "$unamestr" = "Linux" ] ; then
   COMMONwxWidgetsFlag=(--disable-shared --enable-utf8 CXXFLAGS="-std=c++11")
 fi
@@ -78,7 +78,7 @@ cd build-$TYPE
 cmake .. -DCMAKE_BUILD_TYPE=$TYPE -DwxWidgets_CONFIG_EXECUTABLE=$DEVSPACE/wxWidgets/build$TYPE/wx-config -DBOOST_ROOT=$DEVSPACE/boost_1_63_0 -DDCMTK_DIR=$DEVSPACE/dcmtk/$TYPE -DFMJPEG2K=$DEVSPACE/fmjpeg2koj/$TYPE -DOPENJPEG=$DEVSPACE/openjpeg/$TYPE
 make -j8
 
-if [[ "$unamestr" = "Linux"]] && [[ "$TYPE" = "Release" ]]; then
+if [[ "$unamestr" = "Linux" ]] && [[ "$TYPE" = "Release" ]]; then
   cd $BUILD_DIR
   cd snap
   snapcraft
