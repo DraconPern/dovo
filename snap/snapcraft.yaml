@@ -1,0 +1,15 @@
+name: dovo
+version: 1.0.14
+summary: DICOM CD Importer
+description: |
+  Dovo scans dicom files from a CD or directory and imports thems by sending
+  them to a PACS system.
+
+parts:
+  dovo:
+    plugin: dump
+    source: ../build-Release/dovo
+
+apps:
+  dovo:
+    command: dovo
