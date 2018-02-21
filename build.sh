@@ -60,7 +60,7 @@ mkdir -p build$TYPE
 cd build$TYPE
 unamestr=`uname`
 if [ "$unamestr" == 'Darwin' ] ; then
-  COMMONwxWidgetsFlag=(--disable-shared --enable-utf8 --disable-mediactrl CXXFLAGS="-std=c++11 -stdlib=libc++" CPPFLAGS=-stdlib=libc++ LIBS=-lc++ -with-macosx-version-min=10.9 --with-macosx-version-min=10.9)
+  COMMONwxWidgetsFlag=(--disable-shared --enable-utf8 --disable-mediactrl CXXFLAGS="-std=c++11 -stdlib=libc++" CPPFLAGS=-stdlib=libc++ LIBS=-lc++)
 elif [ "$unamestr" = 'Linux'] ; then
   COMMONwxWidgetsFlag=(--disable-shared --enable-utf8 CXXFLAGS="-std=c++11")
 fi
