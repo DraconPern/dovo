@@ -78,7 +78,7 @@ cd build-$TYPE
 cmake .. -DCMAKE_BUILD_TYPE=$TYPE -DwxWidgets_CONFIG_EXECUTABLE=$DEVSPACE/wxWidgets/build$TYPE/wx-config -DBOOST_ROOT=$DEVSPACE/boost_1_63_0 -DDCMTK_DIR=$DEVSPACE/dcmtk/$TYPE -DFMJPEG2K=$DEVSPACE/fmjpeg2koj/$TYPE -DOPENJPEG=$DEVSPACE/openjpeg/$TYPE
 make -j8
 
-if [ "$unamestr" = 'Linux' && "$TYPE" = "Release"] ; then
+if [ "$unamestr" = 'Linux' ] && ["$TYPE" = "Release"] ; then
   cd $BUILD_DIR
   cd snap
   snapcraft
