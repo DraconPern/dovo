@@ -1,8 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Jun 17 2015)
+// C++ code generated with wxFormBuilder (version Nov  6 2017)
 // http://www.wxformbuilder.org/
 //
-// PLEASE DO "NOT" EDIT THIS FILE!
+// PLEASE DO *NOT* EDIT THIS FILE!
 ///////////////////////////////////////////////////////////////////////////
 
 #include "gui.h"
@@ -189,28 +189,41 @@ mainFrame::mainFrame( wxWindow* parent, wxWindowID id, const wxString& title, co
 	fgSizer1->SetFlexibleDirection( wxHORIZONTAL );
 	fgSizer1->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_NONE );
 	
+	
+	bSizer16->Add( fgSizer1, 0, wxEXPAND, 5 );
+	
+	wxGridBagSizer* gbSizer1;
+	gbSizer1 = new wxGridBagSizer( 0, 0 );
+	gbSizer1->SetFlexibleDirection( wxHORIZONTAL );
+	gbSizer1->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
 	m_staticText1 = new wxStaticText( this, wxID_ANY, _("Directory:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText1->Wrap( -1 );
-	fgSizer1->Add( m_staticText1, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+	gbSizer1->Add( m_staticText1, wxGBPosition( 0, 0 ), wxGBSpan( 1, 1 ), wxALL, 5 );
 	
 	m_directory = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer1->Add( m_directory, 1, wxALL|wxEXPAND, 5 );
+	gbSizer1->Add( m_directory, wxGBPosition( 0, 1 ), wxGBSpan( 1, 2 ), wxALL|wxEXPAND, 5 );
 	
 	m_button5 = new wxButton( this, wxID_ANY, _("Browse..."), wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer1->Add( m_button5, 0, wxALL, 5 );
+	gbSizer1->Add( m_button5, wxGBPosition( 0, 3 ), wxGBSpan( 1, 1 ), wxALL, 5 );
 	
 	m_staticText2 = new wxStaticText( this, wxID_ANY, _("Destination:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText2->Wrap( -1 );
-	fgSizer1->Add( m_staticText2, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+	gbSizer1->Add( m_staticText2, wxGBPosition( 1, 0 ), wxGBSpan( 1, 1 ), wxALL, 5 );
 	
 	m_destination = new wxComboBox( this, wxID_ANY, _("Combo!"), wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_DROPDOWN|wxCB_READONLY ); 
-	fgSizer1->Add( m_destination, 1, wxALIGN_CENTER_VERTICAL|wxALL|wxEXPAND, 5 );
+	gbSizer1->Add( m_destination, wxGBPosition( 1, 1 ), wxGBSpan( 1, 1 ), wxALL|wxEXPAND, 5 );
+	
+	m_button15 = new wxButton( this, wxID_ANY, _("Echo"), wxDefaultPosition, wxDefaultSize, 0 );
+	gbSizer1->Add( m_button15, wxGBPosition( 1, 2 ), wxGBSpan( 1, 1 ), wxALL, 5 );
 	
 	m_button6 = new wxButton( this, wxID_ANY, _("Edit..."), wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer1->Add( m_button6, 0, wxALL, 5 );
+	gbSizer1->Add( m_button6, wxGBPosition( 1, 3 ), wxGBSpan( 1, 1 ), wxALL, 5 );
 	
 	
-	bSizer16->Add( fgSizer1, 0, wxEXPAND, 5 );
+	gbSizer1->AddGrowableCol( 1 );
+	
+	bSizer16->Add( gbSizer1, 0, wxEXPAND, 5 );
 	
 	wxBoxSizer* bSizer13;
 	bSizer13 = new wxBoxSizer( wxHORIZONTAL );
@@ -314,6 +327,7 @@ mainFrame::mainFrame( wxWindow* parent, wxWindowID id, const wxString& title, co
 	
 	// Connect Events
 	m_button5->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnBrowse ), NULL, this );
+	m_button15->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnEcho ), NULL, this );
 	m_button6->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnDestinationEdit ), NULL, this );
 	m_patients->Connect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( mainFrame::OnPatientsSelected ), NULL, this );
 	m_studies->Connect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( mainFrame::OnStudiesSelected ), NULL, this );
@@ -330,6 +344,7 @@ mainFrame::~mainFrame()
 {
 	// Disconnect Events
 	m_button5->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnBrowse ), NULL, this );
+	m_button15->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnEcho ), NULL, this );
 	m_button6->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnDestinationEdit ), NULL, this );
 	m_patients->Disconnect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( mainFrame::OnPatientsSelected ), NULL, this );
 	m_studies->Disconnect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( mainFrame::OnStudiesSelected ), NULL, this );

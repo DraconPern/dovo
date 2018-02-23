@@ -303,6 +303,40 @@ void dovo_mainFrame::OnSend( wxCommandEvent& event )
 	}
 }
 
+void dovo_mainFrame::OnEcho(wxCommandEvent& event)
+{
+	if (m_destination->GetSelection() == wxNOT_FOUND)
+	{
+		wxMessageBox(_("Please select a destination."), _("Error"), wxOK, this);
+		return;
+	}
+
+	int destination = m_destination->GetSelection();
+	// find the destination
+	DestinationEntry dest;
+
+	if (destination < m_engine.globalDestinations.size())
+	{
+		dest = m_engine.globalDestinations[destination];
+	}
+	else
+	{
+		destination -= m_engine.globalDestinations.size();
+		dest = m_engine.destinations[destination];
+	}
+
+	wxBusyCursor wait;
+	if (DICOMSender::Echo(dest))
+	{
+		wxMessageBox(_("Success"), _("Echo"), wxOK, this);
+	}
+	else
+	{
+		wxMessageBox(_("Failed"), _("Echo"), wxOK, this);
+	}
+
+}
+
 void dovo_mainFrame::OnAbout( wxCommandEvent& event )
 {
 	dovo_about dlg(this);

@@ -1,8 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Jun 17 2015)
+// C++ code generated with wxFormBuilder (version Nov  6 2017)
 // http://www.wxformbuilder.org/
 //
-// PLEASE DO "NOT" EDIT THIS FILE!
+// PLEASE DO *NOT* EDIT THIS FILE!
 ///////////////////////////////////////////////////////////////////////////
 
 #ifndef __GUI_H__
@@ -23,6 +23,7 @@
 #include <wx/textctrl.h>
 #include <wx/dialog.h>
 #include <wx/combobox.h>
+#include <wx/gbsizer.h>
 #include <wx/bitmap.h>
 #include <wx/image.h>
 #include <wx/icon.h>
@@ -97,6 +98,7 @@ class mainFrame : public wxFrame
 		wxButton* m_button5;
 		wxStaticText* m_staticText2;
 		wxComboBox* m_destination;
+		wxButton* m_button15;
 		wxButton* m_button6;
 		wxListCtrl* m_patients;
 		wxListCtrl* m_studies;
@@ -111,6 +113,7 @@ class mainFrame : public wxFrame
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnBrowse( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnEcho( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnDestinationEdit( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnPatientsSelected( wxListEvent& event ) { event.Skip(); }
 		virtual void OnStudiesSelected( wxListEvent& event ) { event.Skip(); }
