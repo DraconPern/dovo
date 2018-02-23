@@ -29,6 +29,7 @@ wxWidgets is utf32 on Windows and utf8 everywhere else.
 - gcc on Linux
 
 ## Third party dependency
+The build scripts pull these automatically.
 - wxWidgets http://www.wxwidgets.org/ please extract under ./wxWidgets
 - DCMTK http://dicom.offis.de/ please use snapshot or git, and extract under ./dcmtk
 - boost http://www.boost.org/ please extract under ./boost
