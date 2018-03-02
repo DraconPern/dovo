@@ -7,7 +7,16 @@ SET TYPE=Debug
 SET BUILD_DIR=%CD%
 SET DEVSPACE=%CD%
 SET CL=/MP
-SET GENERATOR="Visual Studio 12"
+SET BOOSTTOOLSET=toolset=msvc-14.0
+
+IF "%2"=="32" (
+SET GENERATOR="Visual Studio 14"
+SET OPENSSLFLAG=VC-WIN32
+) ELSE (
+SET GENERATOR="Visual Studio 14 Win64"
+SET OPENSSLFLAG=VC-WIN64A
+SET BOOSTADDRESSMODEL=address-model=64
+)
 
 cd %DEVSPACE%
 git clone --branch=master https://github.com/madler/zlib.git
@@ -68,7 +77,7 @@ if NOT EXIST boost_1_63_0.zip wget -c --no-check-certificate http://downloads.so
 if NOT EXIST boost_1_63_0 unzip -o -q boost_1_63_0.zip
 cd boost_1_63_0
 call bootstrap
-SET COMMONb2Flag=toolset=msvc-12.0 runtime-link=static define=_BIND_TO_CURRENT_VCLIBS_VERSION=1 -j 4 stage
+SET COMMONb2Flag=%BOOSTTOOLSET% %BOOSTADDRESSMODEL% runtime-link=static define=_BIND_TO_CURRENT_VCLIBS_VERSION=1 -j 4 stage
 SET BOOSTmodules=--with-locale --with-atomic --with-thread --with-filesystem --with-system --with-date_time --with-regex
 IF "%TYPE%" == "Release" b2 %COMMONb2Flag% %BOOSTmodules% release
 IF "%TYPE%" == "Debug"   b2 %COMMONb2Flag% %BOOSTmodules% debug
@@ -83,7 +92,7 @@ cd %WXWIN%\build\msw
 copy /Y %WXWIN%\include\wx\msw\setup0.h %WXWIN%\include\wx\msw\setup.h
 powershell "gci . *.vcxproj -recurse | ForEach { (Get-Content $_ | ForEach {$_ -replace 'MultiThreadedDebugDLL', 'MultiThreadedDebug'}) | Set-Content $_ }"
 powershell "gci . *.vcxproj -recurse | ForEach { (Get-Content $_ | ForEach {$_ -replace 'MultiThreadedDLL', 'MultiThreaded'}) | Set-Content $_ }"
-msbuild /maxcpucount:5 /P:Configuration=%TYPE% /p:Platform="Win32" wx_vc12.sln
+msbuild /maxcpucount:5 /P:Configuration=%TYPE% /p:Platform="Win32" wx_vc14.sln
 if ERRORLEVEL 1 exit /B %ERRORLEVEL%
 
 cd %BUILD_DIR%
