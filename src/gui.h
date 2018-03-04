@@ -147,6 +147,8 @@ class about : public wxDialog
 		wxStaticText* m_copyright;
 		wxStaticText* m_staticText13;
 		wxHyperlinkCtrl* m_hyperlink1;
+		wxStaticText* m_staticText18;
+		wxHyperlinkCtrl* m_hyperlink3;
 		wxStdDialogButtonSizer* m_sdbSizer1;
 		wxButton* m_sdbSizer1OK;
 	

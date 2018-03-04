@@ -388,7 +388,20 @@ about::about( wxWindow* parent, wxWindowID id, const wxString& title, const wxPo
 	bSizer27->Add( m_hyperlink1, 0, wxALL, 5 );
 	
 	
-	bSizer28->Add( bSizer27, 1, wxEXPAND, 5 );
+	bSizer28->Add( bSizer27, 0, 0, 5 );
+	
+	wxBoxSizer* bSizer31;
+	bSizer31 = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_staticText18 = new wxStaticText( this, wxID_ANY, _("Bitcoin donation:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText18->Wrap( -1 );
+	bSizer31->Add( m_staticText18, 0, wxALL, 5 );
+	
+	m_hyperlink3 = new wxHyperlinkCtrl( this, wxID_ANY, _("1NJxjksqAbFdwdkKiED6mZq2h69CRpJoTa"), wxT("bitcoin:1NJxjksqAbFdwdkKiED6mZq2h69CRpJoTa"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+	bSizer31->Add( m_hyperlink3, 0, wxALL, 5 );
+	
+	
+	bSizer28->Add( bSizer31, 1, wxEXPAND, 5 );
 	
 	m_sdbSizer1 = new wxStdDialogButtonSizer();
 	m_sdbSizer1OK = new wxButton( this, wxID_OK );
