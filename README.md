@@ -41,5 +41,9 @@ The build scripts pull these automatically.
 ## Author
 Ing-Long Eric Kuo <draconpern@hotmail.com>
 
+## Donate
+bitcoin: 1NJxjksqAbFdwdkKiED6mZq2h69CRpJoTa
+bitcoin segwit: bc1qemt58qxy3me3mkllnt2u6sd72h8mycrz9qd72s
+
 ## License
 This software is licensed under the GPL.  For use under another license, please contact Ing-Long Eric Kuo <eric@frontmotion.com>
