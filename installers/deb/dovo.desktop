@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Dovo
+StartupWMClass=dovo
+Comment=DICOM CD Importer
+GenericName=DICOM
+Exec=/usr/share/dovo/dovo
+Icon=dovo
+Type=Application
+Categories=Utility

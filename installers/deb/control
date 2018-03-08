@@ -1,5 +1,11 @@
 Package: dovo
 Version: 1.0.15.0
+Section: utils
 Maintainer: draconpern@hotmail.com
-Architecture: all
-Description: Point of care, cross-platform software for importing DICOM CD and files then sending it to PACS. Usage scenario is front desk staff getting handed a CD with patient's images.  This tool allows the front desk to preview the images, and send to PACS.  Tested on Windows and OS X.
+Architecture: amd64
+Description: DICOM CD Importer
+  Point of care, cross-platform software for importing DICOM CD and
+  files then sending it to PACS. Usage scenario is front desk staff
+  getting handed a CD with patient's images.  This tool allows the
+  front desk to preview the images, and send to PACS.
+  Tested on Windows and OS X.
