@@ -9,7 +9,7 @@ else
 fi
 
 mkdir -p container/DEBIAN
-cp control container/DEBIAN
+cp control container/DEBIAN/
 mkdir -p container/usr/bin
-cp build-$TYPE/dovo /usr/bin
+cp ../../build-$TYPE/dovo container/usr/bin/
 dpkg-deb --build container
