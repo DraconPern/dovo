@@ -34,7 +34,7 @@
 	<Fragment>
 		<ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
       <Component Id="ProductComponent" Guid="79B9B9F7-EFD2-4FE0-898B-593343C9C764" Win64="yes">
-        <File Id="dovoexe" Source="..\build-Release\Release\dovo.exe" KeyPath="yes" />        
+        <File Id="dovoexe" Source="..\..\build-Release\Release\dovo.exe" KeyPath="yes" />        
       </Component>
     </ComponentGroup>
 	</Fragment>
