@@ -390,6 +390,19 @@ about::about( wxWindow* parent, wxWindowID id, const wxString& title, const wxPo
 	
 	bSizer28->Add( bSizer27, 0, 0, 5 );
 	
+	wxBoxSizer* bSizer271;
+	bSizer271 = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_staticText131 = new wxStaticText( this, wxID_ANY, _("Twitter:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText131->Wrap( -1 );
+	bSizer271->Add( m_staticText131, 0, wxALL, 5 );
+	
+	m_hyperlink11 = new wxHyperlinkCtrl( this, wxID_ANY, wxEmptyString, wxT("https://twitter.com/DraconPernDev"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+	bSizer271->Add( m_hyperlink11, 0, wxALL, 5 );
+	
+	
+	bSizer28->Add( bSizer271, 1, wxEXPAND, 5 );
+	
 	wxBoxSizer* bSizer31;
 	bSizer31 = new wxBoxSizer( wxHORIZONTAL );
 	
