@@ -158,7 +158,7 @@ class about : public wxDialog
 	
 	public:
 		
-		about( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("About"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 588,285 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
+		about( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("About"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 560,348 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
 		~about();
 	
 };

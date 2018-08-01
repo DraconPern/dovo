@@ -401,7 +401,7 @@ about::about( wxWindow* parent, wxWindowID id, const wxString& title, const wxPo
 	bSizer271->Add( m_hyperlink11, 0, wxALL, 5 );
 	
 	
-	bSizer28->Add( bSizer271, 1, wxEXPAND, 5 );
+	bSizer28->Add( bSizer271, 0, wxEXPAND, 5 );
 	
 	wxBoxSizer* bSizer31;
 	bSizer31 = new wxBoxSizer( wxHORIZONTAL );
