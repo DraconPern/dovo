@@ -92,7 +92,7 @@ set(dovo_SRCS
 )
 
 if(WIN32)
-  set(dovo_SRCS ${dovo_SRCS} src/win/dovo.rc src/win/version.rc)
+  set(dovo_SRCS ${dovo_SRCS} src/win/dovo.rc src/win/version.rc src/win/dovo.manifest)
 
   string(REPLACE "." "," VER_FILEVERSION ${VERSION})
 

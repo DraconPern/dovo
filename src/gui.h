@@ -149,12 +149,14 @@ class about : public wxDialog
 		wxHyperlinkCtrl* m_hyperlink1;
 		wxStaticText* m_staticText18;
 		wxHyperlinkCtrl* m_hyperlink3;
+		wxStaticText* m_staticText181;
+		wxHyperlinkCtrl* m_hyperlink31;
 		wxStdDialogButtonSizer* m_sdbSizer1;
 		wxButton* m_sdbSizer1OK;
 	
 	public:
 		
-		about( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("About"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 480,234 ), long style = wxDEFAULT_DIALOG_STYLE ); 
+		about( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("About"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 588,285 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
 		~about();
 	
 };
