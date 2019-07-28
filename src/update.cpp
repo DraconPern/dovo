@@ -51,13 +51,14 @@ bool informUserOfUpdate(std::string json)
 	boost::gregorian::date timelimit = compiledate + boost::gregorian::years(1);
 	boost::gregorian::date today = boost::gregorian::day_clock::local_day();
 
+	/*
 	if(today > timelimit)
 	{				
 
 		updatecheckdlg.m_updatetext = wxT("This software is outdated, please upgrade!");		
 		updatecheckdlg.ShowModal();
 		return true;
-	}
+	}*/
 
 	if (version != thisversion)
 	{
