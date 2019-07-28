@@ -43,7 +43,7 @@
 		</DirectoryRef>
 
 		<Feature Id="MainApplication" Title="Dovo" Level="1">
-			<ComponentRef Id="myapplication.exe" />
+			<ComponentRef Id="dovo.exe" />
 			<ComponentRef Id="ApplicationShortcut" />
 		</Feature>
 
