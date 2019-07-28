@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 
 project(dovo)
 
-set(VERSION 1.0.15)
+set(VERSION 1.0.16)
 
 add_definitions(-DDOVO_VERSION="${VERSION}")
 

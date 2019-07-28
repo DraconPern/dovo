@@ -640,7 +640,7 @@ updateCheck::updateCheck( wxWindow* parent, wxWindowID id, const wxString& title
 	m_staticText13->Wrap( -1 );
 	bSizer27->Add( m_staticText13, 0, wxALL, 5 );
 	
-	m_hyperlink11 = new wxHyperlinkCtrl( this, wxID_ANY, wxEmptyString, wxT("http://www.draconpern.com/software/dovo"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+	m_hyperlink11 = new wxHyperlinkCtrl( this, wxID_ANY, wxEmptyString, wxT("https://www.draconpern.com/software/dovo"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
 	bSizer27->Add( m_hyperlink11, 0, wxALL, 5 );
 	
 	

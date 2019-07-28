@@ -25,7 +25,7 @@ wxWidgets is utf32 on Windows and utf8 everywhere else.
 ## Requirements
 - CMake http://www.cmake.org/download/
 - XCode on OS X
-- Visual Studio 2012 or higher on Windows
+- Visual Studio 2012 or higher on Windows (VS 2015 is used for release)
 - gcc on Linux
 
 ## Third party dependency
