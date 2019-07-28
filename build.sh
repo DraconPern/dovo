@@ -11,6 +11,8 @@ fi
 BUILD_DIR=`pwd`
 DEVSPACE=`pwd`
 
+unamestr=`uname`
+
 cd $DEVSPACE
 [[ -d dcmtk ]] || git clone https://github.com/DCMTK/dcmtk.git
 cd dcmtk
@@ -58,13 +60,11 @@ cd wxWidgets
 git checkout v3.1.0
 mkdir -p build$TYPE
 cd build$TYPE
-unamestr=`uname`
 if [ "$unamestr" = "Darwin" ] ; then
-  COMMONwxWidgetsFlag=(--disable-shared --enable-utf8 --disable-mediactrl CXXFLAGS="-std=c++11 -stdlib=libc++ -D__ASSERT_MACROS_DEFINE_VERSIONS_WITHOUT_UNDERSCORES=1" CPPFLAGS=-stdlib=libc++ LIBS=-lc++)
+  COMMONwxWidgetsFlag=(--disable-shared --enable-utf8 --disable-mediactrl --with-macosx-version-min=10.9 CXXFLAGS="-std=c++11 -stdlib=libc++ -D__ASSERT_MACROS_DEFINE_VERSIONS_WITHOUT_UNDERSCORES=1" CPPFLAGS=-stdlib=libc++ LIBS=-lc++)
 elif [ "$unamestr" = "Linux" ] ; then
   COMMONwxWidgetsFlag=(--disable-shared --enable-utf8 CXXFLAGS="-std=c++11")
 fi
-
 if [ "$TYPE" = "Release" ] ; then
   ../configure "${COMMONwxWidgetsFlag[@]}"
 elif [ "$TYPE" = "Debug" ] ; then
