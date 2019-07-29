@@ -39,6 +39,8 @@ dovo_mainFrame::dovo_mainFrame( wxWindow* parent )
 	m_engine.LoadGlobalDestinationList();
 
 	FillDestinationList();
+	wxConfig::Get()->SetPath("/Settings");
+	m_destination->SetStringSelection(wxConfig::Get()->Read("LastDestination"));
 
 	image.Create(1, 1);
 
@@ -49,6 +51,7 @@ dovo_mainFrame::~dovo_mainFrame()
 {
 	wxConfig::Get()->SetPath("/Settings");
 	wxConfig::Get()->Write("LastDir", m_directory->GetValue());
+	wxConfig::Get()->Write("LastDestination", m_destination->GetStringSelection());
 	wxConfig::Get()->Flush();
 }
 
