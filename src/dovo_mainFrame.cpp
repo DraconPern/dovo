@@ -331,7 +331,7 @@ void dovo_mainFrame::OnQuickSend(wxCommandEvent& event)
 	m_patients->SetColumnWidth(1, wxLIST_AUTOSIZE);
 	m_patients->SetColumnWidth(2, wxLIST_AUTOSIZE);
 
-	if (search_status == IDCANCEL)
+	if (search_status != wxID_OK)
 		return;
 
 	// start send

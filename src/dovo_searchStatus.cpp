@@ -34,9 +34,9 @@ void dovo_searchStatus::OnTimer( wxTimerEvent& event )
 	{
 		timer.Disconnect(wxEVT_TIMER, wxTimerEventHandler( dovo_searchStatus::OnTimer ), NULL, this );
 		if(m_scanner->IsCanceled())
-			EndModal(IDCANCEL);
+			EndModal(wxID_CANCEL);
 		else
-			EndModal(IDOK);
+			EndModal(wxID_OK);
 	}
 	else
 	{
