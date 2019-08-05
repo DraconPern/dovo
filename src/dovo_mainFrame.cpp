@@ -312,6 +312,29 @@ void dovo_mainFrame::OnQuickSend(wxCommandEvent& event)
 		return;
 	}
 
+	m_patients->DeleteAllItems();
+	m_studies->DeleteAllItems();
+	m_series->DeleteAllItems();
+	m_instances->DeleteAllItems();
+
+	boost::filesystem::path p(m_directory->GetValue().fn_str());
+	m_engine.StartScan(p);
+
+	dovo_searchStatus search_dlg(this);
+	search_dlg.m_scanner = &m_engine.scanner;
+
+	// show and wait for thread to end.
+	int search_status = search_dlg.ShowModal();
+
+	m_engine.patientdata.GetPatients(boost::bind(&dovo_mainFrame::fillpatientscallback, this, _1));
+	m_patients->SetColumnWidth(0, wxLIST_AUTOSIZE);
+	m_patients->SetColumnWidth(1, wxLIST_AUTOSIZE);
+	m_patients->SetColumnWidth(2, wxLIST_AUTOSIZE);
+
+	if (search_status == IDCANCEL)
+		return;
+
+	// start send
 	m_engine.StartQuickSend(m_destination->GetSelection());
 
 	dovo_sendStatus dlg(this);

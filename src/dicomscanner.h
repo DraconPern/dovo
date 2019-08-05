@@ -17,6 +17,7 @@ public:
 
 	void Cancel();
 	bool IsDone();
+	bool IsCanceled();
 
 	PatientData &patientdata;
 protected:
@@ -24,7 +25,6 @@ protected:
 	void ScanFile(boost::filesystem::path path);
 	void ScanDir(boost::filesystem::path path);
 
-	bool IsCanceled();
 	void ClearCancel();
 	void SetDone(bool state);
 

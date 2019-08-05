@@ -291,6 +291,11 @@ mainFrame::mainFrame( wxWindow* parent, wxWindowID id, const wxString& title, co
 	m_send = new wxButton( this, wxID_ANY, _("Send"), wxDefaultPosition, wxDefaultSize, 0 );
 	bSizer161->Add( m_send, 0, wxALL, 5 );
 	
+	m_button14 = new wxButton( this, wxID_ANY, _("MyButton"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_button14->Hide();
+	
+	bSizer161->Add( m_button14, 0, wxALL|wxRESERVE_SPACE_EVEN_IF_HIDDEN, 5 );
+	
 	m_quicksend = new wxButton( this, wxID_ANY, _("Quick Send"), wxDefaultPosition, wxDefaultSize, 0 );
 	bSizer161->Add( m_quicksend, 0, wxALL, 5 );
 	

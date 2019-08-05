@@ -107,6 +107,7 @@ class mainFrame : public wxFrame
 		wxListCtrl* m_instances;
 		wxButton* m_update;
 		wxButton* m_send;
+		wxButton* m_button14;
 		wxButton* m_quicksend;
 		wxPanel* m_panel3;
 		wxButton* m_about;
