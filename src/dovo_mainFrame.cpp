@@ -32,15 +32,13 @@ dovo_mainFrame::dovo_mainFrame( wxWindow* parent )
 	m_instances->InsertColumn(1, _("path"));
 
 	// Fill in settings
-	wxConfig::Get()->SetPath("/Settings");
-	m_directory->SetValue(wxConfig::Get()->Read("LastDir"));
+	m_directory->SetValue(wxConfig::Get()->Read("/Settings/LastDir"));
 
 	m_engine.LoadDestinationList();
 	m_engine.LoadGlobalDestinationList();
 
 	FillDestinationList();
-	wxConfig::Get()->SetPath("/Settings");
-	m_destination->SetStringSelection(wxConfig::Get()->Read("LastDestination"));
+	m_destination->SetStringSelection(wxConfig::Get()->Read("/Settings/LastDestination"));
 
 	image.Create(1, 1);
 
