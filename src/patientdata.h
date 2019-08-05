@@ -69,7 +69,7 @@ public:
 	// void GetSeries(std::vector<Series> &series);
 	int AddInstance(std::string sopuid, std::string seriesuid, boost::filesystem::path filename, std::string sopclassuid, std::string transfersyntax);
 	void GetInstances(std::string seriesuid, boost::function< int(Instance &) > action);
-	// void GetInstances(std::vector<Instance> &instances);
+	void GetInstances(boost::function< int(Instance &) > action);
 	void Clear();
 
 protected:

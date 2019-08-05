@@ -30,7 +30,9 @@ engine::~engine()
 void engine::SaveDestinationList()
 {
 	wxConfig::Get()->SetPath("/");
-	wxConfig::Get()->DeleteGroup("Destinations");
+	wxConfig::Get()->DeleteGroup("/Destinations");
+
+	wxConfig::Get()->SetPath("/Destinations");
 	for(unsigned int i = 0; i < destinations.size(); i++)
 	{
 
@@ -41,7 +43,6 @@ void engine::SaveDestinationList()
 			<< destinations[i].destinationAETitle << "," 
 			<< destinations[i].ourAETitle;
 
-		wxConfig::Get()->SetPath("/Destinations");
 		wxConfig::Get()->Write(boost::lexical_cast<std::string>(i + 1), wxString::FromUTF8(stream.str().c_str()));
 	}
 
@@ -49,7 +50,7 @@ void engine::SaveDestinationList()
 }
 
 void engine::LoadDestinationList()
-{		
+{
 	wxConfig::Get()->SetPath("/Destinations");
 	wxString str;
 	long dummy;
@@ -163,6 +164,25 @@ void engine::StartSend(std::string PatientID, std::string PatientName, bool chan
 	
 	sender.DoSendAsync(PatientID, PatientName, changePatientInfo, NewPatientID, NewPatientName, NewBirthDay, dest);
 	
+}
+
+void engine::StartQuickSend(int destination)
+{
+	// find the destination
+	DestinationEntry dest;
+
+	if (destination < globalDestinations.size())
+	{
+		dest = globalDestinations[destination];
+	}
+	else
+	{
+		destination -= globalDestinations.size();
+		dest = destinations[destination];
+	}
+
+	sender.DoQuickSendAsync(dest);
+
 }
 
 void engine::StopSend()

@@ -107,6 +107,7 @@ class mainFrame : public wxFrame
 		wxListCtrl* m_instances;
 		wxButton* m_update;
 		wxButton* m_send;
+		wxButton* m_quicksend;
 		wxPanel* m_panel3;
 		wxButton* m_about;
 		wxButton* m_exit;
@@ -122,6 +123,7 @@ class mainFrame : public wxFrame
 		virtual void OnInstancesSelected( wxListEvent& event ) { event.Skip(); }
 		virtual void OnUpdate( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSend( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnQuickSend( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAbout( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnExit( wxCommandEvent& event ) { event.Skip(); }
 		

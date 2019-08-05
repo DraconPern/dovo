@@ -306,6 +306,23 @@ void dovo_mainFrame::OnSend( wxCommandEvent& event )
 	}
 }
 
+void dovo_mainFrame::OnQuickSend(wxCommandEvent& event)
+{
+	if (m_destination->GetSelection() == wxNOT_FOUND)
+	{
+		wxMessageBox(_("Please select a destination."), _("Error"), wxOK, this);
+		return;
+	}
+
+	m_engine.StartQuickSend(m_destination->GetSelection());
+
+	dovo_sendStatus dlg(this);
+	dlg.m_sender = &m_engine.sender;
+
+	// show and wait for thread to end.
+	dlg.ShowModal();
+}
+
 void dovo_mainFrame::OnEcho(wxCommandEvent& event)
 {
 	if (m_destination->GetSelection() == wxNOT_FOUND)

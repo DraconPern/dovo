@@ -176,7 +176,6 @@ int getinstancescallback(void *param,int columns,char** values, char**names)
 	return pfn(result);
 }
 
-//void PatientData::GetInstances(std::vector<Instance> &instances)
 void PatientData::GetInstances(std::string seriesuid, boost::function< int(Instance &) > action)
 {
 	std::string selectsql = "SELECT sopuid, seriesuid, filename, sopclassuid, transfersyntax FROM instances WHERE (seriesuid = ?) ORDER BY sopuid ASC";
@@ -187,4 +186,11 @@ void PatientData::GetInstances(std::string seriesuid, boost::function< int(Insta
 	sqlite3_finalize(select);
 }
 
-
+void PatientData::GetInstances(boost::function< int(Instance &) > action)
+{
+	std::string selectsql = "SELECT sopuid, seriesuid, filename, sopclassuid, transfersyntax FROM instances ORDER BY sopuid ASC";
+	sqlite3_stmt *select;
+	sqlite3_prepare_v2(db, selectsql.c_str(), selectsql.length(), &select, NULL);
+	sqlite3_exec_stmt(select, getinstancescallback, &action, NULL);
+	sqlite3_finalize(select);
+}

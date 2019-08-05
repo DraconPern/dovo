@@ -31,8 +31,11 @@ public:
 	DICOMSenderImpl(PatientData &patientdata);
 	~DICOMSenderImpl(void);
 
-	void DoSendAsync(std::string PatientID, std::string PatientName, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, DestinationEntry destination);	
-	void DoSend(std::string PatientID, std::string PatientName, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, DestinationEntry destination);	
+	void DoSendAsync(std::string PatientID, std::string PatientName, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, DestinationEntry destination);
+	void DoSend(std::string PatientID, std::string PatientName, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, DestinationEntry destination);
+
+	void DoQuickSendAsync(DestinationEntry destination);
+	void DoQuickSend(DestinationEntry destination);
 
 	static bool Echo(DestinationEntry destination);
 
@@ -44,6 +47,7 @@ public:
 	bool IsDone();				
 protected:
 	static void DoSendThread(void *obj);
+	static void DoQuickSendThread(void *obj);
 	PatientData &patientdata;
 	
 	int SendABatch();
@@ -117,6 +121,18 @@ void DICOMSenderImpl::DoSendAsync(std::string PatientID, std::string PatientName
 	t.detach();
 }
 
+void DICOMSenderImpl::DoQuickSendAsync(DestinationEntry destination)
+{
+	SetDone(false);
+	ClearCancel();
+
+	this->m_destination = destination;
+
+	// start the thread, let the sender manage (e.g. cancel), so we don't need to track anymore
+	boost::thread t(DICOMSenderImpl::DoQuickSendThread, this);
+	t.detach();
+}
+
 class MyAppender : public dcmtk::log4cplus::Appender 
 {
 public:      
@@ -148,6 +164,26 @@ void DICOMSenderImpl::DoSendThread(void *obj)
 	}
 
 	rootLogger.removeAllAppenders();	
+	dcmtk::log4cplus::threadCleanup();
+}
+
+void DICOMSenderImpl::DoQuickSendThread(void *obj)
+{
+	DICOMSenderImpl *me = (DICOMSenderImpl *)obj;
+	dcmtk::log4cplus::SharedAppenderPtr stringlogger(new MyAppender(*me));
+	dcmtk::log4cplus::Logger rootLogger = dcmtk::log4cplus::Logger::getRoot();
+	rootLogger.removeAllAppenders();
+	rootLogger.addAppender(stringlogger);
+
+	OFLog::configure(OFLogger::INFO_LOG_LEVEL);
+
+	if (me)
+	{
+		me->DoQuickSend(me->m_destination);
+		me->SetDone(true);
+	}
+
+	rootLogger.removeAllAppenders();
 	dcmtk::log4cplus::threadCleanup();
 }
 
@@ -265,6 +301,69 @@ void DICOMSenderImpl::DoSend(std::string PatientID, std::string PatientName, boo
 		}
 	}
 	while (!IsCanceled() && unsentcountafter > 0 && retry < 10000);
+
+	// clear 
+	instances.clear();
+	series.clear();
+	studies.clear();
+	sopclassuidtransfersyntax.clear();
+}
+
+
+void DICOMSenderImpl::DoQuickSend(DestinationEntry destination)
+{
+	std::stringstream msg;
+	msg << "gathering images\n";
+	log.Write(msg);
+	msg.str("");
+
+	// get a list of files
+	patientdata.GetInstances(boost::bind(&DICOMSenderImpl::fillinstances, this, _1, &instances));
+
+	msg << "Sending " << instances.size() << " images\n";
+	log.Write(msg);
+
+	int retry = 0;
+	int unsentcountbefore = 0;
+	int unsentcountafter = 0;
+	do
+	{
+		// get number of unsent images
+		unsentcountbefore = instances.size();
+
+		// batch send
+		if (unsentcountbefore > 0)
+			SendABatch();
+
+		unsentcountafter = instances.size();
+
+		// only do a sleep if there's more to send, we didn't send anything out, and we still want to retry
+		if (unsentcountafter > 0 && unsentcountbefore == unsentcountafter && retry < 10000)
+		{
+			retry++;
+			msg << unsentcountafter << " images left to send\n";
+			log.Write(msg);
+			log.Write("Waiting 1 mins before retry\n");
+
+			// sleep loop with cancel check, 1 minutes
+			int sleeploop = 5 * 60 * 1;
+			while (sleeploop > 0)
+			{
+#ifdef _WIN32
+				Sleep(200);
+#else
+				usleep(200 * 1000);
+#endif
+				sleeploop--;
+				if (IsCanceled())
+					break;
+			}
+		}
+		else		// otherwise, the next loop is not a retry
+		{
+			retry = 0;
+		}
+	} while (!IsCanceled() && unsentcountafter > 0 && retry < 10000);
 
 	// clear 
 	instances.clear();
@@ -543,6 +642,16 @@ void DICOMSender::DoSendAsync(std::string PatientID, std::string PatientName, bo
 void DICOMSender::DoSend(std::string PatientID, std::string PatientName, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, DestinationEntry destination)
 {
 	impl->DoSend(PatientID, PatientName, changeinfo, NewPatientID, NewPatientName, NewBirthDay, destination);
+}
+
+void DICOMSender::DoQuickSendAsync(DestinationEntry destination)
+{
+	impl->DoQuickSendAsync(destination);
+}
+
+void DICOMSender::DoQuickSend(DestinationEntry destination)
+{
+	impl->DoQuickSend(destination);
 }
 
 bool DICOMSender::Echo(DestinationEntry destination)

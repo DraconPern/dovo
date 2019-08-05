@@ -36,6 +36,7 @@ class dovo_mainFrame : public mainFrame
 		void OnInstancesSelected( wxListEvent& event );
 		void OnUpdate( wxCommandEvent& event );
 		void OnSend( wxCommandEvent& event );
+		void OnQuickSend(wxCommandEvent& event);
 		void OnEcho(wxCommandEvent& event);
 		void OnAbout( wxCommandEvent& event );
 		void OnExit( wxCommandEvent& event );

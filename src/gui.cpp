@@ -291,6 +291,9 @@ mainFrame::mainFrame( wxWindow* parent, wxWindowID id, const wxString& title, co
 	m_send = new wxButton( this, wxID_ANY, _("Send"), wxDefaultPosition, wxDefaultSize, 0 );
 	bSizer161->Add( m_send, 0, wxALL, 5 );
 	
+	m_quicksend = new wxButton( this, wxID_ANY, _("Quick Send"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer161->Add( m_quicksend, 0, wxALL, 5 );
+	
 	
 	bSizer17->Add( bSizer161, 0, wxEXPAND, 5 );
 	
@@ -336,6 +339,7 @@ mainFrame::mainFrame( wxWindow* parent, wxWindowID id, const wxString& title, co
 	m_instances->Connect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( mainFrame::OnInstancesSelected ), NULL, this );
 	m_update->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnUpdate ), NULL, this );
 	m_send->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnSend ), NULL, this );
+	m_quicksend->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnQuickSend ), NULL, this );
 	m_about->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnAbout ), NULL, this );
 	m_exit->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnExit ), NULL, this );
 }
@@ -353,6 +357,7 @@ mainFrame::~mainFrame()
 	m_instances->Disconnect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( mainFrame::OnInstancesSelected ), NULL, this );
 	m_update->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnUpdate ), NULL, this );
 	m_send->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnSend ), NULL, this );
+	m_quicksend->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnQuickSend ), NULL, this );
 	m_about->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnAbout ), NULL, this );
 	m_exit->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( mainFrame::OnExit ), NULL, this );
 	
