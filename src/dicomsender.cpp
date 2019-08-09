@@ -127,6 +127,7 @@ void DICOMSenderImpl::DoQuickSendAsync(DestinationEntry destination)
 	ClearCancel();
 
 	this->m_destination = destination;
+	this->changeinfo = false;
 
 	// start the thread, let the sender manage (e.g. cancel), so we don't need to track anymore
 	boost::thread t(DICOMSenderImpl::DoQuickSendThread, this);
