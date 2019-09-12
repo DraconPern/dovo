@@ -297,6 +297,8 @@ mainFrame::mainFrame( wxWindow* parent, wxWindowID id, const wxString& title, co
 	bSizer161->Add( m_button14, 0, wxALL|wxRESERVE_SPACE_EVEN_IF_HIDDEN, 5 );
 	
 	m_quicksend = new wxButton( this, wxID_ANY, _("Quick Send"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_quicksend->SetToolTip( _("Send all study in the directory to a destination.") );
+	
 	bSizer161->Add( m_quicksend, 0, wxALL, 5 );
 	
 	
