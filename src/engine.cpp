@@ -162,8 +162,43 @@ void engine::StartSend(std::string PatientID, std::string PatientName, bool chan
 		dest = destinations[destination];
 	}
 	
-	sender.DoSendAsync(PatientID, PatientName, changePatientInfo, NewPatientID, NewPatientName, NewBirthDay, dest);
-	
+	sender.DoSendPatientAsync(PatientID, PatientName, changePatientInfo, NewPatientID, NewPatientName, NewBirthDay, dest);	
+}
+
+void engine::StartSendStudy(std::string studyuid, bool changePatientInfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, int destination)
+{
+	// find the destination
+	DestinationEntry dest;
+
+	if (destination < globalDestinations.size())
+	{
+		dest = globalDestinations[destination];
+	}
+	else
+	{
+		destination -= globalDestinations.size();
+		dest = destinations[destination];
+	}
+
+	sender.DoSendStudyAsync(studyuid, changePatientInfo, NewPatientID, NewPatientName, NewBirthDay, dest);
+}
+
+void engine::StartSendSeries(std::string studyuid, std::string seriesuid, bool changePatientInfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, int destination)
+{
+	// find the destination
+	DestinationEntry dest;
+
+	if (destination < globalDestinations.size())
+	{
+		dest = globalDestinations[destination];
+	}
+	else
+	{
+		destination -= globalDestinations.size();
+		dest = destinations[destination];
+	}
+
+	sender.DoSendSeriesAsync(studyuid, seriesuid, changePatientInfo, NewPatientID, NewPatientName, NewBirthDay, dest);
 }
 
 void engine::StartQuickSend(int destination)

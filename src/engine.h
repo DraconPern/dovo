@@ -20,6 +20,8 @@ public:
 	void StartScan(boost::filesystem::path path);
 	void StopScan();	
 	void StartSend(std::string PatientID, std::string PatientName, bool changePatientInfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, int destination);
+	void StartSendStudy(std::string studyuid, bool changePatientInfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, int destination);
+	void StartSendSeries(std::string studyuid, std::string seriesuid, bool changePatientInfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, int destination);
 	void StartQuickSend(int destination);
 	void StopSend();
 

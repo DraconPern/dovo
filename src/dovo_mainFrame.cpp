@@ -41,8 +41,6 @@ dovo_mainFrame::dovo_mainFrame( wxWindow* parent )
 	m_destination->SetStringSelection(wxConfig::Get()->Read("/Settings/LastDestination"));
 
 	image.Create(1, 1);
-
-	// initlog();
 }
 
 dovo_mainFrame::~dovo_mainFrame()
@@ -389,3 +387,131 @@ void dovo_mainFrame::OnExit( wxCommandEvent& event )
 	Close();
 }
 
+void dovo_mainFrame::OnStudiesRightClick( wxListEvent& event)
+{
+	//m_studies.men
+	//void *data = reinterpret_cast<void *>(event.().GetData());
+	wxMenu mnu;
+	//mnu.SetClientData(data);
+	mnu.Append(1, "Send Study");
+	mnu.Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(dovo_mainFrame::OnSendStudy), NULL, this);
+	PopupMenu(&mnu);	
+}
+
+void dovo_mainFrame::OnSeriesRightClick( wxListEvent& event)
+{
+	//m_studies.men
+	//void *data = reinterpret_cast<void *>(event.().GetData());
+	wxMenu mnu;
+	//mnu.SetClientData(data);
+	mnu.Append(1, "Send Series");
+	mnu.Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(dovo_mainFrame::OnSendSeries), NULL, this);
+	PopupMenu(&mnu);
+}
+
+void dovo_mainFrame::OnSendStudy(wxCommandEvent& event)
+{
+	long item = m_patients->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+	if (item == -1)
+	{
+		wxMessageBox(_("Please select a Patient."), _("Error"), wxOK, this);
+		return;
+	}
+
+	long item2 = m_studies->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+	if (item2 == -1)
+	{
+		wxMessageBox(_("Please select a Study."), _("Error"), wxOK, this);
+		return;
+	}
+
+	if (m_destination->GetSelection() == wxNOT_FOUND)
+	{
+		wxMessageBox(_("Please select a destination."), _("Error"), wxOK, this);
+		return;
+	}
+
+	wxString patientid = m_patients->GetItemText(item);
+	wxString patientname = m_patients->GetItemText(item, 1);
+
+	dovo_changePatientInfo changepatinfo(this);
+	changepatinfo.m_patientID = patientid;
+	changepatinfo.m_patientName = patientname;
+	changepatinfo.m_birthday = m_patients->GetItemText(item, 2);
+
+	wxString studyuid = m_studies->GetItemText(item2, 2);
+
+	if (changepatinfo.ShowModal() == wxID_OK)
+	{
+		m_engine.StartSendStudy(studyuid.ToUTF8().data(),			
+			changepatinfo.m_changeInfo,
+			changepatinfo.m_patientID.ToUTF8().data(),
+			changepatinfo.m_patientName.ToUTF8().data(),
+			changepatinfo.m_birthday.ToUTF8().data(),
+			m_destination->GetSelection());
+
+		dovo_sendStatus dlg(this);
+		dlg.m_sender = &m_engine.sender;
+
+		// show and wait for thread to end.
+		dlg.ShowModal();
+	}
+}
+
+void dovo_mainFrame::OnSendSeries(wxCommandEvent& event)
+{
+	long item = m_patients->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+	if (item == -1)
+	{
+		wxMessageBox(_("Please select a Patient."), _("Error"), wxOK, this);
+		return;
+	}
+
+	long item2 = m_studies->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+	if (item2 == -1)
+	{
+		wxMessageBox(_("Please select a Study."), _("Error"), wxOK, this);
+		return;
+	}
+
+	long item3 = m_series->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+	if (item3 == -1)
+	{
+		wxMessageBox(_("Please select a Series."), _("Error"), wxOK, this);
+		return;
+	}
+
+	if (m_destination->GetSelection() == wxNOT_FOUND)
+	{
+		wxMessageBox(_("Please select a destination."), _("Error"), wxOK, this);
+		return;
+	}
+
+	wxString patientid = m_patients->GetItemText(item);
+	wxString patientname = m_patients->GetItemText(item, 1);
+
+	dovo_changePatientInfo changepatinfo(this);
+	changepatinfo.m_patientID = patientid;
+	changepatinfo.m_patientName = patientname;
+	changepatinfo.m_birthday = m_patients->GetItemText(item, 2);
+
+	wxString studyuid = m_studies->GetItemText(item2, 2);
+	wxString seriesuid = m_series->GetItemText(item3, 1);
+
+	if (changepatinfo.ShowModal() == wxID_OK)
+	{
+		m_engine.StartSendSeries(studyuid.ToUTF8().data(),
+			seriesuid.ToUTF8().data(),
+			changepatinfo.m_changeInfo,
+			changepatinfo.m_patientID.ToUTF8().data(),
+			changepatinfo.m_patientName.ToUTF8().data(),
+			changepatinfo.m_birthday.ToUTF8().data(),
+			m_destination->GetSelection());
+
+		dovo_sendStatus dlg(this);
+		dlg.m_sender = &m_engine.sender;
+
+		// show and wait for thread to end.
+		dlg.ShowModal();
+	}
+}

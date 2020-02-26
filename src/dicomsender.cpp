@@ -31,11 +31,17 @@ public:
 	DICOMSenderImpl(PatientData &patientdata);
 	~DICOMSenderImpl(void);
 
-	void DoSendAsync(std::string PatientID, std::string PatientName, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, DestinationEntry destination);
-	void DoSend(std::string PatientID, std::string PatientName, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, DestinationEntry destination);
+	void DoSendPatientAsync(std::string PatientID, std::string PatientName, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, DestinationEntry destination);
+	void DoSendPatient(std::string PatientID, std::string PatientName, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay);
+
+	void DoSendStudyAsync(std::string studyuid, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, DestinationEntry destination);
+	void DoSendStudy(std::string studyuid, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay);
+
+	void DoSendSeriesAsync(std::string studyuid, std::string seriesuid, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, DestinationEntry destination);
+	void DoSendSeries(std::string studyuid, std::string seriesuid, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay);
 
 	void DoQuickSendAsync(DestinationEntry destination);
-	void DoQuickSend(DestinationEntry destination);
+	void DoQuickSend();
 
 	static bool Echo(DestinationEntry destination);
 
@@ -46,10 +52,13 @@ public:
 	void Cancel();
 	bool IsDone();				
 protected:
-	static void DoSendThread(void *obj);
+	static void DoSendPatientThread(void *obj);
+	static void DoSendStudyThread(void *obj);
+	static void DoSendSeriesThread(void *obj);
 	static void DoQuickSendThread(void *obj);
 	PatientData &patientdata;
 	
+	void DoSendStuff();
 	int SendABatch();
 
 	bool IsCanceled();
@@ -61,6 +70,7 @@ protected:
 	bool cancelEvent, doneEvent;
 	std::string PatientID;
 	std::string PatientName;
+	std::string studyuid, seriesuid;
 	bool changeinfo;	
 	std::string NewPatientID;
 	std::string NewPatientName;
@@ -103,7 +113,7 @@ DICOMSenderImpl::~DICOMSenderImpl()
 {
 }
 
-void DICOMSenderImpl::DoSendAsync(std::string PatientID, std::string PatientName, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, DestinationEntry destination)
+void DICOMSenderImpl::DoSendPatientAsync(std::string PatientID, std::string PatientName, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, DestinationEntry destination)
 {
 	SetDone(false);
 	ClearCancel();
@@ -117,7 +127,42 @@ void DICOMSenderImpl::DoSendAsync(std::string PatientID, std::string PatientName
 	this->m_destination = destination;	
 
 	// start the thread, let the sender manage (e.g. cancel), so we don't need to track anymore
-	boost::thread t(DICOMSenderImpl::DoSendThread, this);
+	boost::thread t(DICOMSenderImpl::DoSendPatientThread, this);
+	t.detach();
+}
+
+void DICOMSenderImpl::DoSendStudyAsync(std::string studyuid, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, DestinationEntry destination)
+{
+	SetDone(false);
+	ClearCancel();
+
+	this->studyuid = studyuid;	
+	this->changeinfo = changeinfo;
+	this->NewPatientID = NewPatientID;
+	this->NewPatientName = NewPatientName;
+	this->NewBirthDay = NewBirthDay;
+	this->m_destination = destination;
+
+	// start the thread, let the sender manage (e.g. cancel), so we don't need to track anymore
+	boost::thread t(DICOMSenderImpl::DoSendStudyThread, this);
+	t.detach();
+}
+
+void DICOMSenderImpl::DoSendSeriesAsync(std::string studyuid, std::string seriesuid, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, DestinationEntry destination)
+{
+	SetDone(false);
+	ClearCancel();
+
+	this->studyuid = studyuid;
+	this->seriesuid = seriesuid;
+	this->changeinfo = changeinfo;
+	this->NewPatientID = NewPatientID;
+	this->NewPatientName = NewPatientName;
+	this->NewBirthDay = NewBirthDay;
+	this->m_destination = destination;
+
+	// start the thread, let the sender manage (e.g. cancel), so we don't need to track anymore
+	boost::thread t(DICOMSenderImpl::DoSendSeriesThread, this);
 	t.detach();
 }
 
@@ -148,7 +193,7 @@ protected:
     DICOMSenderImpl &sender;
 };
 
-void DICOMSenderImpl::DoSendThread(void *obj)
+void DICOMSenderImpl::DoSendPatientThread(void *obj)
 {
 	DICOMSenderImpl *me = (DICOMSenderImpl *) obj;
 	dcmtk::log4cplus::SharedAppenderPtr stringlogger(new MyAppender(*me));
@@ -160,11 +205,51 @@ void DICOMSenderImpl::DoSendThread(void *obj)
 
 	if (me)
 	{
-		me->DoSend(me->PatientID, me->PatientName, me->changeinfo, me->NewPatientID, me->NewPatientName, me->NewBirthDay, me->m_destination);
+		me->DoSendPatient(me->PatientID, me->PatientName, me->changeinfo, me->NewPatientID, me->NewPatientName, me->NewBirthDay);
 		me->SetDone(true);
 	}
 
 	rootLogger.removeAllAppenders();	
+	dcmtk::log4cplus::threadCleanup();
+}
+
+void DICOMSenderImpl::DoSendStudyThread(void *obj)
+{
+	DICOMSenderImpl *me = (DICOMSenderImpl *)obj;
+	dcmtk::log4cplus::SharedAppenderPtr stringlogger(new MyAppender(*me));
+	dcmtk::log4cplus::Logger rootLogger = dcmtk::log4cplus::Logger::getRoot();
+	rootLogger.removeAllAppenders();
+	rootLogger.addAppender(stringlogger);
+
+	OFLog::configure(OFLogger::INFO_LOG_LEVEL);
+
+	if (me)
+	{
+		me->DoSendStudy(me->studyuid, me->changeinfo, me->NewPatientID, me->NewPatientName, me->NewBirthDay);
+		me->SetDone(true);
+	}
+
+	rootLogger.removeAllAppenders();
+	dcmtk::log4cplus::threadCleanup();
+}
+
+void DICOMSenderImpl::DoSendSeriesThread(void *obj)
+{
+	DICOMSenderImpl *me = (DICOMSenderImpl *)obj;
+	dcmtk::log4cplus::SharedAppenderPtr stringlogger(new MyAppender(*me));
+	dcmtk::log4cplus::Logger rootLogger = dcmtk::log4cplus::Logger::getRoot();
+	rootLogger.removeAllAppenders();
+	rootLogger.addAppender(stringlogger);
+
+	OFLog::configure(OFLogger::INFO_LOG_LEVEL);
+
+	if (me)
+	{
+		me->DoSendSeries(me->studyuid, me->seriesuid, me->changeinfo, me->NewPatientID, me->NewPatientName, me->NewBirthDay);
+		me->SetDone(true);
+	}
+
+	rootLogger.removeAllAppenders();
 	dcmtk::log4cplus::threadCleanup();
 }
 
@@ -180,7 +265,7 @@ void DICOMSenderImpl::DoQuickSendThread(void *obj)
 
 	if (me)
 	{
-		me->DoQuickSend(me->m_destination);
+		me->DoQuickSend();
 		me->SetDone(true);
 	}
 
@@ -239,7 +324,7 @@ protected:
 	DcmDataset* dataset;
 };
 
-void DICOMSenderImpl::DoSend(std::string PatientID, std::string PatientName, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, DestinationEntry destination)
+void DICOMSenderImpl::DoSendPatient(std::string PatientID, std::string PatientName, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay)
 {	
 	std::stringstream msg;
 	msg << "gathering images\n";
@@ -257,61 +342,48 @@ void DICOMSenderImpl::DoSend(std::string PatientID, std::string PatientName, boo
 		}
 	}
 			
-	msg << "Sending " << instances.size() << " images\n";
-	log.Write(msg);
-
-	int retry = 0;
-	int unsentcountbefore = 0;
-	int unsentcountafter = 0;
-	do
-	{
-		// get number of unsent images
-		unsentcountbefore = instances.size();
-
-		// batch send
-		if (unsentcountbefore > 0)
-			SendABatch();		
-
-		unsentcountafter = instances.size();
-		
-		// only do a sleep if there's more to send, we didn't send anything out, and we still want to retry
-		if (unsentcountafter > 0 && unsentcountbefore == unsentcountafter && retry < 10000)
-		{
-			retry++;			
-			msg << unsentcountafter << " images left to send\n";
-			log.Write(msg);
-			log.Write("Waiting 1 mins before retry\n");
-
-			// sleep loop with cancel check, 1 minutes
-			int sleeploop = 5 * 60 * 1;
-			while (sleeploop > 0)
-			{
-#ifdef _WIN32
-				Sleep(200);
-#else
-                usleep(200 * 1000);
-#endif
-                sleeploop--;
-				if (IsCanceled())
-					break;
-			}
-		}
-		else		// otherwise, the next loop is not a retry
-		{
-			retry = 0;
-		}
-	}
-	while (!IsCanceled() && unsentcountafter > 0 && retry < 10000);
-
-	// clear 
-	instances.clear();
-	series.clear();
-	studies.clear();
-	sopclassuidtransfersyntax.clear();
+	DoSendStuff();
 }
 
 
-void DICOMSenderImpl::DoQuickSend(DestinationEntry destination)
+void DICOMSenderImpl::DoSendStudy(std::string studyuid, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay)
+{
+	std::stringstream msg;
+	msg << "gathering images\n";
+	log.Write(msg);
+	msg.str("");
+
+	// get a list of files	
+	patientdata.GetSeries(studyuid, boost::bind(&DICOMSenderImpl::fillseries, this, _1));
+	for (std::vector<std::string>::iterator it2 = series.begin(); it2 != series.end(); ++it2)
+	{
+		patientdata.GetInstances(*it2, boost::bind(&DICOMSenderImpl::fillinstances, this, _1, &instances));
+	}
+	
+
+	DoSendStuff();
+}
+
+
+void DICOMSenderImpl::DoSendSeries(std::string studyuid, std::string seriesuid, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay)
+{
+	std::stringstream msg;
+	msg << "gathering images\n";
+	log.Write(msg);
+	msg.str("");
+
+	// get a list of files		
+	patientdata.GetSeries(studyuid, boost::bind(&DICOMSenderImpl::fillseries, this, _1));
+	for (std::vector<std::string>::iterator it2 = series.begin(); it2 != series.end(); ++it2)
+	{
+		if(*it2 == seriesuid)
+			patientdata.GetInstances(*it2, boost::bind(&DICOMSenderImpl::fillinstances, this, _1, &instances));
+	}
+
+	DoSendStuff();
+}
+
+void DICOMSenderImpl::DoQuickSend()
 {
 	std::stringstream msg;
 	msg << "gathering images\n";
@@ -321,6 +393,12 @@ void DICOMSenderImpl::DoQuickSend(DestinationEntry destination)
 	// get a list of files
 	patientdata.GetInstances(boost::bind(&DICOMSenderImpl::fillinstances, this, _1, &instances));
 
+	DoSendStuff();
+}
+
+void DICOMSenderImpl::DoSendStuff()
+{
+	std::stringstream msg;
 	msg << "Sending " << instances.size() << " images\n";
 	log.Write(msg);
 
@@ -635,24 +713,24 @@ DICOMSender::~DICOMSender(void)
 	delete impl;
 }
 
-void DICOMSender::DoSendAsync(std::string PatientID, std::string PatientName, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, DestinationEntry destination)
+void DICOMSender::DoSendPatientAsync(std::string PatientID, std::string PatientName, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, DestinationEntry destination)
 {
-	impl->DoSendAsync(PatientID, PatientName, changeinfo, NewPatientID, NewPatientName, NewBirthDay, destination);
+	impl->DoSendPatientAsync(PatientID, PatientName, changeinfo, NewPatientID, NewPatientName, NewBirthDay, destination);
 }
 
-void DICOMSender::DoSend(std::string PatientID, std::string PatientName, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, DestinationEntry destination)
+void DICOMSender::DoSendStudyAsync(std::string studyuid, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, DestinationEntry destination)
 {
-	impl->DoSend(PatientID, PatientName, changeinfo, NewPatientID, NewPatientName, NewBirthDay, destination);
+	impl->DoSendStudyAsync(studyuid, changeinfo, NewPatientID, NewPatientName, NewBirthDay, destination);
+}
+
+void DICOMSender::DoSendSeriesAsync(std::string studyuid, std::string seriesuid, bool changeinfo, std::string NewPatientID, std::string NewPatientName, std::string NewBirthDay, DestinationEntry destination)
+{
+	impl->DoSendSeriesAsync(studyuid, seriesuid, changeinfo, NewPatientID, NewPatientName, NewBirthDay, destination);
 }
 
 void DICOMSender::DoQuickSendAsync(DestinationEntry destination)
 {
 	impl->DoQuickSendAsync(destination);
-}
-
-void DICOMSender::DoQuickSend(DestinationEntry destination)
-{
-	impl->DoQuickSend(destination);
 }
 
 bool DICOMSender::Echo(DestinationEntry destination)
