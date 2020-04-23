@@ -124,6 +124,7 @@ class mainFrame : public wxFrame
 		virtual void OnSeriesRightClick( wxListEvent& event ) { event.Skip(); }
 		virtual void OnSeriesSelected( wxListEvent& event ) { event.Skip(); }
 		virtual void OnPaintPreview( wxPaintEvent& event ) { event.Skip(); }
+		virtual void OnInstancesRightClick( wxListEvent& event ) { event.Skip(); }
 		virtual void OnInstancesSelected( wxListEvent& event ) { event.Skip(); }
 		virtual void OnUpdate( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSend( wxCommandEvent& event ) { event.Skip(); }

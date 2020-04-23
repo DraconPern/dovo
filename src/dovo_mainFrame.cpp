@@ -394,7 +394,9 @@ void dovo_mainFrame::OnStudiesRightClick( wxListEvent& event)
 	wxMenu mnu;
 	//mnu.SetClientData(data);
 	mnu.Append(1, "Send Study");
-	mnu.Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(dovo_mainFrame::OnSendStudy), NULL, this);
+	mnu.Append(2, "Copy StudyUID");
+	mnu.Connect(1, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(dovo_mainFrame::OnSendStudy), NULL, this);
+	mnu.Connect(2, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(dovo_mainFrame::OnCopyStudyUID), NULL, this);
 	PopupMenu(&mnu);	
 }
 
@@ -405,7 +407,20 @@ void dovo_mainFrame::OnSeriesRightClick( wxListEvent& event)
 	wxMenu mnu;
 	//mnu.SetClientData(data);
 	mnu.Append(1, "Send Series");
-	mnu.Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(dovo_mainFrame::OnSendSeries), NULL, this);
+	mnu.Append(2, "Copy SeriesUID");
+	mnu.Connect(1, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(dovo_mainFrame::OnSendSeries), NULL, this);
+	mnu.Connect(2, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(dovo_mainFrame::OnCopySeriesUID), NULL, this);
+	PopupMenu(&mnu);
+}
+
+void dovo_mainFrame::OnInstancesRightClick(wxListEvent& event)
+{
+	//m_studies.men
+	//void *data = reinterpret_cast<void *>(event.().GetData());
+	wxMenu mnu;
+	//mnu.SetClientData(data);	
+	mnu.Append(2, "Copy SOPUID");	
+	mnu.Connect(2, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(dovo_mainFrame::OnCopySOPUID), NULL, this);
 	PopupMenu(&mnu);
 }
 
@@ -513,5 +528,65 @@ void dovo_mainFrame::OnSendSeries(wxCommandEvent& event)
 
 		// show and wait for thread to end.
 		dlg.ShowModal();
+	}
+}
+
+void dovo_mainFrame::OnCopyStudyUID(wxCommandEvent& event)
+{
+	long item2 = m_studies->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+	if (item2 == -1)
+	{
+		wxMessageBox(_("Please select a Study."), _("Error"), wxOK, this);
+		return;
+	}
+
+	wxString studyuid = m_studies->GetItemText(item2, 2);
+
+	if (wxTheClipboard->Open())
+	{
+		wxTheClipboard->Clear();
+		wxTheClipboard->SetData(new wxTextDataObject(studyuid));
+		wxTheClipboard->Flush();
+		wxTheClipboard->Close();
+	}
+}
+
+void dovo_mainFrame::OnCopySeriesUID(wxCommandEvent& event)
+{
+	long item3 = m_series->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+	if (item3 == -1)
+	{
+		wxMessageBox(_("Please select a Series."), _("Error"), wxOK, this);
+		return;
+	}
+
+	wxString seriesuid = m_series->GetItemText(item3, 1);
+
+	if (wxTheClipboard->Open())
+	{
+		wxTheClipboard->Clear();
+		wxTheClipboard->SetData(new wxTextDataObject(seriesuid));
+		wxTheClipboard->Flush();
+		wxTheClipboard->Close();
+	}
+}
+
+void dovo_mainFrame::OnCopySOPUID(wxCommandEvent& event)
+{
+	long item4 = m_instances->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+	if (item4 == -1)
+	{
+		wxMessageBox(_("Please select an instance."), _("Error"), wxOK, this);
+		return;
+	}
+
+	wxString sopuid = m_instances->GetItemText(item4, 0);
+
+	if (wxTheClipboard->Open())
+	{
+		wxTheClipboard->Clear();
+		wxTheClipboard->SetData(new wxTextDataObject(sopuid));
+		wxTheClipboard->Flush();
+		wxTheClipboard->Close();
 	}
 }
