@@ -555,6 +555,8 @@ int DICOMSenderImpl::SendABatch()
 		DcmFileFormat dcmff;
 		dcmff.loadFile(itr->second.c_str());
 
+		dcmff.getDataset()->convertCharacterSet("ISO_IR 192");
+
 		if(changeinfo)
 		{
 			dcmff.getDataset()->putAndInsertString(DCM_PatientID, NewPatientID.c_str());
