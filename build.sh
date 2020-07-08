@@ -45,6 +45,9 @@ cd $DEVSPACE
 [[ -f boost_1_63_0.zip ]] || wget -c http://downloads.sourceforge.net/project/boost/boost/1.63.0/boost_1_63_0.zip
 unzip -n boost_1_63_0.zip
 cd boost_1_63_0
+if [ "$unamestr" = "Darwin" ] ; then
+patch tools/build/src/tools/darwin.jam < ../boost.patch
+fi
 ./bootstrap.sh
 COMMONb2Flag="-j 4 link=static runtime-link=static stage"
 BOOSTModule="--with-locale --with-thread --with-filesystem --with-system --with-date_time --with-regex"
