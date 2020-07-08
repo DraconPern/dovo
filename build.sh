@@ -46,7 +46,7 @@ cd $DEVSPACE
 unzip -n boost_1_63_0.zip
 cd boost_1_63_0
 if [ "$unamestr" = "Darwin" ] ; then
-patch tools/build/src/tools/darwin.jam < ../boost.patch
+patch -N tools/build/src/tools/darwin.jam < ../boost.patch
 fi
 ./bootstrap.sh
 COMMONb2Flag="-j 4 link=static runtime-link=static stage"

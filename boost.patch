@@ -1,8 +1,17 @@
-141c141
-<     if $(real-version) < "4.0.0"
----
->     if "1" = "0"
-146c146
-<     if $(real-version) < "4.2.0"
----
->     if "1" = "0"
+--- darwin.jam.orig     2020-07-08 03:13:05.000000000 -0500
++++ darwin.jam  2020-07-08 03:16:20.000000000 -0500
+@@ -138,12 +138,12 @@
+     common.handle-options darwin : $(condition) : $(command) : $(options) ;
+
+     # - GCC 4.0 and higher in Darwin does not have -fcoalesce-templates.
+-    if $(real-version) < "4.0.0"
++    if false
+     {
+         flags darwin.compile.c++ OPTIONS $(condition) : -fcoalesce-templates ;
+     }
+     # - GCC 4.2 and higher in Darwin does not have -Wno-long-double.
+-    if $(real-version) < "4.2.0"
++    if false
+     {
+         flags darwin.compile OPTIONS $(condition) : -Wno-long-double ;
+     }
