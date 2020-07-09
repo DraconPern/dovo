@@ -49,7 +49,7 @@ if [ "$unamestr" = "Darwin" ] ; then
 patch -N tools/build/src/tools/darwin.jam < ../boost.patch
 fi
 ./bootstrap.sh
-COMMONb2Flag="-j 4 link=static runtime-link=static stage"
+COMMONb2Flag="-j 4 link=static runtime-link=static address-model=64 architecture=x86 stage"
 BOOSTModule="--with-locale --with-thread --with-filesystem --with-system --with-date_time --with-regex"
 if [ "$TYPE" = "Release" ] ; then
   ./b2 $COMMONb2Flag $BOOSTModule variant=release
