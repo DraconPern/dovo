@@ -46,7 +46,7 @@ cd $DEVSPACE
 unzip -n boost_1_66_0.zip
 cd boost_1_66_0
 ./bootstrap.sh
-COMMONb2Flag="-j 4 link=static runtime-link=static address-model=64 architecture=x86 stage"
+COMMONb2Flag="-j 4 link=static stage"
 BOOSTModule="--with-locale --with-thread --with-filesystem --with-system --with-date_time --with-regex"
 if [ "$TYPE" = "Release" ] ; then
   ./b2 $COMMONb2Flag $BOOSTModule variant=release
