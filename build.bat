@@ -90,6 +90,7 @@ git checkout v3.1.4
 git submodule update --init
 set WXWIN=%DEVSPACE%\wxWidgets
 cd %WXWIN%\build\msw
+copy /Y %WXWIN%\include\wx\msw\setup0.h %WXWIN%\include\wx\msw\setup.h
 powershell "gci . *.vcxproj -recurse | ForEach { (Get-Content $_ | ForEach {$_ -replace 'MultiThreadedDebugDLL', 'MultiThreadedDebug'}) | Set-Content $_ }"
 powershell "gci . *.vcxproj -recurse | ForEach { (Get-Content $_ | ForEach {$_ -replace 'MultiThreadedDLL', 'MultiThreaded'}) | Set-Content $_ }"
 msbuild /maxcpucount:5 /P:Configuration=%TYPE% wx_vc15.sln
