@@ -87,6 +87,7 @@ cd %DEVSPACE%
 git clone --branch=master https://github.com/wxWidgets/wxWidgets.git
 cd wxWidgets
 git checkout v3.1.4
+git submodule update --init
 set WXWIN=%DEVSPACE%\wxWidgets
 cd %WXWIN%\build\msw
 powershell "gci . *.vcxproj -recurse | ForEach { (Get-Content $_ | ForEach {$_ -replace 'MultiThreadedDebugDLL', 'MultiThreadedDebug'}) | Set-Content $_ }"
