@@ -86,14 +86,12 @@ IF "%TYPE%" == "Debug"   b2 %COMMONb2Flag% %BOOSTmodules% debug
 cd %DEVSPACE%
 git clone --branch=master https://github.com/wxWidgets/wxWidgets.git
 cd wxWidgets
-git checkout v3.1.0
-git pull
+git checkout v3.1.4
 set WXWIN=%DEVSPACE%\wxWidgets
 cd %WXWIN%\build\msw
-copy /Y %WXWIN%\include\wx\msw\setup0.h %WXWIN%\include\wx\msw\setup.h
 powershell "gci . *.vcxproj -recurse | ForEach { (Get-Content $_ | ForEach {$_ -replace 'MultiThreadedDebugDLL', 'MultiThreadedDebug'}) | Set-Content $_ }"
 powershell "gci . *.vcxproj -recurse | ForEach { (Get-Content $_ | ForEach {$_ -replace 'MultiThreadedDLL', 'MultiThreaded'}) | Set-Content $_ }"
-msbuild /maxcpucount:5 /P:Configuration=%TYPE% wx_vc14.sln
+msbuild /maxcpucount:5 /P:Configuration=%TYPE% wx_vc15.sln
 if ERRORLEVEL 1 exit /B %ERRORLEVEL%
 
 cd %BUILD_DIR%
