@@ -7,13 +7,13 @@ SET TYPE=Debug
 SET BUILD_DIR=%CD%
 SET DEVSPACE=%CD%
 SET CL=/MP
-SET BOOSTTOOLSET=toolset=msvc-14.0
+SET BOOSTTOOLSET=toolset=msvc-14.1
 
 IF "%2"=="32" (
-SET GENERATOR="Visual Studio 14"
+SET GENERATOR="Visual Studio 15 2017"
 SET OPENSSLFLAG=VC-WIN32
 ) ELSE (
-SET GENERATOR="Visual Studio 14 Win64"
+SET GENERATOR="Visual Studio 15 2017 Win64"
 SET OPENSSLFLAG=VC-WIN64A
 SET BOOSTADDRESSMODEL=address-model=64
 )
@@ -74,9 +74,9 @@ msbuild /P:Configuration=%TYPE% INSTALL.vcxproj
 if ERRORLEVEL 1 exit /B %ERRORLEVEL%
 
 cd %DEVSPACE%
-if NOT EXIST boost_1_66_0.zip wget -c --no-check-certificate http://downloads.sourceforge.net/project/boost/boost/1.66.0/boost_1_66_0.zip
-if NOT EXIST boost_1_66_0 unzip -o -q boost_1_66_0.zip
-cd boost_1_66_0
+if NOT EXIST boost_1_73_0.zip wget -c --no-check-certificate http://downloads.sourceforge.net/project/boost/boost/1.73.0/boost_1_73_0.zip
+if NOT EXIST boost_1_73_0 unzip -o -q boost_1_73_0.zip
+cd boost_1_73_0
 call bootstrap
 SET COMMONb2Flag=%BOOSTTOOLSET% %BOOSTADDRESSMODEL% runtime-link=static define=_BIND_TO_CURRENT_VCLIBS_VERSION=1 -j 4 stage
 SET BOOSTmodules=--with-locale --with-atomic --with-thread --with-filesystem --with-system --with-date_time --with-regex
@@ -99,7 +99,7 @@ if ERRORLEVEL 1 exit /B %ERRORLEVEL%
 cd %BUILD_DIR%
 mkdir build-%TYPE%
 cd build-%TYPE%
-cmake .. -G %GENERATOR% -DwxWidgets_ROOT_DIR=%WXWIN% -DBOOST_ROOT=%DEVSPACE%\boost_1_66_0 -DDCMTK_DIR=%DEVSPACE%\dcmtk\%TYPE% -DZLIB_ROOT=%DEVSPACE%\zlib\%TYPE% -DFMJPEG2K=%DEVSPACE%\fmjpeg2koj\%TYPE% -DOPENJPEG=%DEVSPACE%\openjpeg\%TYPE% -DFMJP2K=%DEVSPACE%\fmjpeg2kjasper\%TYPE% -DJASPER=%DEVSPACE%\jasper\%TYPE% -DVLD="C:\Program Files (x86)\Visual Leak Detector"
+cmake .. -G %GENERATOR% -DwxWidgets_ROOT_DIR=%WXWIN% -DBOOST_ROOT=%DEVSPACE%\boost_1_73_0 -DDCMTK_DIR=%DEVSPACE%\dcmtk\%TYPE% -DZLIB_ROOT=%DEVSPACE%\zlib\%TYPE% -DFMJPEG2K=%DEVSPACE%\fmjpeg2koj\%TYPE% -DOPENJPEG=%DEVSPACE%\openjpeg\%TYPE% -DFMJP2K=%DEVSPACE%\fmjpeg2kjasper\%TYPE% -DJASPER=%DEVSPACE%\jasper\%TYPE% -DVLD="C:\Program Files (x86)\Visual Leak Detector"
 msbuild /P:Configuration=%TYPE% ALL_BUILD.vcxproj
 if ERRORLEVEL 1 exit /B %ERRORLEVEL%
 
