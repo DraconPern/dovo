@@ -24,7 +24,7 @@ cmake .. -DCMAKE_BUILD_TYPE=$TYPE -DDCMTK_ENABLE_CXX11=ON -DDCMTK_ENABLE_STL=ON 
 make -j8 install
 
 cd $DEVSPACE
-[[ -d openjpeg ]] || git clone --branch=openjpeg-2.1 https://github.com/uclouvain/openjpeg.git
+[[ -d openjpeg ]] || git clone --branch=v2.4.0 --single-branch --depth 1 https://github.com/uclouvain/openjpeg.git
 cd openjpeg
 git pull
 mkdir -p build-$TYPE
@@ -42,12 +42,9 @@ cmake .. -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=$TYPE -DOPENJPEG=$DEVSPACE/o
 make -j8 install
 
 cd $DEVSPACE
-[[ -f boost_1_66_0.zip ]] || wget -c http://downloads.sourceforge.net/project/boost/boost/1.66.0/boost_1_66_0.zip
-unzip -o -q -a boost_1_66_0.zip
-cd boost_1_66_0
-if [ "$unamestr" = "Darwin" ] ; then
-patch -N tools/build/src/tools/darwin.jam < ../boost.patch
-fi
+[[ -f boost_1_73_0.zip ]] || wget -c http://downloads.sourceforge.net/project/boost/boost/1.73.0/boost_1_73_0.zip
+unzip -q -u boost_1_73_0.zip
+cd boost_1_73_0
 ./bootstrap.sh
 COMMONb2Flag="-j 4 link=static stage"
 BOOSTModule="--with-locale --with-thread --with-filesystem --with-system --with-date_time --with-regex"
@@ -60,13 +57,12 @@ fi
 cd $DEVSPACE
 [[ -d wxWidgets ]] || git clone --branch=master https://github.com/wxWidgets/wxWidgets.git
 cd wxWidgets
-git checkout v3.1.0
 mkdir -p build$TYPE
 cd build$TYPE
 if [ "$unamestr" = "Darwin" ] ; then
-  COMMONwxWidgetsFlag=(--disable-shared --enable-utf8 --disable-mediactrl --with-macosx-version-min=10.9 CXXFLAGS="-std=c++11 -stdlib=libc++ -D__ASSERT_MACROS_DEFINE_VERSIONS_WITHOUT_UNDERSCORES=1" CPPFLAGS=-stdlib=libc++ LIBS=-lc++)
+  COMMONwxWidgetsFlag=(--disable-shared --enable-utf8)
 elif [ "$unamestr" = "Linux" ] ; then
-  COMMONwxWidgetsFlag=(--disable-shared --enable-utf8 CXXFLAGS="-std=c++11")
+  COMMONwxWidgetsFlag=(--disable-shared --enable-utf8)
 fi
 if [ "$TYPE" = "Release" ] ; then
   ../configure "${COMMONwxWidgetsFlag[@]}"
@@ -78,7 +74,7 @@ make -j8
 cd $BUILD_DIR
 mkdir -p build-$TYPE
 cd build-$TYPE
-cmake .. -DCMAKE_BUILD_TYPE=$TYPE -DwxWidgets_CONFIG_EXECUTABLE=$DEVSPACE/wxWidgets/build$TYPE/wx-config -DBOOST_ROOT=$DEVSPACE/boost_1_66_0 -DDCMTK_DIR=$DEVSPACE/dcmtk/$TYPE -DFMJPEG2K=$DEVSPACE/fmjpeg2koj/$TYPE -DOPENJPEG=$DEVSPACE/openjpeg/$TYPE
+cmake .. -DCMAKE_BUILD_TYPE=$TYPE -DwxWidgets_CONFIG_EXECUTABLE=$DEVSPACE/wxWidgets/build$TYPE/wx-config -DBOOST_ROOT=$DEVSPACE/boost_1_73_0 -DDCMTK_DIR=$DEVSPACE/dcmtk/$TYPE -DFMJPEG2K=$DEVSPACE/fmjpeg2koj/$TYPE -DOPENJPEG=$DEVSPACE/openjpeg/$TYPE
 make -j8
 
 if [[ "$unamestr" = "Linux" ]] && [[ "$TYPE" = "Release" ]]; then
