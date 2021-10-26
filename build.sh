@@ -55,7 +55,7 @@ elif [ "$TYPE" = "Debug" ] ; then
 fi
 
 cd $DEVSPACE
-[[ -d wxWidgets ]] || git clone --branch=master https://github.com/wxWidgets/wxWidgets.git
+[[ -d wxWidgets ]] || git clone --branch=master --recurse-submodules https://github.com/wxWidgets/wxWidgets.git
 cd wxWidgets
 mkdir -p build$TYPE
 cd build$TYPE

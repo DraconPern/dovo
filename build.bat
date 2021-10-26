@@ -84,7 +84,7 @@ IF "%TYPE%" == "Release" b2 %COMMONb2Flag% %BOOSTmodules% release
 IF "%TYPE%" == "Debug"   b2 %COMMONb2Flag% %BOOSTmodules% debug
 
 cd %DEVSPACE%
-git clone --branch=master https://github.com/wxWidgets/wxWidgets.git
+git clone --branch=master --recurse-submodule https://github.com/wxWidgets/wxWidgets.git
 cd wxWidgets
 git checkout v3.1.4
 git submodule update --init
