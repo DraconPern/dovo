@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.15)
 
 project(dovo)
 
@@ -27,17 +27,17 @@ if(WIN32)
 	#enable dcmtk filename to have wide version, only affects WIN32.  http://utf8everywhere.org/
 	add_definitions(-DDCMTK_WIDE_CHAR_FILE_IO_FUNCTIONS=1)
 endif(WIN32)
-find_package(DCMTK REQUIRED CONFIG HINTS ${DCMTK_DIR})
+find_package(DCMTK REQUIRED)
 
 #include zlib
 find_package(ZLIB REQUIRED ${ZLIB_ROOT})
 
 #include openjpeg
-find_package(OpenJPEG REQUIRED HINTS ${OPENJPEG})
+find_package(OpenJPEG REQUIRED)
 add_definitions(-DOPJ_STATIC)
 
 #include fmjpeg2koj
-find_package(fmjpeg2k REQUIRED HINTS ${FMJPEG2K})
+find_package(fmjpeg2k REQUIRED)
 
 set(wxWidgets_USE_STATIC   ON)
 #define this so that wxWidgets doesn't define it. Conflicts w/ dcmtk's declaration

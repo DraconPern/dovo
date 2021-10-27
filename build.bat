@@ -69,7 +69,7 @@ cd fmjpeg2koj
 git pull
 mkdir build-%TYPE%
 cd build-%TYPE%
-cmake .. -G %GENERATOR% -DBUILD_SHARED_LIBS=OFF -DCMAKE_CXX_FLAGS_RELEASE="/MT /O2 /D NDEBUG" -DCMAKE_CXX_FLAGS_DEBUG="/D_DEBUG /MTd /Od" -DOPENJPEG=%DEVSPACE%\openjpeg\%TYPE% -DDCMTK_DIR=%DEVSPACE%\dcmtk\%TYPE% -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\fmjpeg2koj\%TYPE%
+cmake .. -G %GENERATOR% -DBUILD_SHARED_LIBS=OFF -DCMAKE_CXX_FLAGS_RELEASE="/MT /O2 /D NDEBUG" -DCMAKE_CXX_FLAGS_DEBUG="/D_DEBUG /MTd /Od" -DOpenJPEG_ROOT=%DEVSPACE%\openjpeg\%TYPE% -DDCMTK_ROOT=%DEVSPACE%\dcmtk\%TYPE% -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\fmjpeg2koj\%TYPE%
 msbuild /P:Configuration=%TYPE% INSTALL.vcxproj
 if ERRORLEVEL 1 exit /B %ERRORLEVEL%
 
@@ -99,7 +99,7 @@ if ERRORLEVEL 1 exit /B %ERRORLEVEL%
 cd %BUILD_DIR%
 mkdir build-%TYPE%
 cd build-%TYPE%
-cmake .. -G %GENERATOR% -DwxWidgets_ROOT_DIR=%WXWIN% -DBOOST_ROOT=%DEVSPACE%\boost_1_73_0 -DDCMTK_DIR=%DEVSPACE%\dcmtk\%TYPE% -DZLIB_ROOT=%DEVSPACE%\zlib\%TYPE% -DFMJPEG2K=%DEVSPACE%\fmjpeg2koj\%TYPE% -DOPENJPEG=%DEVSPACE%\openjpeg\%TYPE% -DFMJP2K=%DEVSPACE%\fmjpeg2kjasper\%TYPE% -DJASPER=%DEVSPACE%\jasper\%TYPE% -DVLD="C:\Program Files (x86)\Visual Leak Detector"
+cmake .. -G %GENERATOR% -DwxWidgets_ROOT_DIR=%WXWIN% -DBOOST_ROOT=%DEVSPACE%\boost_1_73_0 -DDCMTK_ROOT=%DEVSPACE%\dcmtk\%TYPE% -DZLIB_ROOT=%DEVSPACE%\zlib\%TYPE% -Dfmjpeg2k_ROOT=%DEVSPACE%\fmjpeg2koj\%TYPE% -DOpenJPEG_ROOT=%DEVSPACE%\openjpeg\%TYPE% -DVLD="C:\Program Files (x86)\Visual Leak Detector"
 msbuild /P:Configuration=%TYPE% ALL_BUILD.vcxproj
 if ERRORLEVEL 1 exit /B %ERRORLEVEL%
 
