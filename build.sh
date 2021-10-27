@@ -74,7 +74,7 @@ make -j8
 cd $BUILD_DIR
 mkdir -p build-$TYPE
 cd build-$TYPE
-cmake .. -DCMAKE_BUILD_TYPE=$TYPE -DwxWidgets_CONFIG_EXECUTABLE=$DEVSPACE/wxWidgets/build$TYPE/wx-config -DBoost_ROOT=$DEVSPACE/boost_1_73_0 -DDCMTK_ROOT=$DEVSPACE/dcmtk/$TYPE -DFMJPEG2K_ROOT=$DEVSPACE/fmjpeg2koj/$TYPE -DOpenJPEG_ROOT=$DEVSPACE/openjpeg/$TYPE
+cmake .. -DCMAKE_BUILD_TYPE=$TYPE -DwxWidgets_CONFIG_EXECUTABLE=$DEVSPACE/wxWidgets/build$TYPE/wx-config -DBoost_ROOT=$DEVSPACE/boost_1_73_0 -DDCMTK_ROOT=$DEVSPACE/dcmtk/$TYPE -Dfmjpeg2k_ROOT=$DEVSPACE/fmjpeg2koj/$TYPE -DOpenJPEG_ROOT=$DEVSPACE/openjpeg/$TYPE
 make -j8
 
 if [[ "$unamestr" = "Linux" ]] && [[ "$TYPE" = "Release" ]]; then

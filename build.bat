@@ -99,7 +99,7 @@ if ERRORLEVEL 1 exit /B %ERRORLEVEL%
 cd %BUILD_DIR%
 mkdir build-%TYPE%
 cd build-%TYPE%
-cmake .. -G %GENERATOR% -DwxWidgets_ROOT_DIR=%WXWIN% -DBOOST_ROOT=%DEVSPACE%\boost_1_73_0 -DDCMTK_ROOT=%DEVSPACE%\dcmtk\%TYPE% -DZLIB_ROOT=%DEVSPACE%\zlib\%TYPE% -Dfmjpeg2k_ROOT=%DEVSPACE%\fmjpeg2koj\%TYPE% -DOpenJPEG_ROOT=%DEVSPACE%\openjpeg\%TYPE% -DVLD="C:\Program Files (x86)\Visual Leak Detector"
+cmake .. -G %GENERATOR% -DwxWidgets_ROOT_DIR=%WXWIN% -DBoost_ROOT=%DEVSPACE%\boost_1_73_0 -DDCMTK_ROOT=%DEVSPACE%\dcmtk\%TYPE% -DZLIB_ROOT=%DEVSPACE%\zlib\%TYPE% -Dfmjpeg2k_ROOT=%DEVSPACE%\fmjpeg2koj\%TYPE% -DOpenJPEG_ROOT=%DEVSPACE%\openjpeg\%TYPE% -DVLD="C:\Program Files (x86)\Visual Leak Detector"
 msbuild /P:Configuration=%TYPE% ALL_BUILD.vcxproj
 if ERRORLEVEL 1 exit /B %ERRORLEVEL%
 
