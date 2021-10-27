@@ -10,7 +10,7 @@ fi
 
 BUILD_DIR=`pwd`
 DEVSPACE=`pwd`
-export MACOSX_DEPLOYMENT_TARGET=10.10
+export MACOSX_DEPLOYMENT_TARGET=10.12
 
 ./build.sh $1
 
