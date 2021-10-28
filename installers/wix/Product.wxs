@@ -37,7 +37,7 @@
 	<Fragment>
 		<ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
 			<Component Id="dovo.exe" Guid="79B9B9F7-EFD2-4FE0-898B-593343C9C764" Win64="yes">
-				<File Id="dovo.exe" Source="..\..\build-Release\Release\dovo.exe" KeyPath="yes" Checksum="yes"/>
+				<File Id="dovo.exe" Source="..\..\build-$(var.Configuration)\$(var.Configuration)\dovo.exe" KeyPath="yes" Checksum="yes"/>
 			</Component>
 		</ComponentGroup>
 		<ComponentGroup Id="Shortcuts" Directory="ApplicationProgramsFolder">
