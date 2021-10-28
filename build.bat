@@ -54,7 +54,7 @@ msbuild /maxcpucount:8 /P:Configuration=%TYPE% INSTALL.vcxproj
 if ERRORLEVEL 1 exit /B %ERRORLEVEL%
 
 cd %DEVSPACE%
-git clone --branch=openjpeg-2.1 https://github.com/uclouvain/openjpeg.git
+git clone --branch=v2.4.0 --single-branch --depth 1 https://github.com/uclouvain/openjpeg.git
 cd openjpeg
 git pull
 mkdir build-%TYPE%
