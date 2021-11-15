@@ -75,7 +75,7 @@ if ERRORLEVEL 1 exit /B %ERRORLEVEL%
 
 cd %DEVSPACE%
 if NOT EXIST boost_1_73_0.zip wget -c --no-check-certificate http://downloads.sourceforge.net/project/boost/boost/1.73.0/boost_1_73_0.zip
-if NOT EXIST boost_1_73_0 unzip -o -q boost_1_73_0.zip
+unzip -q -u boost_1_73_0.zip
 cd boost_1_73_0
 call bootstrap
 SET COMMONb2Flag=%BOOSTTOOLSET% %BOOSTADDRESSMODEL% runtime-link=static define=_BIND_TO_CURRENT_VCLIBS_VERSION=1 -j 4 stage
