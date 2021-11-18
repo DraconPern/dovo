@@ -132,12 +132,14 @@ void dovo_mainFrame::OnPatientsSelected( wxListEvent& event )
 	m_instances->DeleteAllItems();
 
 	m_engine.patientdata.GetStudies(m_patients->GetItemText(item, 0).ToUTF8().data(), m_patients->GetItemText(item, 1).ToUTF8().data(), boost::bind(&dovo_mainFrame::fillstudiescallback, this, _1));
-	m_studies->SetColumnWidth(0, wxLIST_AUTOSIZE);
-	m_studies->SetColumnWidth(1, wxLIST_AUTOSIZE);
-	m_studies->SetColumnWidth(2, wxLIST_AUTOSIZE);
 
 	if(m_studies->GetItemCount() > 0)
+	{
+		m_studies->SetColumnWidth(0, wxLIST_AUTOSIZE);
+		m_studies->SetColumnWidth(1, wxLIST_AUTOSIZE);
+		m_studies->SetColumnWidth(2, wxLIST_AUTOSIZE);
 		m_studies->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+	}
 }
 
 int dovo_mainFrame::fillstudiescallback(Study &study)
@@ -189,11 +191,12 @@ void dovo_mainFrame::OnStudiesSelected( wxListEvent& event )
 		j++;
 	}
 
-	m_series->SetColumnWidth(0, wxLIST_AUTOSIZE);
-	m_series->SetColumnWidth(1, wxLIST_AUTOSIZE);
-
 	if(m_series->GetItemCount() > 0)
+	{
+		m_series->SetColumnWidth(0, wxLIST_AUTOSIZE);
+		m_series->SetColumnWidth(1, wxLIST_AUTOSIZE);
 		m_series->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+	}
 }
 
 int dovo_mainFrame::fillseriescallback(Series &series, naturalstringmap *entries)
@@ -221,11 +224,12 @@ void dovo_mainFrame::OnSeriesSelected( wxListEvent& event )
 		j++;
 	}
 
-	m_instances->SetColumnWidth(0, wxLIST_AUTOSIZE);
-	m_instances->SetColumnWidth(1, wxLIST_AUTOSIZE);
-
 	if(m_instances->GetItemCount() > 0)
+	{
+		m_instances->SetColumnWidth(0, wxLIST_AUTOSIZE);
+		m_instances->SetColumnWidth(1, wxLIST_AUTOSIZE);
 		m_instances->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+	}
 }
 
 int dovo_mainFrame::fillinstancescallback(Instance &instance, naturalpathmap *entries)
