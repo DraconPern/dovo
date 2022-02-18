@@ -401,7 +401,7 @@ about::about( wxWindow* parent, wxWindowID id, const wxString& title, const wxPo
 	m_buildinfo->Wrap( -1 );
 	bSizer28->Add( m_buildinfo, 0, wxALL, 5 );
 
-	m_copyright = new wxStaticText( this, wxID_ANY, _("Copyright (C) 2007-2019 Ing-Long Eric Kuo"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_copyright = new wxStaticText( this, wxID_ANY, _("Copyright (C) 2007-2022 Ing-Long Eric Kuo"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_copyright->Wrap( -1 );
 	bSizer28->Add( m_copyright, 0, wxALL, 5 );
 
@@ -418,6 +418,19 @@ about::about( wxWindow* parent, wxWindowID id, const wxString& title, const wxPo
 
 	bSizer28->Add( bSizer27, 0, 0, 5 );
 
+	wxBoxSizer* bSizer31;
+	bSizer31 = new wxBoxSizer( wxHORIZONTAL );
+
+	m_staticText18 = new wxStaticText( this, wxID_ANY, _("source code:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText18->Wrap( -1 );
+	bSizer31->Add( m_staticText18, 0, wxALL, 5 );
+
+	m_hyperlink3 = new wxHyperlinkCtrl( this, wxID_ANY, _("https://github.com/DraconPern/dovo"), wxT("https://github.com/DraconPern/dovo"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+	bSizer31->Add( m_hyperlink3, 0, wxALL, 5 );
+
+
+	bSizer28->Add( bSizer31, 0, wxEXPAND, 5 );
+
 	wxBoxSizer* bSizer271;
 	bSizer271 = new wxBoxSizer( wxHORIZONTAL );
 
@@ -431,28 +444,12 @@ about::about( wxWindow* parent, wxWindowID id, const wxString& title, const wxPo
 
 	bSizer28->Add( bSizer271, 0, wxEXPAND, 5 );
 
-	wxBoxSizer* bSizer31;
-	bSizer31 = new wxBoxSizer( wxHORIZONTAL );
-
-	m_staticText18 = new wxStaticText( this, wxID_ANY, _("Bitcoin segwit donation:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText18->Wrap( -1 );
-	bSizer31->Add( m_staticText18, 0, wxALL, 5 );
-
-	m_hyperlink3 = new wxHyperlinkCtrl( this, wxID_ANY, _("bc1qemt58qxy3me3mkllnt2u6sd72h8mycrz9qd72s"), wxT("bitcoin:bc1qemt58qxy3me3mkllnt2u6sd72h8mycrz9qd72s"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
-	bSizer31->Add( m_hyperlink3, 0, wxALL, 5 );
-
-
-	bSizer28->Add( bSizer31, 0, wxEXPAND, 5 );
-
 	wxBoxSizer* bSizer311;
 	bSizer311 = new wxBoxSizer( wxHORIZONTAL );
 
-	m_staticText181 = new wxStaticText( this, wxID_ANY, _("Bitcoin donation:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText181 = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText181->Wrap( -1 );
 	bSizer311->Add( m_staticText181, 0, wxALL, 5 );
-
-	m_hyperlink31 = new wxHyperlinkCtrl( this, wxID_ANY, _("1NJxjksqAbFdwdkKiED6mZq2h69CRpJoTa"), wxT("bitcoin:1NJxjksqAbFdwdkKiED6mZq2h69CRpJoTa"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
-	bSizer311->Add( m_hyperlink31, 0, wxALL, 5 );
 
 
 	bSizer28->Add( bSizer311, 1, wxEXPAND, 5 );
