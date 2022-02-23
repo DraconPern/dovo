@@ -38,10 +38,8 @@ IF "%TYPE%" == "Debug"   copy /Y %DEVSPACE%\libiconv\Debug\lib\libiconv.lib %DEV
 IF "%TYPE%" == "Release" copy /Y %DEVSPACE%\libiconv\Release\lib\libiconv.lib %DEVSPACE%\libiconv\Release\lib\libiconv_o.lib
 
 cd %DEVSPACE%
-git clone https://github.com/DCMTK/dcmtk.git
+git clone --branch=DCMTK-3.6.5 https://github.com/DCMTK/dcmtk.git
 cd dcmtk
-git fetch
-git checkout -f DCMTK-3.6.5
 mkdir build-%TYPE%
 cd build-%TYPE%
 cmake .. %GENERATOR% -DDCMTK_WIDE_CHAR_FILE_IO_FUNCTIONS=1 -DCMAKE_CXX_FLAGS_RELEASE="/Zi" -DDCMTK_WITH_ZLIB=1 -DWITH_ZLIBINC=%DEVSPACE%\zlib\%TYPE% -DDCMTK_WITH_ICONV=1 -DWITH_LIBICONVINC=%DEVSPACE%\libiconv\%TYPE% -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\dcmtk\%TYPE%
@@ -69,9 +67,8 @@ msbuild /P:Configuration=%TYPE% INSTALL.vcxproj
 if ERRORLEVEL 1 exit /B %ERRORLEVEL%
 
 cd %DEVSPACE%
-if NOT EXIST boost_1_73_0.zip wget -c --no-check-certificate http://downloads.sourceforge.net/project/boost/boost/1.73.0/boost_1_73_0.zip
-unzip -q -u boost_1_73_0.zip
-cd boost_1_73_0
+git clone --branch=boost-1.73.0 --recurse-submodules https://github.com/boostorg/boost.git
+cd boost
 call bootstrap
 SET COMMONb2Flag=%BOOSTTOOLSET% %BOOSTADDRESSMODEL% runtime-link=static define=_BIND_TO_CURRENT_VCLIBS_VERSION=1 -j 4 stage
 SET BOOSTmodules=--with-locale --with-atomic --with-thread --with-filesystem --with-system --with-date_time --with-regex
@@ -79,9 +76,8 @@ IF "%TYPE%" == "Release" b2 %COMMONb2Flag% %BOOSTmodules% release
 IF "%TYPE%" == "Debug"   b2 %COMMONb2Flag% %BOOSTmodules% debug
 
 cd %DEVSPACE%
-git clone --branch=master --recurse-submodule https://github.com/wxWidgets/wxWidgets.git
+git clone --branch=v3.1.5 --recurse-submodule https://github.com/wxWidgets/wxWidgets.git
 cd wxWidgets
-git checkout v3.1.5
 git submodule update --init
 set WXWIN=%DEVSPACE%\wxWidgets
 cd %WXWIN%\build\msw
@@ -94,7 +90,7 @@ if ERRORLEVEL 1 exit /B %ERRORLEVEL%
 cd %BUILD_DIR%
 mkdir build-%TYPE%
 cd build-%TYPE%
-cmake .. %GENERATOR% -DwxWidgets_ROOT_DIR=%WXWIN% -DBOOST_ROOT=%DEVSPACE%\boost_1_73_0 -DDCMTK_ROOT=%DEVSPACE%\dcmtk\%TYPE% -DZLIB_ROOT=%DEVSPACE%\zlib\%TYPE% -Dfmjpeg2k_ROOT=%DEVSPACE%\fmjpeg2koj\%TYPE% -DOpenJPEG_ROOT=%DEVSPACE%\openjpeg\%TYPE% -DVLD="C:\Program Files (x86)\Visual Leak Detector"
+cmake .. %GENERATOR% -DwxWidgets_ROOT_DIR=%WXWIN% -DBoost_ROOT=%DEVSPACE%\boost -DDCMTK_ROOT=%DEVSPACE%\dcmtk\%TYPE% -DZLIB_ROOT=%DEVSPACE%\zlib\%TYPE% -Dfmjpeg2k_ROOT=%DEVSPACE%\fmjpeg2koj\%TYPE% -DOpenJPEG_ROOT=%DEVSPACE%\openjpeg\%TYPE% -DVLD="C:\Program Files (x86)\Visual Leak Detector"
 msbuild /P:Configuration=%TYPE% ALL_BUILD.vcxproj
 if ERRORLEVEL 1 exit /B %ERRORLEVEL%
 
