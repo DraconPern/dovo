@@ -42,9 +42,8 @@ cmake .. -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=$TYPE -DOpenJPEG_ROOT=$DEVSP
 make -j8 install
 
 cd $DEVSPACE
-[[ -f boost_1_73_0.zip ]] || wget -c http://downloads.sourceforge.net/project/boost/boost/1.73.0/boost_1_73_0.zip
-unzip -q -u boost_1_73_0.zip
-cd boost_1_73_0
+[[ -d boost ]] || git clone --branch=boost-1.73.0 --recurse-submodules https://github.com/boostorg/boost.git
+cd boost
 ./bootstrap.sh
 COMMONb2Flag="-j 4 link=static stage"
 BOOSTModule="--with-locale --with-thread --with-filesystem --with-system --with-date_time --with-regex"
@@ -74,5 +73,5 @@ make -j8
 cd $BUILD_DIR
 mkdir -p build-$TYPE
 cd build-$TYPE
-cmake .. -DCMAKE_BUILD_TYPE=$TYPE -DwxWidgets_CONFIG_EXECUTABLE=$DEVSPACE/wxWidgets/build$TYPE/wx-config -DBoost_ROOT=$DEVSPACE/boost_1_73_0 -DDCMTK_ROOT=$DEVSPACE/dcmtk/$TYPE -Dfmjpeg2k_ROOT=$DEVSPACE/fmjpeg2koj/$TYPE -DOpenJPEG_ROOT=$DEVSPACE/openjpeg/$TYPE
+cmake .. -DCMAKE_BUILD_TYPE=$TYPE -DwxWidgets_CONFIG_EXECUTABLE=$DEVSPACE/wxWidgets/build$TYPE/wx-config -DBoost_ROOT=$DEVSPACE/boost -DDCMTK_ROOT=$DEVSPACE/dcmtk/$TYPE -Dfmjpeg2k_ROOT=$DEVSPACE/fmjpeg2koj/$TYPE -DOpenJPEG_ROOT=$DEVSPACE/openjpeg/$TYPE
 make -j8
