@@ -49,7 +49,6 @@ if ERRORLEVEL 1 exit /B %ERRORLEVEL%
 cd %DEVSPACE%
 git clone --branch=v2.4.0 --single-branch --depth 1 https://github.com/uclouvain/openjpeg.git
 cd openjpeg
-git pull
 mkdir build-%TYPE%
 cd build-%TYPE%
 cmake .. %GENERATOR% -DBUILD_THIRDPARTY=ON -DBUILD_SHARED_LIBS=OFF -DCMAKE_C_FLAGS_RELEASE="/MT /O2 /D NDEBUG" -DCMAKE_C_FLAGS_DEBUG="/D_DEBUG /MTd /Od" -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\openjpeg\%TYPE%
@@ -59,7 +58,6 @@ if ERRORLEVEL 1 exit /B %ERRORLEVEL%
 cd %DEVSPACE%
 git clone --branch=master https://github.com/DraconPern/fmjpeg2koj.git
 cd fmjpeg2koj
-git pull
 mkdir build-%TYPE%
 cd build-%TYPE%
 cmake .. %GENERATOR% -DBUILD_SHARED_LIBS=OFF -DCMAKE_CXX_FLAGS_RELEASE="/MT /O2 /D NDEBUG" -DCMAKE_CXX_FLAGS_DEBUG="/D_DEBUG /MTd /Od" -DOpenJPEG_ROOT=%DEVSPACE%\openjpeg\%TYPE% -DDCMTK_ROOT=%DEVSPACE%\dcmtk\%TYPE% -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\fmjpeg2koj\%TYPE%
@@ -78,7 +76,6 @@ IF "%TYPE%" == "Debug"   b2 %COMMONb2Flag% %BOOSTmodules% debug
 cd %DEVSPACE%
 git clone --branch=v3.1.5 --recurse-submodule https://github.com/wxWidgets/wxWidgets.git
 cd wxWidgets
-git submodule update --init
 set WXWIN=%DEVSPACE%\wxWidgets
 cd %WXWIN%\build\msw
 copy /Y %WXWIN%\include\wx\msw\setup0.h %WXWIN%\include\wx\msw\setup.h
