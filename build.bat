@@ -81,7 +81,7 @@ cd %WXWIN%\build\msw
 copy /Y %WXWIN%\include\wx\msw\setup0.h %WXWIN%\include\wx\msw\setup.h
 powershell "gci . *.vcxproj -recurse | ForEach { (Get-Content $_ | ForEach {$_ -replace 'MultiThreadedDebugDLL', 'MultiThreadedDebug'}) | Set-Content $_ }"
 powershell "gci . *.vcxproj -recurse | ForEach { (Get-Content $_ | ForEach {$_ -replace 'MultiThreadedDLL', 'MultiThreaded'}) | Set-Content $_ }"
-msbuild /P:Configuration=%TYPE% wx_vc16.sln
+msbuild /P:Configuration=%TYPE% /p:Platform="x64" wx_vc16.sln
 if ERRORLEVEL 1 exit /B %ERRORLEVEL%
 
 cd %BUILD_DIR%
