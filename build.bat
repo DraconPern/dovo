@@ -16,7 +16,6 @@ SET BOOSTADDRESSMODEL=address-model=64
 cd %DEVSPACE%
 git clone --branch=master --single-branch --depth=1 https://github.com/madler/zlib.git
 cd zlib
-git pull
 mkdir build-%TYPE%
 cd build-%TYPE%
 cmake.exe .. %GENERATOR% -DCMAKE_C_FLAGS_RELEASE="/MT /O2 /D NDEBUG" -DCMAKE_C_FLAGS_DEBUG="/D_DEBUG /MTd /Od" -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\zlib\%TYPE%
