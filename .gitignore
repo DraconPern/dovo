@@ -4,6 +4,8 @@ build-Debug/
 build-Release/
 dcmtk/
 fmjpeg2koj/
+libiconv
+libiconv-cmake
 openjpeg/
 wxWidgets/
 zlib/
