@@ -20,7 +20,8 @@
 			<ComponentRef Id="dovo.exe" />
 			<ComponentRef Id="ApplicationShortcut" />
 		</Feature>
-
+		
+		<WixVariable Id="WixUILicenseRtf" Value="license.rtf" />
 	</Product>
 
 	<Fragment>
