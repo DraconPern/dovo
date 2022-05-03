@@ -1,10 +1,8 @@
 cmake_minimum_required(VERSION 3.15)
 
-project(dovo)
+project(dovo VERSION 1.0.19 DESCRIPTION "Dovo DICOM import and send")
 
-set(VERSION 1.0.19)
-
-add_definitions(-DDOVO_VERSION="${VERSION}")
+add_definitions(-DDOVO_VERSION="${PROJECT_VERSION}")
 
 set (CMAKE_CXX_STANDARD 11)
 
@@ -93,12 +91,12 @@ set(dovo_SRCS
 if(WIN32)
   set(dovo_SRCS ${dovo_SRCS} src/win/dovo.rc src/win/version.rc src/win/dovo.manifest)
 
-  string(REPLACE "." "," VER_FILEVERSION ${VERSION})
+  string(REPLACE "." "," VER_FILEVERSION ${PROJECT_VERSION})
 
   add_definitions(-DVER_FILEVERSION=${VER_FILEVERSION})
-  add_definitions(-DVER_FILEVERSION_STR="${VERSION}")
+  add_definitions(-DVER_FILEVERSION_STR="${PROJECT_VERSION}")
   add_definitions(-DVER_PRODUCTVERSION=${VER_FILEVERSION})
-  add_definitions(-DVER_PRODUCTVERSION_STR="${VERSION}")
+  add_definitions(-DVER_PRODUCTVERSION_STR="${PROJECT_VERSION}")
 
 endif()
 
@@ -119,7 +117,7 @@ ENDIF()
 
 if(APPLE)
   set_target_properties(dovo PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/src/osx/Info.plist.in)
-  set_target_properties(dovo PROPERTIES MACOSX_BUNDLE_SHORT_VERSION_STRING ${VERSION})
+  set_target_properties(dovo PROPERTIES MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION})
 	SET_SOURCE_FILES_PROPERTIES(${CMAKE_SOURCE_DIR}/src/osx/dovo.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
 ENDIF()
 
@@ -133,3 +131,26 @@ TARGET_LINK_LIBRARIES(dovo
 	${Boost_LIBRARIES}
 	${OS_SPECIFIC_LIBS}
 	)
+
+install(TARGETS dovo RUNTIME DESTINATION ".")
+
+set(CPACK_PACKAGE_NAME "Dovo")
+set(CPACK_PACKAGE_VENDOR "FrontMotion")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Dovo DICOM import and send")
+set(CPACK_PACKAGE_DESCRIPTION "Dovo DICOM import and send")
+set(CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_PACKAGE_NAME}")
+set(CPACK_RESOURCE_FILE_LICENSE "../LICENSE.txt")
+set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${PROJECT_VERSION}")
+
+set(CPACK_WIX_TEMPLATE ../installers/wix/WIX.template.in)
+set(CPACK_WIX_PROGRAM_MENU_FOLDER ".")
+set(CPACK_WIX_UPGRADE_GUID "6ab99c1c-fb94-4d60-942e-bd5d5a298b36")
+set(CPACK_PACKAGE_EXECUTABLES "dovo" "Dovo")
+set(CPACK_CREATE_DESKTOP_LINKS "dovo")
+set(CPACK_WIX_UI_REF WixUI_FeatureTree)
+set(CPACK_WIX_EXTENSIONS WixUtilExtension)
+
+set(CPACK_PACKAGE_CONTACT "eric@frontmotion.com")
+
+
+include(CPack)
