@@ -10,3 +10,6 @@ openjpeg/
 wxWidgets/
 zlib/
 .DS_Store
+installers/wix/.vs
+installers/wix/bin
+installers/wix/obj

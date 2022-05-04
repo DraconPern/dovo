@@ -1,7 +1,7 @@
 Package: dovo
 Version: @PROJECT_VERSION@
 Section: utils
-Maintainer: draconpern@hotmail.com
+Maintainer: eric@frontmotion.com
 Architecture: amd64
 Description: DICOM CD Importer
   Point of care, cross-platform software for importing DICOM CD and
