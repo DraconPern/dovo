@@ -13,3 +13,5 @@ zlib/
 installers/wix/.vs
 installers/wix/bin
 installers/wix/obj
+installers/wix/Product.wxs
+installers/deb/control
