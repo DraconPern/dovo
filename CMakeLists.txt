@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 
-project(dovo VERSION 1.0.19 DESCRIPTION "Dovo DICOM import and send")
+project(dovo VERSION 1.0.19)
 
 add_definitions(-DDOVO_VERSION="${PROJECT_VERSION}")
 
@@ -11,7 +11,7 @@ if(WIN32)
 	add_definitions(-D_WIN32_WINNT=0x0501)
 	add_definitions(-D_UNICODE)
 	add_definitions(-D_BIND_TO_CURRENT_VCLIBS_VERSION=1)
-	set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")	
+	set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 	set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /LTCG")
 endif()
 
@@ -132,25 +132,5 @@ TARGET_LINK_LIBRARIES(dovo
 	${OS_SPECIFIC_LIBS}
 	)
 
-install(TARGETS dovo RUNTIME DESTINATION ".")
-
-set(CPACK_PACKAGE_NAME "Dovo")
-set(CPACK_PACKAGE_VENDOR "FrontMotion")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Dovo DICOM import and send")
-set(CPACK_PACKAGE_DESCRIPTION "Dovo DICOM import and send")
-set(CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_PACKAGE_NAME}")
-set(CPACK_RESOURCE_FILE_LICENSE "../LICENSE.txt")
-set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${PROJECT_VERSION}")
-
-set(CPACK_WIX_TEMPLATE ../installers/wix/WIX.template.in)
-set(CPACK_WIX_PROGRAM_MENU_FOLDER ".")
-set(CPACK_WIX_UPGRADE_GUID "6ab99c1c-fb94-4d60-942e-bd5d5a298b36")
-set(CPACK_PACKAGE_EXECUTABLES "dovo" "Dovo")
-set(CPACK_CREATE_DESKTOP_LINKS "dovo")
-set(CPACK_WIX_UI_REF WixUI_FeatureTree)
-set(CPACK_WIX_EXTENSIONS WixUtilExtension)
-
-set(CPACK_PACKAGE_CONTACT "eric@frontmotion.com")
-
-
-include(CPack)
+configure_file("installers/wix/Product.wxs.in" "${CMAKE_CURRENT_SOURCE_DIR}/installers/wix/Product.wxs")
+configure_file("installers/deb/control.in" "${CMAKE_CURRENT_SOURCE_DIR}/installers/deb/control")

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-	<Product Id="*" Name="dovo" Language="1033" Version="1.0.19.0" Manufacturer="FrontMotion" UpgradeCode="6AB99C1C-FB94-4D60-942E-BD5D5A298B36">
+	<Product Id="*" Name="dovo" Language="1033" Version="@PROJECT_VERSION@" Manufacturer="FrontMotion" UpgradeCode="6AB99C1C-FB94-4D60-942E-BD5D5A298B36">
 		<Package InstallerVersion="300" Compressed="yes" InstallScope="perMachine" Platform="x64" />
 
 		<MajorUpgrade AllowDowngrades="yes" />
@@ -20,7 +20,7 @@
 			<ComponentRef Id="dovo.exe" />
 			<ComponentRef Id="ApplicationShortcut" />
 		</Feature>
-		
+
 		<WixVariable Id="WixUILicenseRtf" Value="license.rtf" />
 	</Product>
 
