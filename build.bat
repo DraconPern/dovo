@@ -18,7 +18,7 @@ git clone --branch=master --single-branch --depth=1 https://github.com/madler/zl
 cd zlib
 mkdir build-%TYPE%
 cd build-%TYPE%
-cmake.exe .. %GENERATOR% -DCMAKE_C_FLAGS_RELEASE="/MT /O2 /D NDEBUG" -DCMAKE_C_FLAGS_DEBUG="/D_DEBUG /MTd /Od" -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\zlib\%TYPE%
+cmake.exe .. %GENERATOR% -DCMAKE_C_FLAGS_RELEASE="/MT /O2" -DCMAKE_C_FLAGS_DEBUG="/MTd /Od" -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\zlib\%TYPE%
 msbuild /P:Configuration=%TYPE% INSTALL.vcxproj
 if ERRORLEVEL 1 exit /B %ERRORLEVEL%
 IF "%TYPE%" == "Release" copy /Y %DEVSPACE%\zlib\Release\lib\zlibstatic.lib %DEVSPACE%\zlib\Release\lib\zlib_o.lib
@@ -50,7 +50,7 @@ git clone --branch=v2.4.0 --single-branch --depth 1 https://github.com/uclouvain
 cd openjpeg
 mkdir build-%TYPE%
 cd build-%TYPE%
-cmake .. %GENERATOR% -DBUILD_THIRDPARTY=ON -DBUILD_SHARED_LIBS=OFF -DCMAKE_C_FLAGS_RELEASE="/MT /O2 /D NDEBUG" -DCMAKE_C_FLAGS_DEBUG="/D_DEBUG /MTd /Od" -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\openjpeg\%TYPE%
+cmake .. %GENERATOR% -DBUILD_THIRDPARTY=ON -DBUILD_SHARED_LIBS=OFF -DCMAKE_C_FLAGS_RELEASE="/MT /O2" -DCMAKE_C_FLAGS_DEBUG="/MTd /Od" -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\openjpeg\%TYPE%
 msbuild /P:Configuration=%TYPE% INSTALL.vcxproj
 if ERRORLEVEL 1 exit /B %ERRORLEVEL%
 
@@ -59,7 +59,7 @@ git clone --branch=master https://github.com/DraconPern/fmjpeg2koj.git
 cd fmjpeg2koj
 mkdir build-%TYPE%
 cd build-%TYPE%
-cmake .. %GENERATOR% -DBUILD_SHARED_LIBS=OFF -DCMAKE_CXX_FLAGS_RELEASE="/MT /O2 /D NDEBUG" -DCMAKE_CXX_FLAGS_DEBUG="/D_DEBUG /MTd /Od" -DOpenJPEG_ROOT=%DEVSPACE%\openjpeg\%TYPE% -DDCMTK_ROOT=%DEVSPACE%\dcmtk\%TYPE% -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\fmjpeg2koj\%TYPE%
+cmake .. %GENERATOR% -DBUILD_SHARED_LIBS=OFF -DCMAKE_CXX_FLAGS_RELEASE="/MT /O2" -DCMAKE_CXX_FLAGS_DEBUG="/MTd /Od" -DOpenJPEG_ROOT=%DEVSPACE%\openjpeg\%TYPE% -DDCMTK_ROOT=%DEVSPACE%\dcmtk\%TYPE% -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\fmjpeg2koj\%TYPE%
 msbuild /P:Configuration=%TYPE% INSTALL.vcxproj
 if ERRORLEVEL 1 exit /B %ERRORLEVEL%
 
@@ -75,18 +75,16 @@ IF "%TYPE%" == "Debug"   b2 %COMMONb2Flag% %BOOSTmodules% debug
 cd %DEVSPACE%
 git clone --branch=v3.1.6 --recurse-submodule https://github.com/wxWidgets/wxWidgets.git
 cd wxWidgets
-set WXWIN=%DEVSPACE%\wxWidgets
-cd %WXWIN%\build\msw
-copy /Y %WXWIN%\include\wx\msw\setup0.h %WXWIN%\include\wx\msw\setup.h
-powershell "gci . *.vcxproj -recurse | ForEach { (Get-Content $_ | ForEach {$_ -replace 'MultiThreadedDebugDLL', 'MultiThreadedDebug'}) | Set-Content $_ }"
-powershell "gci . *.vcxproj -recurse | ForEach { (Get-Content $_ | ForEach {$_ -replace 'MultiThreadedDLL', 'MultiThreaded'}) | Set-Content $_ }"
-msbuild /P:Configuration=%TYPE% /p:Platform="x64" wx_vc16.sln
+mkdir build-%TYPE%
+cd build-%TYPE%
+cmake .. %GENERATOR% -DwxBUILD_SHARED=FALSE -DwxUSE_ZLIB=OFF -DwxUSE_LIBTIFF=OFF -DwxUSE_LIBPNG=OFF -DwxUSE_ARTPROVIDER_TANGO=OFF -DwxUSE_SVG=OFF -DCMAKE_CXX_FLAGS_RELEASE="/MT /O2" -DCMAKE_CXX_FLAGS_DEBUG="/MTd /Od" -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\wxWidgets\%TYPE%
+msbuild /P:Configuration=%TYPE% INSTALL.vcxproj
 if ERRORLEVEL 1 exit /B %ERRORLEVEL%
 
 cd %BUILD_DIR%
 mkdir build-%TYPE%
 cd build-%TYPE%
-cmake .. %GENERATOR% -DwxWidgets_ROOT_DIR=%WXWIN% -DBoost_ROOT=%DEVSPACE%\boost -DDCMTK_ROOT=%DEVSPACE%\dcmtk\%TYPE% -DZLIB_ROOT=%DEVSPACE%\zlib\%TYPE% -Dfmjpeg2k_ROOT=%DEVSPACE%\fmjpeg2koj\%TYPE% -DOpenJPEG_ROOT=%DEVSPACE%\openjpeg\%TYPE% -DVLD="C:\Program Files (x86)\Visual Leak Detector"
+cmake .. %GENERATOR% -DwxWidgets_ROOT_DIR=%DEVSPACE%\wxWidgets\%TYPE% -DBoost_ROOT=%DEVSPACE%\boost -DDCMTK_ROOT=%DEVSPACE%\dcmtk\%TYPE% -DZLIB_ROOT=%DEVSPACE%\zlib\%TYPE% -Dfmjpeg2k_ROOT=%DEVSPACE%\fmjpeg2koj\%TYPE% -DOpenJPEG_ROOT=%DEVSPACE%\openjpeg\%TYPE% -DVLD="C:\Program Files (x86)\Visual Leak Detector"
 msbuild /P:Configuration=%TYPE% ALL_BUILD.vcxproj
 if ERRORLEVEL 1 exit /B %ERRORLEVEL%
 
