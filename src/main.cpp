@@ -14,6 +14,9 @@
 #endif
 
 #include <boost/thread.hpp>
+#include <boost/filesystem.hpp>
+#include "dovo_about.h"
+#include "dcm2img.h"
 
 class MyApp: public wxApp
 {
@@ -44,6 +47,11 @@ BEGIN_EVENT_TABLE(MyApp, wxApp)
 	wxConfig::Get()->SetAppName("dovo");
 	wxConfig::Get()->SetVendorName("FrontMotion");
 
+	boost::filesystem::path::codecvt();  // ensure VC++ does not race during initialization.
+
+	// check for update in background and save result for next run
+	updater = boost::thread(&updateChecker);
+
 	// see if there's a new version. Note that we just look at what we downloaded on a previous run
 	wxString json = wxConfig::Get()->Read("/Settings/UpdateInfo");
 
@@ -51,16 +59,9 @@ BEGIN_EVENT_TABLE(MyApp, wxApp)
 	if(informUserOfUpdate(json.ToUTF8().data()))
 	{
 		// we need to exit...
-		// get update w/o threading since no window is up anyways
-		updateChecker();
 		m_shouldExit = 1;
 		return true;
 	}
-
-	boost::filesystem::path::codecvt();  // ensure VC++ does not race during initialization.
-
-	// check for update	in background and save result for next run
-	updater = boost::thread(&updateChecker);
 
 	RegisterCodecs();
 
