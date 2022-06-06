@@ -1160,24 +1160,6 @@
                             <property name="border">5</property>
                             <property name="flag">wxEXPAND</property>
                             <property name="proportion">0</property>
-                            <object class="wxFlexGridSizer" expanded="0">
-                                <property name="cols">3</property>
-                                <property name="flexible_direction">wxHORIZONTAL</property>
-                                <property name="growablecols">1</property>
-                                <property name="growablerows"></property>
-                                <property name="hgap">0</property>
-                                <property name="minimum_size"></property>
-                                <property name="name">fgSizer1</property>
-                                <property name="non_flexible_grow_mode">wxFLEX_GROWMODE_NONE</property>
-                                <property name="permission">none</property>
-                                <property name="rows">2</property>
-                                <property name="vgap">0</property>
-                            </object>
-                        </object>
-                        <object class="sizeritem" expanded="0">
-                            <property name="border">5</property>
-                            <property name="flag">wxEXPAND</property>
-                            <property name="proportion">0</property>
                             <object class="wxGridBagSizer" expanded="0">
                                 <property name="empty_cell_size"></property>
                                 <property name="flexible_direction">wxHORIZONTAL</property>
@@ -2739,7 +2721,7 @@
                 </object>
             </object>
         </object>
-        <object class="Dialog" expanded="1">
+        <object class="Dialog" expanded="0">
             <property name="aui_managed">0</property>
             <property name="aui_manager_style">wxAUI_MGR_DEFAULT</property>
             <property name="bg"></property>
@@ -2766,7 +2748,7 @@
             <property name="window_extra_style"></property>
             <property name="window_name"></property>
             <property name="window_style"></property>
-            <object class="wxBoxSizer" expanded="1">
+            <object class="wxBoxSizer" expanded="0">
                 <property name="minimum_size"></property>
                 <property name="name">bSizer28</property>
                 <property name="orient">wxVERTICAL</property>
@@ -3359,11 +3341,11 @@
                         </object>
                     </object>
                 </object>
-                <object class="sizeritem" expanded="1">
+                <object class="sizeritem" expanded="0">
                     <property name="border">5</property>
                     <property name="flag">wxEXPAND</property>
                     <property name="proportion">1</property>
-                    <object class="wxBoxSizer" expanded="1">
+                    <object class="wxBoxSizer" expanded="0">
                         <property name="minimum_size"></property>
                         <property name="name">bSizer311</property>
                         <property name="orient">wxHORIZONTAL</property>

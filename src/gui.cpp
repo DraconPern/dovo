@@ -183,15 +183,6 @@ mainFrame::mainFrame( wxWindow* parent, wxWindowID id, const wxString& title, co
 	wxBoxSizer* bSizer16;
 	bSizer16 = new wxBoxSizer( wxVERTICAL );
 
-	wxFlexGridSizer* fgSizer1;
-	fgSizer1 = new wxFlexGridSizer( 2, 3, 0, 0 );
-	fgSizer1->AddGrowableCol( 1 );
-	fgSizer1->SetFlexibleDirection( wxHORIZONTAL );
-	fgSizer1->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_NONE );
-
-
-	bSizer16->Add( fgSizer1, 0, wxEXPAND, 5 );
-
 	wxGridBagSizer* gbSizer1;
 	gbSizer1 = new wxGridBagSizer( 0, 0 );
 	gbSizer1->SetFlexibleDirection( wxHORIZONTAL );
