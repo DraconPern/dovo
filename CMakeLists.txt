@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 
-project(dovo VERSION 1.0.19)
+project(dovo VERSION 1.0.20)
 
 add_definitions(-DDOVO_VERSION="${PROJECT_VERSION}")
 
@@ -91,13 +91,9 @@ set(dovo_SRCS
 if(WIN32)
   set(dovo_SRCS ${dovo_SRCS} src/win/dovo.rc src/win/version.rc src/win/dovo.manifest)
 
-  string(REPLACE "." "," VER_FILEVERSION ${PROJECT_VERSION})
+  string(REPLACE "." "," RC_DOVO_VERSION ${PROJECT_VERSION})
 
-  add_definitions(-DVER_FILEVERSION=${VER_FILEVERSION})
-  add_definitions(-DVER_FILEVERSION_STR="${PROJECT_VERSION}")
-  add_definitions(-DVER_PRODUCTVERSION=${VER_FILEVERSION})
-  add_definitions(-DVER_PRODUCTVERSION_STR="${PROJECT_VERSION}")
-
+  add_definitions(-DRC_DOVO_VERSION=${RC_DOVO_VERSION})
 endif()
 
 if(APPLE)

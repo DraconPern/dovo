@@ -7,8 +7,8 @@
 #endif
 
 VS_VERSION_INFO VERSIONINFO
-FILEVERSION    	VER_FILEVERSION
-PRODUCTVERSION 	VER_PRODUCTVERSION
+FILEVERSION    	RC_DOVO_VERSION
+PRODUCTVERSION 	RC_DOVO_VERSION
 FILEFLAGSMASK  	VS_FFI_FILEFLAGSMASK
 FILEOS         	VOS__WINDOWS32
 FILETYPE       	VFT_APP
@@ -20,14 +20,14 @@ BEGIN
         BEGIN
             VALUE "CompanyName",      "FrontMotion"
             VALUE "FileDescription",  "dovo"
-            VALUE "FileVersion",      VER_FILEVERSION_STR
+            VALUE "FileVersion",      DOVO_VERSION
             VALUE "InternalName",     "dovo"
             VALUE "LegalCopyright",   "Copyright (c) Ing-Long Eric Kuo"
             VALUE "LegalTrademarks1", ""
             VALUE "LegalTrademarks2", ""
             VALUE "OriginalFilename", "dovo"
             VALUE "ProductName",      "dovo"
-            VALUE "ProductVersion",   VER_PRODUCTVERSION_STR
+            VALUE "ProductVersion",   DOVO_VERSION
         END
     END
 

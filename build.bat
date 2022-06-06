@@ -77,7 +77,9 @@ git clone --branch=v3.1.6 --recurse-submodule https://github.com/wxWidgets/wxWid
 cd wxWidgets
 mkdir build-%TYPE%
 cd build-%TYPE%
-cmake .. %GENERATOR% -DwxBUILD_SHARED=FALSE -DwxUSE_ZLIB=OFF -DwxUSE_LIBTIFF=OFF -DwxUSE_LIBPNG=OFF -DwxUSE_ARTPROVIDER_TANGO=OFF -DwxUSE_SVG=OFF -DCMAKE_CXX_FLAGS_RELEASE="/MT /O2" -DCMAKE_CXX_FLAGS_DEBUG="/MTd /Od" -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\wxWidgets\%TYPE%
+cmake .. %GENERATOR% -DwxBUILD_SHARED=FALSE -DwxUSE_ZLIB=OFF -DwxUSE_LIBTIFF=OFF -DwxUSE_LIBPNG=OFF -DwxUSE_ARTPROVIDER_TANGO=OFF -DwxUSE_SVG=OFF -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\wxWidgets\%TYPE%
+powershell "gci . *.vcxproj -recurse | ForEach { (Get-Content $_.FullName | ForEach {$_ -replace 'MultiThreadedDebugDLL', 'MultiThreadedDebug'}) | Set-Content $_.FullName }"
+powershell "gci . *.vcxproj -recurse | ForEach { (Get-Content $_.FullName | ForEach {$_ -replace 'MultiThreadedDLL', 'MultiThreaded'}) | Set-Content $_.FullName }"
 msbuild /P:Configuration=%TYPE% INSTALL.vcxproj
 if ERRORLEVEL 1 exit /B %ERRORLEVEL%
 
