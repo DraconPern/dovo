@@ -36,11 +36,14 @@ public:
 wxIMPLEMENT_APP(MyApp);
 
 BEGIN_EVENT_TABLE(MyApp, wxApp)
-	EVT_MENU(wxID_ABOUT, MyApp::OnAbout)
-	END_EVENT_TABLE()
+EVT_MENU(wxID_ABOUT, MyApp::OnAbout)
+END_EVENT_TABLE()
 
-	bool MyApp::OnInit()
+bool MyApp::OnInit()
 {
+	if (!wxApp::OnInit())
+		return false;
+		
 	wxTheApp->SetAppName("dovo");
 	wxTheApp->SetVendorName("FrontMotion");
 
@@ -84,6 +87,7 @@ BEGIN_EVENT_TABLE(MyApp, wxApp)
 #endif
 
 	frame->Show( true );
+	SetTopWindow(frame);
 
 	return true;
 }
