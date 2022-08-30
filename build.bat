@@ -37,11 +37,21 @@ IF "%TYPE%" == "Debug"   copy /Y %DEVSPACE%\libiconv\Debug\lib\libiconv.lib %DEV
 IF "%TYPE%" == "Release" copy /Y %DEVSPACE%\libiconv\Release\lib\libiconv.lib %DEVSPACE%\libiconv\Release\lib\libiconv_o.lib
 
 cd %DEVSPACE%
+git clone https://github.com/openssl/openssl.git --branch OpenSSL_1_1_1-stable --single-branch --depth 1
+cd openssl
+SET OLDPATH=%PATH%
+IF "%TYPE%" == "Release" perl Configure -D_CRT_SECURE_NO_WARNINGS=1 no-asm no-shared --openssldir=%DEVSPACE%\openssl\Release --prefix=%DEVSPACE%\openssl\Release %OPENSSLFLAG%
+IF "%TYPE%" == "Debug"   perl Configure -D_CRT_SECURE_NO_WARNINGS=1 no-asm no-shared --openssldir=%DEVSPACE%\openssl\Debug --prefix=%DEVSPACE%\openssl\Debug %OPENSSLFLAG%
+nmake install
+SET OPENSSL_ROOT_DIR=%DEVSPACE%\openssl\%TYPE%
+SET PATH=%OLDPATH%
+
+cd %DEVSPACE%
 git clone --branch=DCMTK-3.6.5 https://github.com/DCMTK/dcmtk.git
 cd dcmtk
 mkdir build-%TYPE%
 cd build-%TYPE%
-cmake .. %GENERATOR% -DDCMTK_WIDE_CHAR_FILE_IO_FUNCTIONS=1 -DCMAKE_CXX_FLAGS_RELEASE="/Zi" -DDCMTK_WITH_ZLIB=1 -DWITH_ZLIBINC=%DEVSPACE%\zlib\%TYPE% -DDCMTK_WITH_ICONV=1 -DWITH_LIBICONVINC=%DEVSPACE%\libiconv\%TYPE% -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\dcmtk\%TYPE%
+cmake .. %GENERATOR% -DDCMTK_WIDE_CHAR_FILE_IO_FUNCTIONS=1 -DCMAKE_CXX_FLAGS_RELEASE="/Zi" -DDCMTK_WITH_ZLIB=1 -DDCMTK_WITH_OPENSSL=0 -DWITH_ZLIBINC=%DEVSPACE%\zlib\%TYPE% -DDCMTK_WITH_ICONV=1 -DWITH_LIBICONVINC=%DEVSPACE%\libiconv\%TYPE% -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\dcmtk\%TYPE%
 msbuild /P:Configuration=%TYPE% INSTALL.vcxproj
 if ERRORLEVEL 1 exit /B %ERRORLEVEL%
 
@@ -71,6 +81,9 @@ SET COMMONb2Flag=%BOOSTTOOLSET% %BOOSTADDRESSMODEL% runtime-link=static define=_
 SET BOOSTmodules=--with-locale --with-atomic --with-thread --with-filesystem --with-system --with-date_time --with-regex
 IF "%TYPE%" == "Release" b2 %COMMONb2Flag% %BOOSTmodules% release
 IF "%TYPE%" == "Debug"   b2 %COMMONb2Flag% %BOOSTmodules% debug
+
+cd %DEVSPACE%
+git clone https://github.com/laudrup/boost-wintls.git
 
 cd %DEVSPACE%
 git clone --branch=v3.1.6 --recurse-submodule https://github.com/wxWidgets/wxWidgets.git

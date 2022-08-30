@@ -104,7 +104,7 @@ void dovo_mainFrame::OnUpdate( wxCommandEvent& event )
 	// show and wait for thread to end.
 	dlg.ShowModal();
 	
-	m_engine.patientdata.GetPatients(boost::bind(&dovo_mainFrame::fillpatientscallback, this, _1));
+	m_engine.patientdata.GetPatients(boost::bind(&dovo_mainFrame::fillpatientscallback, this, boost::placeholders::_1));
 	m_patients->SetColumnWidth(0, wxLIST_AUTOSIZE);
 	m_patients->SetColumnWidth(1, wxLIST_AUTOSIZE);
 	m_patients->SetColumnWidth(2, wxLIST_AUTOSIZE);
@@ -131,7 +131,7 @@ void dovo_mainFrame::OnPatientsSelected( wxListEvent& event )
 	m_series->DeleteAllItems();
 	m_instances->DeleteAllItems();
 
-	m_engine.patientdata.GetStudies(m_patients->GetItemText(item, 0).ToUTF8().data(), m_patients->GetItemText(item, 1).ToUTF8().data(), boost::bind(&dovo_mainFrame::fillstudiescallback, this, _1));
+	m_engine.patientdata.GetStudies(m_patients->GetItemText(item, 0).ToUTF8().data(), m_patients->GetItemText(item, 1).ToUTF8().data(), boost::bind(&dovo_mainFrame::fillstudiescallback, this, boost::placeholders::_1));
 
 	if(m_studies->GetItemCount() > 0)
 	{
@@ -181,7 +181,7 @@ void dovo_mainFrame::OnStudiesSelected( wxListEvent& event )
 	m_series->DeleteAllItems();
 	m_instances->DeleteAllItems();
 
-	m_engine.patientdata.GetSeries(m_studies->GetItemText(item, 2).ToUTF8().data(), boost::bind(&dovo_mainFrame::fillseriescallback, this, _1, &entries));
+	m_engine.patientdata.GetSeries(m_studies->GetItemText(item, 2).ToUTF8().data(), boost::bind(&dovo_mainFrame::fillseriescallback, this, boost::placeholders::_1, &entries));
 
 	int j = 0;
 	for(naturalstringmap::iterator ii = entries.begin(); ii != entries.end(); ++ii)
@@ -214,7 +214,7 @@ void dovo_mainFrame::OnSeriesSelected( wxListEvent& event )
 	naturalpathmap entries;
 
 	m_instances->DeleteAllItems();
-	m_engine.patientdata.GetInstances(m_series->GetItemText(item, 1).ToUTF8().data(), boost::bind(&dovo_mainFrame::fillinstancescallback, this, _1, &entries));
+	m_engine.patientdata.GetInstances(m_series->GetItemText(item, 1).ToUTF8().data(), boost::bind(&dovo_mainFrame::fillinstancescallback, this, boost::placeholders::_1, &entries));
 
 	int j = 0;
 	for(naturalpathmap::iterator ii = entries.begin(); ii != entries.end(); ++ii)
@@ -328,7 +328,7 @@ void dovo_mainFrame::OnQuickSend(wxCommandEvent& event)
 	// show and wait for thread to end.
 	int search_status = search_dlg.ShowModal();
 
-	m_engine.patientdata.GetPatients(boost::bind(&dovo_mainFrame::fillpatientscallback, this, _1));
+	m_engine.patientdata.GetPatients(boost::bind(&dovo_mainFrame::fillpatientscallback, this, boost::placeholders::_1));
 	m_patients->SetColumnWidth(0, wxLIST_AUTOSIZE);
 	m_patients->SetColumnWidth(1, wxLIST_AUTOSIZE);
 	m_patients->SetColumnWidth(2, wxLIST_AUTOSIZE);

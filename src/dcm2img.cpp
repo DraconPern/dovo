@@ -16,13 +16,11 @@
 #include "dcmtk/dcmdata/dctk.h"
 #include "dcmtk/dcmimgle/dcmimage.h"
 #include "dcmtk/dcmimage/diregist.h" // register support for color
-
-#include "dcmtk/dcmdata/dcrledrg.h"	// rle decoder
 #include "dcmtk/dcmjpeg/djdecode.h"	// jpeg decoder
 #include "dcmtk/dcmjpeg/djencode.h" 
 #include "dcmtk/dcmjpls/djdecode.h"	// jpeg-ls decoder
 #include "dcmtk/dcmjpls/djencode.h" 
-#include "dcmtk/dcmdata/dcrledrg.h" 
+#include "dcmtk/dcmdata/dcrledrg.h"	// rle
 #include "dcmtk/dcmdata/dcrleerg.h" 
 #include "fmjpeg2k/djencode.h"
 #include "fmjpeg2k/djdecode.h"

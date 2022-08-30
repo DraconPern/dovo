@@ -71,7 +71,7 @@ protected:
 	std::string PatientID;
 	std::string PatientName;
 	std::string studyuid, seriesuid;
-	bool changeinfo;	
+	bool changeinfo = false;
 	std::string NewPatientID;
 	std::string NewPatientName;
 	std::string NewBirthDay;
@@ -105,8 +105,8 @@ protected:
 
 DICOMSenderImpl::DICOMSenderImpl(PatientData &patientdata) 
 	: patientdata(patientdata)
-{			
-	cancelEvent = doneEvent = false;
+{
+	cancelEvent = doneEvent = changeinfo = false;
 }
 
 DICOMSenderImpl::~DICOMSenderImpl()
@@ -332,13 +332,13 @@ void DICOMSenderImpl::DoSendPatient(std::string PatientID, std::string PatientNa
 	msg.str("");
 
 	// get a list of files
-	patientdata.GetStudies(PatientID, PatientName, boost::bind(&DICOMSenderImpl::fillstudies, this, _1));
+	patientdata.GetStudies(PatientID, PatientName, boost::bind(&DICOMSenderImpl::fillstudies, this, boost::placeholders::_1));
 	for (std::vector<std::string>::iterator it = studies.begin() ; it != studies.end(); ++it)
 	{
-		patientdata.GetSeries(*it, boost::bind(&DICOMSenderImpl::fillseries, this, _1));
+		patientdata.GetSeries(*it, boost::bind(&DICOMSenderImpl::fillseries, this, boost::placeholders::_1));
 		for (std::vector<std::string>::iterator it2 = series.begin() ; it2 != series.end(); ++it2)
 		{
-			patientdata.GetInstances(*it2, boost::bind(&DICOMSenderImpl::fillinstances, this, _1, &instances));
+			patientdata.GetInstances(*it2, boost::bind(&DICOMSenderImpl::fillinstances, this, boost::placeholders::_1, &instances));
 		}
 	}
 			
@@ -354,10 +354,10 @@ void DICOMSenderImpl::DoSendStudy(std::string studyuid, bool changeinfo, std::st
 	msg.str("");
 
 	// get a list of files	
-	patientdata.GetSeries(studyuid, boost::bind(&DICOMSenderImpl::fillseries, this, _1));
+	patientdata.GetSeries(studyuid, boost::bind(&DICOMSenderImpl::fillseries, this, boost::placeholders::_1));
 	for (std::vector<std::string>::iterator it2 = series.begin(); it2 != series.end(); ++it2)
 	{
-		patientdata.GetInstances(*it2, boost::bind(&DICOMSenderImpl::fillinstances, this, _1, &instances));
+		patientdata.GetInstances(*it2, boost::bind(&DICOMSenderImpl::fillinstances, this, boost::placeholders::_1, &instances));
 	}
 	
 
@@ -373,11 +373,11 @@ void DICOMSenderImpl::DoSendSeries(std::string studyuid, std::string seriesuid, 
 	msg.str("");
 
 	// get a list of files		
-	patientdata.GetSeries(studyuid, boost::bind(&DICOMSenderImpl::fillseries, this, _1));
+	patientdata.GetSeries(studyuid, boost::bind(&DICOMSenderImpl::fillseries, this, boost::placeholders::_1));
 	for (std::vector<std::string>::iterator it2 = series.begin(); it2 != series.end(); ++it2)
 	{
 		if(*it2 == seriesuid)
-			patientdata.GetInstances(*it2, boost::bind(&DICOMSenderImpl::fillinstances, this, _1, &instances));
+			patientdata.GetInstances(*it2, boost::bind(&DICOMSenderImpl::fillinstances, this, boost::placeholders::_1, &instances));
 	}
 
 	DoSendStuff();
@@ -391,7 +391,7 @@ void DICOMSenderImpl::DoQuickSend()
 	msg.str("");
 
 	// get a list of files
-	patientdata.GetInstances(boost::bind(&DICOMSenderImpl::fillinstances, this, _1, &instances));
+	patientdata.GetInstances(boost::bind(&DICOMSenderImpl::fillinstances, this, boost::placeholders::_1, &instances));
 
 	DoSendStuff();
 }
@@ -477,17 +477,9 @@ class MyDcmSCU: public DcmSCU
 {
 public:
 	MyDcmSCU(DICOMSenderImpl &sender) : sender(sender) {}
-	bool newtransfer;
 protected:
 	virtual void notifySENDProgress(const unsigned long byteCount)
 	{
-		/*if(newtransfer)
-		{
-			sender.WriteLog("|");
-			newtransfer = false;
-		}
-		else
-			sender.WriteLog(".");*/
 	}
 
 	DICOMSenderImpl &sender;	
@@ -549,7 +541,6 @@ int DICOMSenderImpl::SendABatch()
 		std::stringstream msg;
 		msg << "Sending file: " << itr->second << "\n";
 		log.Write(msg);
-		scu.newtransfer = true;
 
 		// load file
 		DcmFileFormat dcmff;
@@ -584,8 +575,6 @@ int DICOMSenderImpl::SendABatch()
 		{		
 			itr++;
 		}
-		/*if(!scu.newtransfer)
-			log.Write("|");*/
 		
 		log.Write("\n");
 	}

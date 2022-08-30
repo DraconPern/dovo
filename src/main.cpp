@@ -17,8 +17,9 @@
 #include <boost/filesystem.hpp>
 #include "dovo_about.h"
 #include "dcm2img.h"
+#include <boost/asio/ssl.hpp>
 
-class MyApp: public wxApp
+class MyApp: public wxApp 
 {
 public:
 	virtual bool OnInit();
@@ -30,7 +31,7 @@ public:
     void OnAbout(wxCommandEvent& evt);
 
 	boost::thread updater;
-	int m_shouldExit;
+	bool m_shouldExit = false;
 };
 
 wxIMPLEMENT_APP(MyApp);
@@ -51,6 +52,7 @@ bool MyApp::OnInit()
 	wxConfig::Get()->SetVendorName("FrontMotion");
 
 	boost::filesystem::path::codecvt();  // ensure VC++ does not race during initialization.
+	boost::asio::ssl::detail::openssl_init<> _openssl_init;
 
 	// check for update in background and save result for next run
 	updater = boost::thread(&updateChecker);
@@ -58,11 +60,11 @@ bool MyApp::OnInit()
 	// see if there's a new version. Note that we just look at what we downloaded on a previous run
 	wxString json = wxConfig::Get()->Read("/Settings/UpdateInfo");
 
-	m_shouldExit = 0;
+	m_shouldExit = false;
 	if(informUserOfUpdate(json.ToUTF8().data()))
 	{
 		// we need to exit...
-		m_shouldExit = 1;
+		m_shouldExit = true;
 		return true;
 	}
 
@@ -108,7 +110,7 @@ void MyApp::OnAbout(wxCommandEvent& evt)
 
 int MyApp::OnRun()
 {
-	if(m_shouldExit == 0)	// run normal code if we aren't exiting immediatly
+	if(!m_shouldExit)	// run normal code if we aren't exiting immediatly
         wxApp::OnRun();
 
     return m_shouldExit;

@@ -13,5 +13,5 @@ void dovo_updateCheck::updateCheckOnInitDialog( wxInitDialogEvent& event )
 		m_needtoupgrade->SetLabel(m_updatetext);
 
 	m_remoteversion->SetLabel(m_version);
-	m_remotemessage->SetLabel(m_message);
+	*m_remotemessage << m_message;
 }

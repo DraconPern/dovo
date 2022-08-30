@@ -8,7 +8,7 @@ set (CMAKE_CXX_STANDARD 11)
 
 if(WIN32)
 	#VC++ stuff
-	add_definitions(-D_WIN32_WINNT=0x0501)
+	add_definitions(-D_WIN32_WINNT=0x0601)
 	add_definitions(-D_UNICODE)
 	add_definitions(-D_BIND_TO_CURRENT_VCLIBS_VERSION=1)
 	set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
@@ -36,13 +36,15 @@ add_definitions(-DOPJ_STATIC)
 #include fmjpeg2koj
 find_package(fmjpeg2k REQUIRED)
 
+find_package(OpenSSL REQUIRED)
+
 set(wxWidgets_USE_STATIC   ON)
 #define this so that wxWidgets doesn't define it. Conflicts w/ dcmtk's declaration
 #add_definitions(-DHAVE_SSIZE_T)
 find_package(wxWidgets COMPONENTS core base adv REQUIRED)
 include(${wxWidgets_USE_FILE})
 
-INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/sqlite3 ${Boost_INCLUDE_DIRS} ${FMJPEG2K_INCLUDE_DIRS} ${DCMTK_INCLUDE_DIRS} ${VLD}/include)
+INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/sqlite3 ${Boost_INCLUDE_DIRS} ${OPENSSL_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/boost-wintls/include ${FMJPEG2K_INCLUDE_DIRS} ${DCMTK_INCLUDE_DIRS} ${VLD}/include)
 LINK_DIRECTORIES(${FMJPEG2K}/lib ${Boost_LIBRARY_DIRS}  ${VLD}/lib/Win64)
 
 set(dovo_HEADERS
@@ -64,6 +66,7 @@ set(dovo_HEADERS
 	src/dcm2img.h
 	src/update.h
 	src/alphanum.hpp
+	src/fetch.h
 )
 
 set(dovo_SRCS
@@ -86,6 +89,7 @@ set(dovo_SRCS
 	src/dicomsender.cpp
 	src/dcm2img.cpp
 	src/update.cpp
+	src/fetch.cpp
 )
 
 if(WIN32)
@@ -103,7 +107,7 @@ endif()
 ADD_EXECUTABLE(dovo WIN32 MACOSX_BUNDLE ${dovo_SRCS})
 
 IF(WIN32)
-  SET(OS_SPECIFIC_LIBS netapi32 wsock32 odbc32 Rpcrt4)
+  SET(OS_SPECIFIC_LIBS netapi32 wsock32 odbc32 Rpcrt4 Crypt32)
 ELSE()
   IF(APPLE)
   ELSE()
@@ -125,6 +129,7 @@ TARGET_LINK_LIBRARIES(dovo
 	${DCMTK_LIBRARIES}
 	${wxWidgets_LIBRARIES}
 	${Boost_LIBRARIES}
+	${OPENSSL_LIBRARIES}
 	${OS_SPECIFIC_LIBS}
 	)
 

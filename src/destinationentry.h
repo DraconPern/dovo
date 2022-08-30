@@ -19,7 +19,7 @@ public:
 
 	std::string name;
 	std::string destinationHost;
-	int destinationPort;
+	int destinationPort = 0;
 	std::string destinationAETitle;
 	std::string ourAETitle;
 };

@@ -27,8 +27,6 @@ class dovo_sendStatus : public sendStatus
 		wxTimer timer;
 		void OnTimer( wxTimerEvent& event );
 		DICOMSender *m_sender;
-
-
 };
 
 #endif // __dovo_sendStatus__

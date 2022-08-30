@@ -2,7 +2,7 @@
 
 dovo_sendStatus::dovo_sendStatus( wxWindow* parent )
 	:
-	sendStatus( parent )
+	sendStatus( parent ), m_sender(NULL)
 {
 	timer.Connect(wxEVT_TIMER, wxTimerEventHandler( dovo_sendStatus::OnTimer ), NULL, this );
 	timer.Start(200);
