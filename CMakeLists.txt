@@ -23,7 +23,7 @@ find_package(Boost REQUIRED thread filesystem system regex date_time)
 if(WIN32)
 	#enable dcmtk filename to have wide version, only affects WIN32.  http://utf8everywhere.org/
 	add_definitions(-DDCMTK_WIDE_CHAR_FILE_IO_FUNCTIONS=1)
-endif(WIN32)
+endif()
 find_package(DCMTK REQUIRED)
 
 #include zlib

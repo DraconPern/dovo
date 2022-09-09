@@ -17,13 +17,10 @@ cd $DEVSPACE
 [[ -d openssl ]] || git clone https://github.com/openssl/openssl.git --branch OpenSSL_1_1_1-stable --single-branch --depth 1
 cd openssl
 git pull
-if [ "$unamestr" == 'Darwin' ] ; then
 ./Configure darwin64-x86_64-cc  --prefix=$DEVSPACE/openssl/$TYPE --openssldir=$DEVSPACE/openssl/$TYPE/openssl no-shared
-else
-./config --prefix=$DEVSPACE/openssl/$TYPE --openssldir=$DEVSPACE/openssl/$TYPE/openssl no-shared
-fi
 make install
 export OPENSSL_ROOT_DIR=$DEVSPACE/openssl/$TYPE
+# [ "$unamestr" == 'Darwin' ]
 fi
 
 cd $DEVSPACE
@@ -67,11 +64,7 @@ cd $DEVSPACE
 cd wxWidgets
 mkdir -p build$TYPE
 cd build$TYPE
-if [ "$unamestr" = "Darwin" ] ; then
-  COMMONwxWidgetsFlag=(--disable-shared --enable-utf8)
-elif [ "$unamestr" = "Linux" ] ; then
-  COMMONwxWidgetsFlag=(--disable-shared --enable-utf8)
-fi
+ COMMONwxWidgetsFlag=(--disable-shared --enable-utf8)
 if [ "$TYPE" = "Release" ] ; then
   ../configure "${COMMONwxWidgetsFlag[@]}"
 elif [ "$TYPE" = "Debug" ] ; then
