@@ -3,6 +3,8 @@
 #include <map>
 #include "alphanum.hpp"
 
+wxDEFINE_EVENT(UPDATE_ONSTART_EVENT, wxCommandEvent);
+
 dovo_mainFrame::dovo_mainFrame( wxWindow* parent )
 	:
 	mainFrame( parent )
@@ -41,6 +43,15 @@ dovo_mainFrame::dovo_mainFrame( wxWindow* parent )
 	m_destination->SetStringSelection(wxConfig::Get()->Read("/Settings/LastDestination"));
 
 	image.Create(1, 1);
+
+	// check
+	if (boost::filesystem::exists(boost::filesystem::current_path() / "DICOMDIR"))
+	{
+		m_directory->SetValue(boost::filesystem::current_path().c_str());
+		Bind(UPDATE_ONSTART_EVENT, &dovo_mainFrame::OnUpdate, this);
+		wxCommandEvent* event = new wxCommandEvent(UPDATE_ONSTART_EVENT, GetId());
+		QueueEvent(event);
+	}
 }
 
 dovo_mainFrame::~dovo_mainFrame()
