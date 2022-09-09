@@ -4,7 +4,12 @@ project(dovo VERSION 1.0.20)
 
 add_definitions(-DDOVO_VERSION="${PROJECT_VERSION}")
 
-set (CMAKE_CXX_STANDARD 11)
+if(WIN32 OR APPLE)
+set(CMAKE_CXX_STANDARD 11)
+else()
+#ubuntu 22.04
+set(CMAKE_CXX_STANDARD 17)
+endif()
 
 if(WIN32)
 	#VC++ stuff
@@ -17,7 +22,9 @@ endif()
 
 set(Boost_USE_STATIC_LIBS        ON)
 set(Boost_USE_MULTITHREADED      ON)
+if(WIN32 OR APPLE)
 set(Boost_USE_STATIC_RUNTIME     ON)
+endif()
 find_package(Boost REQUIRED thread filesystem system regex date_time)
 
 if(WIN32)

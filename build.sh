@@ -17,11 +17,7 @@ cd $DEVSPACE
 [[ -d openssl ]] || git clone https://github.com/openssl/openssl.git --branch OpenSSL_1_1_1-stable --single-branch --depth 1
 cd openssl
 git pull
-if [ "$unamestr" == 'Darwin' ] ; then
 ./Configure darwin64-x86_64-cc  --prefix=$DEVSPACE/openssl/$TYPE --openssldir=$DEVSPACE/openssl/$TYPE/openssl no-shared
-else
-./config --prefix=$DEVSPACE/openssl/$TYPE --openssldir=$DEVSPACE/openssl/$TYPE/openssl no-shared
-fi
 make install
 export OPENSSL_ROOT_DIR=$DEVSPACE/openssl/$TYPE
 fi
@@ -50,6 +46,7 @@ cd build-$TYPE
 cmake .. -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=$TYPE -DOpenJPEG_ROOT=$DEVSPACE/openjpeg/$TYPE -DDCMTK_ROOT=$DEVSPACE/dcmtk/$TYPE -DCMAKE_INSTALL_PREFIX=$DEVSPACE/fmjpeg2koj/$TYPE
 make -j8 install
 
+if [ "$unamestr" == 'Darwin' ] ; then
 cd $DEVSPACE
 [[ -d boost ]] || git clone --branch=boost-1.73.0 --recurse-submodules https://github.com/boostorg/boost.git
 cd boost
@@ -61,17 +58,14 @@ if [ "$TYPE" = "Release" ] ; then
 elif [ "$TYPE" = "Debug" ] ; then
   ./b2 $COMMONb2Flag $BOOSTModule variant=debug
 fi
+fi
 
 cd $DEVSPACE
 [[ -d wxWidgets ]] || git clone --branch=master --recurse-submodules https://github.com/wxWidgets/wxWidgets.git
 cd wxWidgets
 mkdir -p build$TYPE
 cd build$TYPE
-if [ "$unamestr" = "Darwin" ] ; then
-  COMMONwxWidgetsFlag=(--disable-shared --enable-utf8)
-elif [ "$unamestr" = "Linux" ] ; then
-  COMMONwxWidgetsFlag=(--disable-shared --enable-utf8)
-fi
+COMMONwxWidgetsFlag=(--disable-shared --enable-utf8)
 if [ "$TYPE" = "Release" ] ; then
   ../configure "${COMMONwxWidgetsFlag[@]}"
 elif [ "$TYPE" = "Debug" ] ; then
@@ -82,5 +76,5 @@ make -j8
 cd $BUILD_DIR
 mkdir -p build-$TYPE
 cd build-$TYPE
-cmake .. -DCMAKE_BUILD_TYPE=$TYPE -DwxWidgets_CONFIG_EXECUTABLE=$DEVSPACE/wxWidgets/build$TYPE/wx-config -DBoost_ROOT=$DEVSPACE/boost -DDCMTK_ROOT=$DEVSPACE/dcmtk/$TYPE -Dfmjpeg2k_ROOT=$DEVSPACE/fmjpeg2koj/$TYPE -DOpenJPEG_ROOT=$DEVSPACE/openjpeg/$TYPE
+cmake .. -DCMAKE_BUILD_TYPE=$TYPE -DwxWidgets_CONFIG_EXECUTABLE=$DEVSPACE/wxWidgets/build$TYPE/wx-config -DBOOST_ROOT=$DEVSPACE/boost -DDCMTK_ROOT=$DEVSPACE/dcmtk/$TYPE -Dfmjpeg2k_ROOT=$DEVSPACE/fmjpeg2koj/$TYPE -DOpenJPEG_ROOT=$DEVSPACE/openjpeg/$TYPE
 make -j8
