@@ -20,6 +20,7 @@ git pull
 ./Configure darwin64-x86_64-cc  --prefix=$DEVSPACE/openssl/$TYPE --openssldir=$DEVSPACE/openssl/$TYPE/openssl no-shared
 make install
 export OPENSSL_ROOT_DIR=$DEVSPACE/openssl/$TYPE
+# [ "$unamestr" == 'Darwin' ]
 fi
 
 cd $DEVSPACE

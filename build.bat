@@ -83,9 +83,6 @@ IF "%TYPE%" == "Release" b2 %COMMONb2Flag% %BOOSTmodules% release
 IF "%TYPE%" == "Debug"   b2 %COMMONb2Flag% %BOOSTmodules% debug
 
 cd %DEVSPACE%
-git clone https://github.com/laudrup/boost-wintls.git
-
-cd %DEVSPACE%
 git clone --branch=v3.1.6 --recurse-submodule https://github.com/wxWidgets/wxWidgets.git
 cd wxWidgets
 mkdir build-%TYPE%
