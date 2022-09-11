@@ -47,6 +47,7 @@ cd build-$TYPE
 cmake .. -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=$TYPE -DOpenJPEG_ROOT=$DEVSPACE/openjpeg/$TYPE -DDCMTK_ROOT=$DEVSPACE/dcmtk/$TYPE -DCMAKE_INSTALL_PREFIX=$DEVSPACE/fmjpeg2koj/$TYPE
 make -j8 install
 
+if [ "$unamestr" == 'Darwin' ] ; then
 cd $DEVSPACE
 [[ -d boost ]] || git clone --branch=boost-1.73.0 --recurse-submodules https://github.com/boostorg/boost.git
 cd boost
@@ -57,6 +58,7 @@ if [ "$TYPE" = "Release" ] ; then
   ./b2 $COMMONb2Flag $BOOSTModule variant=release
 elif [ "$TYPE" = "Debug" ] ; then
   ./b2 $COMMONb2Flag $BOOSTModule variant=debug
+fi
 fi
 
 cd $DEVSPACE
