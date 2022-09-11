@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.15)
 
+cmake_policy(SET CMP0048 NEW)
+
 project(dovo VERSION 1.0.20)
 
 add_definitions(-DDOVO_VERSION="${PROJECT_VERSION}")
@@ -102,7 +104,7 @@ set(dovo_SRCS
 if(WIN32)
   set(dovo_SRCS ${dovo_SRCS} src/win/dovo.rc src/win/version.rc src/win/dovo.manifest)
 
-  string(REPLACE "." "," RC_DOVO_VERSION ${PROJECT_VERSION})
+  string(REPLACE "." "," RC_DOVO_VERSION ${dovo_VERSION})
 
   add_definitions(-DRC_DOVO_VERSION=${RC_DOVO_VERSION})
 endif()
