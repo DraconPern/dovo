@@ -19,7 +19,6 @@ if(WIN32)
 	add_definitions(-D_UNICODE)
 	add_definitions(-D_BIND_TO_CURRENT_VCLIBS_VERSION=1)
 	set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-	set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /LTCG")
 endif()
 
 set(Boost_USE_STATIC_LIBS        ON)
@@ -45,6 +44,8 @@ add_definitions(-DOPJ_STATIC)
 #include fmjpeg2koj
 find_package(fmjpeg2k REQUIRED)
 
+set (OPENSSL_USE_STATIC_LIBS TRUE)
+set (OPENSSL_MSVC_STATIC_RT TRUE)
 find_package(OpenSSL REQUIRED)
 
 set(wxWidgets_USE_STATIC   ON)
