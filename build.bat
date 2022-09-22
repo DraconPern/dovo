@@ -46,9 +46,9 @@ SET OLDPATH=%PATH%
 IF "%TYPE%" == "Release" perl Configure -D_CRT_SECURE_NO_WARNINGS=1 no-asm no-shared --openssldir=%DEVSPACE%\openssl\Release --prefix=%DEVSPACE%\openssl\Release %OPENSSLFLAG%
 IF "%TYPE%" == "Debug"   perl Configure -D_CRT_SECURE_NO_WARNINGS=1 no-asm no-shared --openssldir=%DEVSPACE%\openssl\Debug --prefix=%DEVSPACE%\openssl\Debug %OPENSSLFLAG%
 nmake install
-SET OPENSSL_ROOT_DIR=%DEVSPACE%\openssl\%TYPE%
 SET PATH=%OLDPATH%
 :dontbuildssl
+SET OPENSSL_ROOT_DIR=%DEVSPACE%\openssl\%TYPE%
 
 cd %DEVSPACE%
 git clone --branch=DCMTK-3.6.5 https://github.com/DCMTK/dcmtk.git
