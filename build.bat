@@ -36,6 +36,9 @@ IF "%TYPE%" == "Debug"   copy /Y %DEVSPACE%\libiconv\Debug\lib\libiconv.lib %DEV
 IF "%TYPE%" == "Debug"   copy /Y %DEVSPACE%\libiconv\Debug\lib\libiconv.lib %DEVSPACE%\libiconv\Debug\lib\libiconv_d.lib
 IF "%TYPE%" == "Release" copy /Y %DEVSPACE%\libiconv\Release\lib\libiconv.lib %DEVSPACE%\libiconv\Release\lib\libiconv_o.lib
 
+if DEFINED FORCEBUILD goto buildssl
+if EXIST "%DEVSPACE%\openssl\%TYPE%\lib\libcrypto.lib" goto dontbuildssl
+:buildssl
 cd %DEVSPACE%
 git clone https://github.com/openssl/openssl.git --branch OpenSSL_1_1_1-stable --single-branch --depth 1
 cd openssl
@@ -45,6 +48,7 @@ IF "%TYPE%" == "Debug"   perl Configure -D_CRT_SECURE_NO_WARNINGS=1 no-asm no-sh
 nmake install
 SET OPENSSL_ROOT_DIR=%DEVSPACE%\openssl\%TYPE%
 SET PATH=%OLDPATH%
+:dontbuildssl
 
 cd %DEVSPACE%
 git clone --branch=DCMTK-3.6.5 https://github.com/DCMTK/dcmtk.git
