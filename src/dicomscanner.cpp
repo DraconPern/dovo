@@ -38,15 +38,23 @@ DICOMFileScanner::~DICOMFileScanner()
 
 void DICOMFileScanner::ScanFile(boost::filesystem::path path)
 {
+	std::string extension = path.extension().string();
+	if (extension == "exe" || extension == "dll")
+		return;
+
+	std::string filename = path.filename().string();
+	if (filename == "DICOMDIR")
+		return;
+
 	DcmFileFormat dfile;
 	OFCondition cond = dfile.loadFile(path.c_str());
 	if (cond.good())
-	{		
+	{
 		OFString patientname, patientid, birthday;
 		OFString studyuid, modality, studydesc, studydate;
 		OFString seriesuid, seriesdesc;
 		OFString sopuid, sopclassuid, transfersyntax;
-				
+
 		dfile.getDataset()->convertToUTF8();
 
 		dfile.getDataset()->findAndGetOFString(DCM_PatientName, patientname);
@@ -106,7 +114,7 @@ void DICOMFileScanner::DoScan(boost::filesystem::path path)
 	// catch any access errors
 	try
 	{
-		ScanDir(path);	
+		ScanDir(path);
 	}
 	catch(...)
 	{
@@ -117,16 +125,17 @@ void DICOMFileScanner::DoScan(boost::filesystem::path path)
 
 void DICOMFileScanner::ScanDir(boost::filesystem::path path)
 {
-	boost::filesystem::path someDir(path);
-	boost::filesystem::directory_iterator end_iter;
+	std::string filename = path.filename().string();
+	//if (filename == "exe")
+	//	return;
 
-	
-	if ( boost::filesystem::exists(path) && boost::filesystem::is_directory(path))
+	boost::filesystem::directory_iterator end_iter;
+	if (boost::filesystem::is_directory(path))
 	{
-		for( boost::filesystem::directory_iterator dir_iter(someDir) ; dir_iter != end_iter ; dir_iter++)
+		for( boost::filesystem::directory_iterator dir_iter(path) ; dir_iter != end_iter ; dir_iter++)
 		{
 			if(IsCanceled())
-			{			
+			{
 				break;
 			}
 
@@ -142,7 +151,6 @@ void DICOMFileScanner::ScanDir(boost::filesystem::path path)
 		}
 	}	
 }
-
 
 void DICOMFileScanner::Cancel()
 {
