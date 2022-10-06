@@ -39,15 +39,26 @@ DICOMFileScanner::~DICOMFileScanner()
 void DICOMFileScanner::ScanFile(boost::filesystem::path path)
 {
 	std::string extension = path.extension().string();
-	if (extension == "exe" || extension == "dll")
-		return;
+	std::transform(extension.begin(), extension.end(), extension.begin(),
+		[](unsigned char c) { return std::tolower(c); });
+
+	if (!extension.empty() && extension != "dcm")
+	{
+		if (extension == "exe" ||
+			extension == "dll" ||
+			extension == "jpg" ||
+			extension == "bmp" ||
+			extension == "mdb" ||
+			extension == "zip")
+			return;
+	}
 
 	std::string filename = path.filename().string();
 	if (filename == "DICOMDIR")
 		return;
 
 	DcmFileFormat dfile;
-	OFCondition cond = dfile.loadFile(path.c_str());
+	OFCondition cond = dfile.loadFileUntilTag(path.c_str(), EXS_Unknown, EGL_noChange, 4096UL, ERM_autoDetect, DCM_InstanceNumber);
 	if (cond.good())
 	{
 		OFString patientname, patientid, birthday;
@@ -126,6 +137,9 @@ void DICOMFileScanner::DoScan(boost::filesystem::path path)
 void DICOMFileScanner::ScanDir(boost::filesystem::path path)
 {
 	std::string filename = path.filename().string();
+	std::transform(filename.begin(), filename.end(), filename.begin(),
+		[](unsigned char c) { return std::tolower(c); });
+
 	//if (filename == "exe")
 	//	return;
 
