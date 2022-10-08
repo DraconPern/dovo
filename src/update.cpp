@@ -19,6 +19,7 @@
 #include <wx/platinfo.h>
 
 #include "dovo_updateCheck.h"
+#include <openssl/crypto.h>
 
 // returns true if the application needs to exit
 bool informUserOfUpdate(std::string json)
@@ -80,6 +81,7 @@ void updateChecker()
 {
 	std::string updateinfo;
 	getUpdateJSON(updateinfo);
+	OPENSSL_thread_stop();	// required when static linking OpenSSL
 	wxConfig::Get()->Write("/Settings/UpdateInfo", updateinfo.c_str());	
 }
 
