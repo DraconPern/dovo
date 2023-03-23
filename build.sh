@@ -48,7 +48,7 @@ cmake .. -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=$TYPE -DOpenJPEG_ROOT=$DEVSP
 make -j8 install
 
 cd $DEVSPACE
-[[ -d boost ]] || git clone --branch=boost-1.73.0 --recurse-submodules https://github.com/boostorg/boost.git
+[[ -d boost ]] || git clone --branch=boost-1.81.0 --recurse-submodules https://github.com/boostorg/boost.git
 cd boost
 ./bootstrap.sh
 COMMONb2Flag="-j 4 link=static stage"
