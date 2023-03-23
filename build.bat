@@ -9,7 +9,7 @@ SET DEVSPACE=%CD%
 SET CL=/MP
 SET BOOSTTOOLSET=toolset=msvc
 
-SET GENERATOR=-G "Visual Studio 16 2019" -A x64
+SET GENERATOR=-G "Visual Studio 17 2022" -A x64
 SET OPENSSLFLAG=VC-WIN64A
 SET BOOSTADDRESSMODEL=address-model=64
 
@@ -78,7 +78,7 @@ msbuild /P:Configuration=%TYPE% INSTALL.vcxproj
 if ERRORLEVEL 1 exit /B %ERRORLEVEL%
 
 cd %DEVSPACE%
-git clone --branch=boost-1.73.0 --recurse-submodules https://github.com/boostorg/boost.git
+git clone --branch=boost-1.81.0 --recurse-submodules https://github.com/boostorg/boost.git
 cd boost
 call bootstrap
 SET COMMONb2Flag=%BOOSTTOOLSET% %BOOSTADDRESSMODEL% runtime-link=static define=_BIND_TO_CURRENT_VCLIBS_VERSION=1 -j 4 stage
