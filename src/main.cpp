@@ -9,7 +9,7 @@
 #include "update.h"
 
 // Visual Leak Detector
-#if defined(_WIN32) && defined(_DEBUG) && _MSC_VER >= 1920
+#if defined(_WIN32) && defined(_DEBUG) && _MSC_VER < 1920
 #include <vld.h>
 #endif
 
