@@ -9,7 +9,7 @@
 #include "update.h"
 
 // Visual Leak Detector
-#if defined(_WIN32) && defined(_DEBUG)
+#if defined(_WIN32) && defined(_DEBUG) && _MSC_VER >= 1920
 #include <vld.h>
 #endif
 
@@ -19,7 +19,7 @@
 #include "dcm2img.h"
 #include <boost/asio/ssl.hpp>
 
-class MyApp: public wxApp 
+class MyApp: public wxApp
 {
 public:
 	virtual bool OnInit();
@@ -44,7 +44,7 @@ bool MyApp::OnInit()
 {
 	if (!wxApp::OnInit())
 		return false;
-		
+
 	wxTheApp->SetAppName("dovo");
 	wxTheApp->SetVendorName("FrontMotion");
 
