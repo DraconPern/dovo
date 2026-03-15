@@ -1,6 +1,4 @@
-cmake_minimum_required(VERSION 3.15)
-
-cmake_policy(SET CMP0048 NEW)
+cmake_minimum_required(VERSION 3.31)
 
 project(dovo VERSION 1.0.20)
 
@@ -26,7 +24,7 @@ set(Boost_USE_MULTITHREADED      ON)
 if(WIN32 OR APPLE)
   set(Boost_USE_STATIC_RUNTIME     ON)
 endif()
-find_package(Boost CONFIG 1.88.0 COMPONENTS headers thread filesystem system regex date_time locale)
+find_package(Boost REQUIRED COMPONENTS headers thread filesystem system regex date_time locale)
 
 if(WIN32)
   #enable dcmtk filename to have wide version, only affects WIN32.  http://utf8everywhere.org/

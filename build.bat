@@ -68,16 +68,16 @@ if ERRORLEVEL 1 exit /B %ERRORLEVEL%
 
 cd %DEVSPACE%
 git clone --branch=boost-1.88.0 --recurse-submodules %GITHUBURL%/boostorg/boost.git
+set Boost_DIR=%DEVSPACE%\boost\stage\lib\cmake\Boost-1.88.0
 cd boost
 call bootstrap
 SET BOOSTTOOLSET=toolset=msvc
 SET BOOSTADDRESSMODEL=address-model=64
 SET COMMONb2Flag=%BOOSTTOOLSET% %BOOSTADDRESSMODEL% runtime-link=static define=_BIND_TO_CURRENT_VCLIBS_VERSION=1 -j 4 stage
 SET BOOSTmodules=--with-locale --with-atomic --with-thread --with-filesystem --with-system --with-date_time --with-regex
-SET BOOST_ROOT=%DEVSPACE%\boost
+b2 headers
 IF "%TYPE%" == "Release" b2 %COMMONb2Flag% %BOOSTmodules% release
 IF "%TYPE%" == "Debug"   b2 %COMMONb2Flag% %BOOSTmodules% debug
-b2 headers
 
 cd %DEVSPACE%
 git clone --branch=3.2.2-hotfix --recurse-submodule %GITHUBURL%/wxWidgets/wxWidgets.git
@@ -96,7 +96,7 @@ git clone https://github.com/laudrup/boost-wintls.git
 cd %BUILD_DIR%
 mkdir build-%TYPE%
 cd build-%TYPE%
-cmake .. %GENERATOR% -DwxWidgets_ROOT_DIR=%DEVSPACE%\wxWidgets\%TYPE% -DBoost_ROOT=%DEVSPACE%\boost -DDCMTK_ROOT=%DEVSPACE%\dcmtk\%TYPE% -DZLIB_ROOT=%DEVSPACE%\zlib\%TYPE% -Dfmjpeg2k_ROOT=%DEVSPACE%\fmjpeg2koj\%TYPE% -DOpenJPEG_ROOT=%DEVSPACE%\openjpeg\%TYPE%
+cmake .. %GENERATOR% -DwxWidgets_ROOT_DIR=%DEVSPACE%\wxWidgets\%TYPE% -DDCMTK_ROOT=%DEVSPACE%\dcmtk\%TYPE% -DZLIB_ROOT=%DEVSPACE%\zlib\%TYPE% -Dfmjpeg2k_ROOT=%DEVSPACE%\fmjpeg2koj\%TYPE% -DOpenJPEG_ROOT=%DEVSPACE%\openjpeg\%TYPE%
 msbuild /P:Configuration=%TYPE% ALL_BUILD.vcxproj
 if ERRORLEVEL 1 exit /B %ERRORLEVEL%
 
