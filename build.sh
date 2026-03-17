@@ -32,7 +32,7 @@ export OPENSSL_ROOT_DIR=$DEVSPACE/openssl/$TYPE
 fi
 
 cd $DEVSPACE
-[[ -d dcmtk ]] || git clone --branch=DCMTK-3.6.5 $githuburl/DCMTK/dcmtk.git
+[[ -d dcmtk ]] || git clone --branch=DCMTK-3.7.0 $githuburl/DCMTK/dcmtk.git
 cd dcmtk
 mkdir -p build-$TYPE
 cd build-$TYPE
