@@ -137,7 +137,7 @@ target_link_libraries(dovo
   ${OPENJPEG_LIBRARIES}
   ${ZLIB_LIBRARIES}
   ${LIBICONV_LIBRARIES}
-  ${DCMTK_LIBRARIES}
+  DCMTK::DCMTK
   ${wxWidgets_LIBRARIES}
   Boost::thread
   Boost::filesystem
