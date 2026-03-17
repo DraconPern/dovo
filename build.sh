@@ -57,7 +57,7 @@ make -j8 install
 
 cd $DEVSPACE
 [[ -d boost ]] || git clone --branch=boost-1.88.0 --recurse-submodules $githuburl/boostorg/boost.git
-Boost_DIR=$DEVSPACE/boost/stage/lib/cmake/Boost-1.88.0
+export Boost_DIR=$DEVSPACE/boost/stage/lib/cmake/Boost-1.88.0
 cd boost
 ./bootstrap.sh
 COMMONb2Flag="-j 4 link=static stage"
