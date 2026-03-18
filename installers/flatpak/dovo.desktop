@@ -4,6 +4,6 @@ StartupWMClass=dovo
 Comment=DICOM CD Importer
 GenericName=DICOM
 Exec=dovo
-Icon=dovo
+Icon=com.draconpern.dovo
 Type=Application
 Categories=Utility
