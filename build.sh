@@ -77,15 +77,8 @@ fi
 cd $DEVSPACE
 [[ -d wxWidgets ]] || git clone --branch=v3.3.2 --recurse-submodules $githuburl/wxWidgets/wxWidgets.git
 cd wxWidgets
-mkdir -p $TYPE
-cd $TYPE
-COMMONwxWidgetsFlag=(--disable-shared --enable-utf8)
-if [ "$TYPE" = "Release" ] ; then
-  ../configure "${COMMONwxWidgetsFlag[@]}"
-elif [ "$TYPE" = "Debug" ] ; then
-  ../configure "${COMMONwxWidgetsFlag[@]}" --enable-debug
-fi
-make -j8
+cmake .. -DwxBUILD_SHARED=OFF -DCMAKE_BUILD_TYPE=$TYPE -DCMAKE_INSTALL_PREFIX=$DEVSPACE/wxWidgets/$TYPE
+make -j8 install
 
 cd $BUILD_DIR
 mkdir -p build-$TYPE
