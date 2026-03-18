@@ -1,0 +1,50 @@
+id: com.draconpern.dovo
+runtime: org.gnome.Platform
+runtime-version: '49'
+sdk: org.gnome.Sdk
+command: dovo
+modules:
+  - name: dovo
+    buildsystem: simple
+    build-commands:
+      - ./build.sh Release localgit 
+      - install -Dm644 installers/deb/dovo.png ${FLATPAK_DEST}/share/icons/hicolor/256x256/apps/${FLATPAK_ID}.png
+      - install -Dm644 installers/flatpak/dovo.desktop ${FLATPAK_DEST}/share/applications/${FLATPAK_ID}.desktop
+      - install -Dm755 build-Release/dovo /app/bin/dovo
+    sources:
+      - type: git
+        url: http://gitcache:8080/github.com/DraconPern/dovo.git
+        branch: dev
+      - type: git
+        url: http://gitcache:8080/github.com/DCMTK/dcmtk.git
+        tag: DCMTK-3.6.9
+        dest: dcmtk
+      - type: git
+        url: http://gitcache:8080/github.com/uclouvain/openjpeg.git
+        dest: openjpeg
+      - type: git
+        url: http://gitcache:8080/github.com/DraconPern/fmjpeg2koj.git
+        branch: master
+        dest: fmjpeg2koj
+      - type: git
+        url: http://gitcache:8080/github.com/boostorg/boost.git
+        branch: boost-1.88.0
+        dest: boost
+      - type: git
+        url: http://gitcache:8080/github.com/wxWidgets/wxWidgets.git
+        branch: 3.2.2-hotfix
+        dest: wxWidgets
+    cleanup:
+        - /dcmtk
+        - /fmjpeg2koj
+        - /boost
+        - /wxWidgets
+finish-args:
+    - --share=ipc
+    - --share=network
+    - --socket=wayland
+    - --socket=fallback-x11
+    - --device=dri
+    - --filesystem=host
+    - --filesystem=xdg-config/gtk-3.0:ro
+    - --talk-name=org.freedesktop.FileManager1
