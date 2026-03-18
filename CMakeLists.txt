@@ -122,7 +122,7 @@ if(WIN32)
 else()
   if(APPLE)
   else()
-    SET(OS_SPECIFIC_LIBS dl crypto)
+    SET(OS_SPECIFIC_LIBS dl crypto ssl)
   endif()
 endif()
 
