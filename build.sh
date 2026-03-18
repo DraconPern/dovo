@@ -39,6 +39,7 @@ cd build-$TYPE
 cmake .. -DCMAKE_BUILD_TYPE=$TYPE -DDCMTK_ENABLE_CXX11=ON -DDCMTK_ENABLE_STL=ON -DDCMTK_WIDE_CHAR_FILE_IO_FUNCTIONS=1 -DDCMTK_ENABLE_BUILTIN_DICTIONARY=1 -DDCMTK_WITH_TIFF=OFF -DDCMTK_WITH_PNG=OFF -DDCMTK_WITH_OPENSSL=OFF -DDCMTK_WITH_XML=OFF -DDCMTK_WITH_ZLIB=ON -DDCMTK_WITH_SNDFILE=OFF -DDCMTK_WITH_ICONV=ON -DDCMTK_WITH_WRAP=OFF -DCMAKE_INSTALL_PREFIX=$DEVSPACE/dcmtk/$TYPE
 make -j8 install
 
+if [ "$unamestr" == 'Darwin' ] ; then
 cd $DEVSPACE
 [[ -d openjpeg ]] || git clone --branch=v2.4.0 --single-branch --depth 1 $githuburl/uclouvain/openjpeg.git
 cd openjpeg
@@ -46,6 +47,8 @@ mkdir -p build-$TYPE
 cd build-$TYPE
 cmake .. -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=$TYPE -DCMAKE_INSTALL_PREFIX=$DEVSPACE/openjpeg/$TYPE
 make -j8 install
+# [ "$unamestr" == 'Darwin' ]
+fi
 
 cd $DEVSPACE
 [[ -d fmjpeg2koj ]] || git clone --branch=master $githuburl/DraconPern/fmjpeg2koj.git
