@@ -122,7 +122,7 @@ if(WIN32)
 else()
   if(APPLE)
   else()
-    SET(OS_SPECIFIC_LIBS dl)
+    SET(OS_SPECIFIC_LIBS dl crypto)
   endif()
 endif()
 
@@ -147,12 +147,6 @@ target_link_libraries(dovo
   Boost::locale	
   ${OS_SPECIFIC_LIBS}
   )
-
-if(LINUX)
-target_link_libraries(dovo
-  ${OPENSSL_LIBRARIES}
-)
-endif()
 
 configure_file("installers/wix/Product.wxs.in" "${CMAKE_CURRENT_SOURCE_DIR}/installers/wix/Product.wxs")
 configure_file("installers/deb/control.in" "${CMAKE_CURRENT_SOURCE_DIR}/installers/deb/control")
