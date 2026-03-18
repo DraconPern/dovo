@@ -25,7 +25,7 @@ cmake.exe .. -G %GENERATOR% -DCMAKE_MSVC_RUNTIME_LIBRARY="MultiThreaded$<$<CONFI
 msbuild /P:Configuration=%TYPE% INSTALL.vcxproj
 if ERRORLEVEL 1 exit /B %ERRORLEVEL%
 IF "%TYPE%" == "Release" copy /Y %DEVSPACE%\zlib\Release\lib\zs.lib %DEVSPACE%\zlib\Release\lib\zlib_o.lib
-IF "%TYPE%" == "Debug"   copy /Y %DEVSPACE%\zlib\Debug\lib\zlibstaticd.lib %DEVSPACE%\zlib\Debug\lib\zlib_d.lib
+IF "%TYPE%" == "Debug"   copy /Y %DEVSPACE%\zlib\Debug\lib\zsd.lib %DEVSPACE%\zlib\Debug\lib\zlib_d.lib
 
 cd %DEVSPACE%
 git clone %GITHUBURL%/DraconPern/libiconv-cmake.git
