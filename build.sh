@@ -47,7 +47,10 @@ mkdir -p build-$TYPE
 cd build-$TYPE
 cmake .. -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=$TYPE -DCMAKE_INSTALL_PREFIX=$DEVSPACE/openjpeg/$TYPE
 make -j8 install
+export OPENJPEG_CMAKEARG=-DOpenJPEG_ROOT=$DEVSPACE/openjpeg/$TYPE
 # [ "$unamestr" == 'Darwin' ]
+else
+export OPENJPEG_CMAKEARG=
 fi
 
 cd $DEVSPACE
@@ -55,7 +58,7 @@ cd $DEVSPACE
 cd fmjpeg2koj
 mkdir -p build-$TYPE
 cd build-$TYPE
-cmake .. -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=$TYPE -DOpenJPEG_ROOT=$DEVSPACE/openjpeg/$TYPE -DDCMTK_ROOT=$DEVSPACE/dcmtk/$TYPE -DCMAKE_INSTALL_PREFIX=$DEVSPACE/fmjpeg2koj/$TYPE
+cmake .. -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=$TYPE $OPENJPEG_CMAKEARG -DDCMTK_ROOT=$DEVSPACE/dcmtk/$TYPE -DCMAKE_INSTALL_PREFIX=$DEVSPACE/fmjpeg2koj/$TYPE
 make -j8 install
 
 cd $DEVSPACE
@@ -87,5 +90,5 @@ make -j8
 cd $BUILD_DIR
 mkdir -p build-$TYPE
 cd build-$TYPE
-cmake .. -DCMAKE_BUILD_TYPE=$TYPE -DwxWidgets_CONFIG_EXECUTABLE=$DEVSPACE/wxWidgets/build$TYPE/wx-config -DDCMTK_ROOT=$DEVSPACE/dcmtk/$TYPE -Dfmjpeg2k_ROOT=$DEVSPACE/fmjpeg2koj/$TYPE -DOpenJPEG_ROOT=$DEVSPACE/openjpeg/$TYPE -DZLIB_LIBRARY=/usr/lib/x86_64-linux-gnu/libz.so
+cmake .. -DCMAKE_BUILD_TYPE=$TYPE -DwxWidgets_CONFIG_EXECUTABLE=$DEVSPACE/wxWidgets/build$TYPE/wx-config -DDCMTK_ROOT=$DEVSPACE/dcmtk/$TYPE -Dfmjpeg2k_ROOT=$DEVSPACE/fmjpeg2koj/$TYPE $OPENJPEG_CMAKEARG -DZLIB_LIBRARY=/usr/lib/x86_64-linux-gnu/libz.so
 make -j8
