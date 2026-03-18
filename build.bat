@@ -80,7 +80,7 @@ IF "%TYPE%" == "Release" b2 %COMMONb2Flag% %BOOSTmodules% release
 IF "%TYPE%" == "Debug"   b2 %COMMONb2Flag% %BOOSTmodules% debug
 
 cd %DEVSPACE%
-git clone --branch=3.2.2-hotfix --recurse-submodule %GITHUBURL%/wxWidgets/wxWidgets.git
+git clone --branch=v3.3.2 --recurse-submodule %GITHUBURL%/wxWidgets/wxWidgets.git
 cd wxWidgets
 mkdir build-%TYPE%
 cd build-%TYPE%

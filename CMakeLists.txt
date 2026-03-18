@@ -53,8 +53,7 @@ endif()
 set(wxWidgets_USE_STATIC   ON)
 #define this so that wxWidgets doesn't define it. Conflicts w/ dcmtk's declaration
 #add_definitions(-DHAVE_SSIZE_T)
-find_package(wxWidgets COMPONENTS core base adv REQUIRED)
-include(${wxWidgets_USE_FILE})
+find_package(wxWidgets CONFIG REQUIRED COMPONENTS core base adv)
 
 set(dovo_HEADERS
   src/gui.h
