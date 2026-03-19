@@ -84,9 +84,7 @@ git clone --branch=v3.3.2 --recurse-submodule %GITHUBURL%/wxWidgets/wxWidgets.gi
 cd wxWidgets
 mkdir build-%TYPE%
 cd build-%TYPE%
-cmake .. -G %GENERATOR% -DwxBUILD_SHARED=FALSE -DwxUSE_ZLIB=OFF -DwxUSE_LIBTIFF=OFF -DwxUSE_LIBPNG=OFF -DwxUSE_ARTPROVIDER_TANGO=OFF -DwxUSE_SVG=OFF -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\wxWidgets\%TYPE%
-powershell "gci . *.vcxproj -recurse | ForEach { (Get-Content $_.FullName | ForEach {$_ -replace 'MultiThreadedDebugDLL', 'MultiThreadedDebug'}) | Set-Content $_.FullName }"
-powershell "gci . *.vcxproj -recurse | ForEach { (Get-Content $_.FullName | ForEach {$_ -replace 'MultiThreadedDLL', 'MultiThreaded'}) | Set-Content $_.FullName }"
+cmake .. -G %GENERATOR% -DwxBUILD_SHARED=FALSE -DwxBUILD_USE_STATIC_RUNTIME=TRUE -DwxUSE_ZLIB=OFF -DwxUSE_LIBTIFF=OFF -DwxUSE_LIBPNG=OFF -DwxUSE_ARTPROVIDER_TANGO=OFF -DwxUSE_SVG=OFF -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\wxWidgets\%TYPE%
 msbuild /P:Configuration=%TYPE% INSTALL.vcxproj
 if ERRORLEVEL 1 exit /B %ERRORLEVEL%
 
