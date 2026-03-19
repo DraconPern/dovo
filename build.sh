@@ -77,6 +77,8 @@ fi
 cd $DEVSPACE
 [[ -d wxWidgets ]] || git clone --branch=v3.3.2 --recurse-submodules $githuburl/wxWidgets/wxWidgets.git
 cd wxWidgets
+mkdir -p build-$TYPE
+cd build-$TYPE
 cmake .. -DwxBUILD_SHARED=OFF -DCMAKE_BUILD_TYPE=$TYPE -DCMAKE_INSTALL_PREFIX=$DEVSPACE/wxWidgets/$TYPE
 make -j8 install
 
