@@ -30,7 +30,6 @@ if(WIN32)
   #enable dcmtk filename to have wide version, only affects WIN32.  http://utf8everywhere.org/
   add_definitions(-DDCMTK_WIDE_CHAR_FILE_IO_FUNCTIONS=1)
 endif()
-list(APPEND CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/dcmtk")
 find_package(DCMTK REQUIRED CONFIG)
 
 #include zlib
@@ -54,6 +53,7 @@ set(wxWidgets_USE_STATIC   ON)
 #define this so that wxWidgets doesn't define it. Conflicts w/ dcmtk's declaration
 #add_definitions(-DHAVE_SSIZE_T)
 find_package(wxWidgets CONFIG REQUIRED COMPONENTS core base adv)
+include(UsewxWidgets)
 
 set(dovo_HEADERS
   src/gui.h
@@ -137,7 +137,7 @@ target_link_libraries(dovo
   ${ZLIB_LIBRARIES}
   ${LIBICONV_LIBRARIES}
   DCMTK::DCMTK
-  ${wxWidgets_LIBRARIES}
+  wxWidgets::wxWidgets
   Boost::thread
   Boost::filesystem
   Boost::system
