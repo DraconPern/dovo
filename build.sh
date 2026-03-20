@@ -85,5 +85,5 @@ make -j8 install
 cd $BUILD_DIR
 mkdir -p build-$TYPE
 cd build-$TYPE
-cmake .. -DCMAKE_BUILD_TYPE=$TYPE -DwxWidgets_DIR=$DEVSPACE/wxWidgets/$TYPE/lib64/cmake/wxWidgets-3.3 -DDCMTK_DIR=$DEVSPACE/dcmtk/$TYPE/lib64/cmake/dcmtk -Dfmjpeg2k_ROOT=$DEVSPACE/fmjpeg2koj/$TYPE $OPENJPEG_CMAKEARG -DZLIB_LIBRARY=/usr/lib/x86_64-linux-gnu/libz.so
+cmake .. -DCMAKE_BUILD_TYPE=$TYPE -DwxWidgets_DIR=$DEVSPACE/wxWidgets/$TYPE/lib64/cmake/wxWidgets-3.2 -DDCMTK_DIR=$DEVSPACE/dcmtk/$TYPE/lib64/cmake/dcmtk -Dfmjpeg2k_ROOT=$DEVSPACE/fmjpeg2koj/$TYPE $OPENJPEG_CMAKEARG -DZLIB_LIBRARY=/usr/lib/x86_64-linux-gnu/libz.so
 make -j8

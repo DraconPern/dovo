@@ -7,7 +7,7 @@ modules:
   - name: dovo
     buildsystem: simple
     build-commands:
-      - ./build.sh Release localgit 
+      - ./build.sh Release localgit
       - install -Dm644 installers/deb/dovo.png ${FLATPAK_DEST}/share/icons/hicolor/256x256/apps/${FLATPAK_ID}.png
       - install -Dm644 installers/flatpak/dovo.desktop ${FLATPAK_DEST}/share/applications/${FLATPAK_ID}.desktop
       - install -Dm755 build-Release/dovo /app/bin/dovo
