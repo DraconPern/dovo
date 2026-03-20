@@ -32,7 +32,7 @@ modules:
         dest: boost
       - type: git
         url: http://gitcache:8080/github.com/wxWidgets/wxWidgets.git
-        branch: v3.3.2
+        branch: v3.2.10
         dest: wxWidgets
     cleanup:
         - /dcmtk

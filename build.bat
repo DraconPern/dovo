@@ -80,7 +80,7 @@ IF "%TYPE%" == "Release" b2 %COMMONb2Flag% %BOOSTmodules% release
 IF "%TYPE%" == "Debug"   b2 %COMMONb2Flag% %BOOSTmodules% debug
 
 cd %DEVSPACE%
-git clone --branch=v3.3.2 --recurse-submodule %GITHUBURL%/wxWidgets/wxWidgets.git
+git clone --branch=v3.2.10 --recurse-submodule %GITHUBURL%/wxWidgets/wxWidgets.git
 cd wxWidgets
 mkdir build-%TYPE%
 cd build-%TYPE%
@@ -94,7 +94,7 @@ git clone https://github.com/laudrup/boost-wintls.git
 cd %BUILD_DIR%
 mkdir build-%TYPE%
 cd build-%TYPE%
-cmake .. -G %GENERATOR% -DwxWidgets_DIR=%DEVSPACE%\wxWidgets\%TYPE%\lib\cmake\wxWidgets-3.3 -DDCMTK_ROOT=%DEVSPACE%\dcmtk\%TYPE% -DZLIB_ROOT=%DEVSPACE%\zlib\%TYPE% -Dfmjpeg2k_ROOT=%DEVSPACE%\fmjpeg2koj\%TYPE% -DOpenJPEG_ROOT=%DEVSPACE%\openjpeg\%TYPE%
+cmake .. -G %GENERATOR% -DwxWidgets_DIR=%DEVSPACE%\wxWidgets\%TYPE%\lib\cmake\wxWidgets-3.2-DDCMTK_ROOT=%DEVSPACE%\dcmtk\%TYPE% -DZLIB_ROOT=%DEVSPACE%\zlib\%TYPE% -Dfmjpeg2k_ROOT=%DEVSPACE%\fmjpeg2koj\%TYPE% -DOpenJPEG_ROOT=%DEVSPACE%\openjpeg\%TYPE%
 msbuild /P:Configuration=%TYPE% ALL_BUILD.vcxproj
 if ERRORLEVEL 1 exit /B %ERRORLEVEL%
 
