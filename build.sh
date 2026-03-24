@@ -38,8 +38,8 @@ mkdir -p build-$TYPE
 cd build-$TYPE
 cmake .. -DCMAKE_BUILD_TYPE=$TYPE -DDCMTK_ENABLE_CXX11=ON -DDCMTK_ENABLE_STL=ON -DDCMTK_WIDE_CHAR_FILE_IO_FUNCTIONS=1 -DDCMTK_ENABLE_BUILTIN_DICTIONARY=1 -DDCMTK_WITH_TIFF=OFF -DDCMTK_WITH_PNG=OFF -DDCMTK_WITH_OPENSSL=OFF -DDCMTK_WITH_XML=OFF -DDCMTK_WITH_ZLIB=ON -DDCMTK_WITH_SNDFILE=OFF -DDCMTK_WITH_ICONV=ON -DDCMTK_WITH_WRAP=OFF -DCMAKE_INSTALL_PREFIX=$DEVSPACE/dcmtk/$TYPE
 make -j8 install
+export CMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH:$DEVSPACE/dcmtk/$TYPE
 
-#if [ "$unamestr" == 'Darwin' ] ; then
 cd $DEVSPACE
 [[ -d openjpeg ]] || git clone --branch=v2.4.0 --single-branch --depth 1 $githuburl/uclouvain/openjpeg.git
 cd openjpeg
@@ -47,11 +47,7 @@ mkdir -p build-$TYPE
 cd build-$TYPE
 cmake .. -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=$TYPE -DCMAKE_INSTALL_PREFIX=$DEVSPACE/openjpeg/$TYPE
 make -j8 install
-export OPENJPEG_CMAKEARG=-DOpenJPEG_ROOT=$DEVSPACE/openjpeg/$TYPE
-# [ "$unamestr" == 'Darwin' ]
-#else
-#export OPENJPEG_CMAKEARG=-DOPENJPEG_LIBRARY=/usr/lib/x86_64-linux-gnu/openjpeg.so
-#fi
+export CMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH:$DEVSPACE/openjpeg/$TYPE
 
 cd $DEVSPACE
 [[ -d fmjpeg2koj ]] || git clone --branch=master $githuburl/DraconPern/fmjpeg2koj.git
@@ -60,6 +56,7 @@ mkdir -p build-$TYPE
 cd build-$TYPE
 cmake .. -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=$TYPE $OPENJPEG_CMAKEARG -DDCMTK_ROOT=$DEVSPACE/dcmtk/$TYPE -DCMAKE_INSTALL_PREFIX=$DEVSPACE/fmjpeg2koj/$TYPE
 make -j8 install
+export CMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH:$DEVSPACE/fmjpeg2koj/$TYPE
 
 cd $DEVSPACE
 [[ -d boost ]] || git clone --branch=boost-1.88.0 --recurse-submodules $githuburl/boostorg/boost.git
@@ -81,9 +78,10 @@ mkdir -p build-$TYPE
 cd build-$TYPE
 cmake .. -DwxBUILD_SHARED=OFF -DCMAKE_BUILD_TYPE=$TYPE -DCMAKE_INSTALL_PREFIX=$DEVSPACE/wxWidgets/$TYPE
 make -j8 install
+export CMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH:$DEVSPACE/wxWidgets/$TYPE
 
 cd $BUILD_DIR
 mkdir -p build-$TYPE
 cd build-$TYPE
-cmake .. -DCMAKE_BUILD_TYPE=$TYPE -DwxWidgets_DIR=$DEVSPACE/wxWidgets/$TYPE/lib64/cmake/wxWidgets-3.2 -DDCMTK_DIR=$DEVSPACE/dcmtk/$TYPE/lib64/cmake/dcmtk -Dfmjpeg2k_ROOT=$DEVSPACE/fmjpeg2koj/$TYPE $OPENJPEG_CMAKEARG -DZLIB_LIBRARY=/usr/lib/x86_64-linux-gnu/libz.so
+cmake .. -DCMAKE_BUILD_TYPE=$TYPE
 make -j8

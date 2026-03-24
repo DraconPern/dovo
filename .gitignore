@@ -17,3 +17,5 @@ installers/wix/obj
 installers/wix/Product.wxs
 installers/deb/control
 /.vscode
+installers/flatpak/.flatpak-builder/
+installers/flatpak/repo/
