@@ -26,6 +26,7 @@ msbuild /P:Configuration=%TYPE% INSTALL.vcxproj
 if ERRORLEVEL 1 exit /B %ERRORLEVEL%
 IF "%TYPE%" == "Release" copy /Y %DEVSPACE%\zlib\Release\lib\zs.lib %DEVSPACE%\zlib\Release\lib\zlib_o.lib
 IF "%TYPE%" == "Debug"   copy /Y %DEVSPACE%\zlib\Debug\lib\zsd.lib %DEVSPACE%\zlib\Debug\lib\zlib_d.lib
+set CMAKE_PREFIX_PATH=%CMAKE_PREFIX_PATH%;%DEVSPACE%/zlib/%TYPE%
 
 cd %DEVSPACE%
 git clone %GITHUBURL%/DraconPern/libiconv-cmake.git
@@ -47,15 +48,17 @@ cd build-%TYPE%
 cmake .. -G %GENERATOR% -DDCMTK_WIDE_CHAR_FILE_IO_FUNCTIONS=1 -DCMAKE_CXX_FLAGS_RELEASE="/Zi" -DDCMTK_WITH_ZLIB=1 -DDCMTK_WITH_OPENSSL=0 -DWITH_ZLIBINC=%DEVSPACE%\zlib\%TYPE% -DDCMTK_WITH_ICONV=1 -DWITH_LIBICONVINC=%DEVSPACE%\libiconv\%TYPE% -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\dcmtk\%TYPE%
 msbuild /P:Configuration=%TYPE% INSTALL.vcxproj
 if ERRORLEVEL 1 exit /B %ERRORLEVEL%
+set CMAKE_PREFIX_PATH=%CMAKE_PREFIX_PATH%;%DEVSPACE%/dcmtk/%TYPE%
 
 cd %DEVSPACE%
-git clone --branch=v2.4.0 --single-branch --depth 1 %GITHUBURL%/uclouvain/openjpeg.git
+git clone --branch=v2.5.2 --single-branch --depth 1 %GITHUBURL%/uclouvain/openjpeg.git
 cd openjpeg
 mkdir build-%TYPE%
 cd build-%TYPE%
 cmake .. -G %GENERATOR% -DBUILD_THIRDPARTY=ON -DBUILD_SHARED_LIBS=OFF -DCMAKE_C_FLAGS_RELEASE="/MT /O2" -DCMAKE_C_FLAGS_DEBUG="/MTd /Od" -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\openjpeg\%TYPE%
 msbuild /P:Configuration=%TYPE% INSTALL.vcxproj
 if ERRORLEVEL 1 exit /B %ERRORLEVEL%
+set CMAKE_PREFIX_PATH=%CMAKE_PREFIX_PATH%;%DEVSPACE%/openjpeg/%TYPE%
 
 cd %DEVSPACE%
 git clone --branch=master %GITHUBURL%/DraconPern/fmjpeg2koj.git
@@ -65,6 +68,7 @@ cd build-%TYPE%
 cmake .. -G %GENERATOR% -DBUILD_SHARED_LIBS=OFF -DCMAKE_CXX_FLAGS_RELEASE="/MT /O2" -DCMAKE_CXX_FLAGS_DEBUG="/MTd /Od" -DOpenJPEG_ROOT=%DEVSPACE%\openjpeg\%TYPE% -DDCMTK_ROOT=%DEVSPACE%\dcmtk\%TYPE% -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\fmjpeg2koj\%TYPE%
 msbuild /P:Configuration=%TYPE% INSTALL.vcxproj
 if ERRORLEVEL 1 exit /B %ERRORLEVEL%
+set CMAKE_PREFIX_PATH=%CMAKE_PREFIX_PATH%;%DEVSPACE%/fmjpeg2koj/%TYPE%
 
 cd %DEVSPACE%
 git clone --branch=boost-1.88.0 --recurse-submodules %GITHUBURL%/boostorg/boost.git
@@ -87,6 +91,7 @@ cd build-%TYPE%
 cmake .. -G %GENERATOR% -DwxBUILD_SHARED=FALSE -DwxBUILD_USE_STATIC_RUNTIME=TRUE -DwxUSE_ZLIB=OFF -DwxUSE_LIBTIFF=OFF -DwxUSE_LIBPNG=OFF -DwxUSE_ARTPROVIDER_TANGO=OFF -DwxUSE_SVG=OFF -DCMAKE_INSTALL_PREFIX=%DEVSPACE%\wxWidgets\%TYPE%
 msbuild /P:Configuration=%TYPE% INSTALL.vcxproj
 if ERRORLEVEL 1 exit /B %ERRORLEVEL%
+set CMAKE_PREFIX_PATH=%CMAKE_PREFIX_PATH%;%DEVSPACE%/wxWidgets/%TYPE%
 
 cd %DEVSPACE%
 git clone https://github.com/laudrup/boost-wintls.git
@@ -94,7 +99,7 @@ git clone https://github.com/laudrup/boost-wintls.git
 cd %BUILD_DIR%
 mkdir build-%TYPE%
 cd build-%TYPE%
-cmake .. -G %GENERATOR% -DwxWidgets_DIR=%DEVSPACE%\wxWidgets\%TYPE%\lib\cmake\wxWidgets-3.2-DDCMTK_ROOT=%DEVSPACE%\dcmtk\%TYPE% -DZLIB_ROOT=%DEVSPACE%\zlib\%TYPE% -Dfmjpeg2k_ROOT=%DEVSPACE%\fmjpeg2koj\%TYPE% -DOpenJPEG_ROOT=%DEVSPACE%\openjpeg\%TYPE%
+cmake .. -G %GENERATOR%
 msbuild /P:Configuration=%TYPE% ALL_BUILD.vcxproj
 if ERRORLEVEL 1 exit /B %ERRORLEVEL%
 
