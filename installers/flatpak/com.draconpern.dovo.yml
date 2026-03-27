@@ -21,6 +21,7 @@ modules:
         dest: dcmtk
       - type: git
         url: http://gitcache:8080/github.com/uclouvain/openjpeg.git
+        branch: v2.5.4
         dest: openjpeg
       - type: git
         url: http://gitcache:8080/github.com/DraconPern/fmjpeg2koj.git

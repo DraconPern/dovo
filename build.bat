@@ -51,7 +51,7 @@ if ERRORLEVEL 1 exit /B %ERRORLEVEL%
 set CMAKE_PREFIX_PATH=%CMAKE_PREFIX_PATH%;%DEVSPACE%/dcmtk/%TYPE%
 
 cd %DEVSPACE%
-git clone --branch=v2.5.2 --single-branch --depth 1 %GITHUBURL%/uclouvain/openjpeg.git
+git clone --branch=v2.5.4 --single-branch --depth 1 %GITHUBURL%/uclouvain/openjpeg.git
 cd openjpeg
 mkdir build-%TYPE%
 cd build-%TYPE%
