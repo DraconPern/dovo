@@ -83,5 +83,5 @@ export CMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH:$DEVSPACE/wxWidgets/$TYPE
 cd $BUILD_DIR
 mkdir -p build-$TYPE
 cd build-$TYPE
-cmake .. -DCMAKE_BUILD_TYPE=$TYPE
+cmake .. -DCMAKE_BUILD_TYPE=$TYPE -DZLIB_LIBRARY=/usr/lib/x86_64-linux-gnu/libz.so  # zlib for flatpak
 make -j8
