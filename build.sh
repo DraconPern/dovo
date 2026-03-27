@@ -41,7 +41,7 @@ make -j8 install
 export CMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH:$DEVSPACE/dcmtk/$TYPE
 
 cd $DEVSPACE
-[[ -d openjpeg ]] || git clone --branch=v2.4.0 --single-branch --depth 1 $githuburl/uclouvain/openjpeg.git
+[[ -d openjpeg ]] || git clone --branch=v2.5.2 --single-branch --depth 1 $githuburl/uclouvain/openjpeg.git
 cd openjpeg
 mkdir -p build-$TYPE
 cd build-$TYPE
