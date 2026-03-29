@@ -10,7 +10,8 @@ modules:
       - ./build.sh Release localgit
       - install -Dm644 installers/deb/dovo.png ${FLATPAK_DEST}/share/icons/hicolor/256x256/apps/${FLATPAK_ID}.png
       - install -Dm644 installers/flatpak/dovo.desktop ${FLATPAK_DEST}/share/applications/${FLATPAK_ID}.desktop
-      - install -Dm755 build-Release/dovo /app/bin/dovo
+      - install -Dm644 installers/flatpak/com.draconpern.dovo.metainfo.xml ${FLATPAK_DEST}/share/metainfo/com.draconpern.dovo.metainfo.xml
+      - install -Dm755 build-Release/dovo ${FLATPAK_DEST}/bin/dovo
     sources:
       - type: git
         url: http://gitcache:8080/github.com/DraconPern/dovo.git

@@ -19,3 +19,4 @@ installers/deb/control
 /.vscode
 installers/flatpak/.flatpak-builder/
 installers/flatpak/repo/
+installers/flatpak/builddir/
